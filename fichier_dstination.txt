@@ -1,0 +1,19 @@
+ TRAME :0
+---------
+
+couche ethernet:
+----------------
+	source : 0c: 8d: db: 1a: 1e: 88
+	destination : f0: 18: 98: 59: ae: 32
+	type: 0x0800 (IPv4)
+
+couche IP :
+-----------
+	Version : 4
+	Longueur header (IHL) : 20 (5)
+	Differentiated Services Codepoint: 0
+	Explicit Congestion Notification: 0
+	longueur totale: 490
+	Identification; 0xe78d (59277)
+	flags :0x4000
+
