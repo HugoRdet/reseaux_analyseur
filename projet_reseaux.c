@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define val_byte_1(x) ( (int) (x/16.0) )
+#define val_byte_0(x) ( x%16 )
+
+
 //renvoie la valeur décimale d'un caractère 
 int val_exa_int(char c){
 	unsigned int val=(int) c;
@@ -131,14 +135,14 @@ static inline int charge_ligne(FILE *fichier_source,unsigned int tab[16]){
 
 
 void afficher_tableau(unsigned int tab[16]){
-	for (int i=0;i<16;i++){
+	for (int i=0;i<16;++i){
 		printf("%.2x ",tab[i]);
 	}
 	printf("\n");
 }
 
 //renvoie x a la puissance n
-static inline double pow(double x,int n){
+static inline double pow(double x,unsigned int n){
 	double acc=1.0;
 	for (int i=0;i<n;i++){
 		acc*=x;
@@ -146,13 +150,17 @@ static inline double pow(double x,int n){
 	return acc;
 } 
 
-static inline int val_n_ieme_bit2(int nombre,int numero){
-	if (numero==1){
-		return (int) nombre/pow(16.0,numero);
-	}else{
-		return nombre%16;
-	}
+//on va travailler sur des hexadecimaux.
+//il y a donc 4 bits.
+//on aurait pu faire une fonction demandant le nombre de bit dans x
+//mais c'est pas necessaire ici. on a donc n C [0;3]
+unsigned int valeur_n_eme_bit(unsigned int x, int n){
+	return 0;
+	//a completer
 }
+
+
+
 
 //une trame commence a la ligne 0;
 //renvoie la prochaine n ieme ligne d une trame.
@@ -270,13 +278,13 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	//special couche ethernet car on est pas arrivés à la fin de la ligne.		
 	fprintf(fichier_dest,"couche IP :\n");
 	fprintf(fichier_dest,"-----------\n");
-	fprintf(fichier_dest,"\tVersion : %d\n",val_n_ieme_bit2(tab_ligne[14],1));
-	int IHL=val_n_ieme_bit2(tab_ligne[14],0);
+	fprintf(fichier_dest,"\tVersion : %d\n",val_byte_1(tab_ligne[14]));
+	int IHL=val_byte_0(tab_ligne[14]);
 	//le IHL est en quad words ici.
 	unsigned int len_IHL=IHL*4;
 	fprintf(fichier_dest,"\tLongueur header (IHL) : %d (%d)\n",len_IHL,IHL);
-	fprintf(fichier_dest,"\tDifferentiated Services Codepoint: %d\n",val_n_ieme_bit2(tab_ligne[15],1));
-	fprintf(fichier_dest,"\tExplicit Congestion Notification: %d\n",val_n_ieme_bit2(tab_ligne[15],0));
+	fprintf(fichier_dest,"\tDifferentiated Services Codepoint: %d\n",val_byte_1(tab_ligne[14]));
+	fprintf(fichier_dest,"\tExplicit Congestion Notification: %d\n",val_byte_0(tab_ligne[14]));
 	//ligne 2;
 	
 	if (cherche_prochaine_ligne(fichier_source,1)==0){
@@ -291,19 +299,18 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 		return 0;
 	}
 	
-	afficher_tableau(tab_ligne);
+	
 	unsigned int longueur_totale=tab_ligne[0]*256+tab_ligne[1];
 	fprintf(fichier_dest,"\tlongueur totale: %d\n",longueur_totale );
 	fprintf(fichier_dest,"\tIdentification; 0x%.2x%.2x (%d)\n",tab_ligne[2],tab_ligne[3],tab_ligne[2]*256+tab_ligne[3]);
 	fprintf(fichier_dest,"\tflags :0x%.2x%.2x\n",tab_ligne[4],tab_ligne[5]);
-	
-	
+		
 	fprintf(fichier_dest,"\n");
 	return 1;
 	
 }
 int main(int argc, char *argv[]) {
-	
+	valeur_n_eme_bit(2,0);
 	FILE *fichier_source=fopen("test_res.txt","r");
 	FILE *fichier_dest=fopen("fichier_dstination.txt","w");
 	
