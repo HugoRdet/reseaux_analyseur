@@ -155,8 +155,17 @@ static inline double pow(double x,unsigned int n){
 //on aurait pu faire une fonction demandant le nombre de bit dans x
 //mais c'est pas necessaire ici. on a donc n C [0;3]
 unsigned int valeur_n_eme_bit(unsigned int x, int n){
-	return 0;
-	//a completer
+	unsigned int reste;
+	unsigned int quotient;
+	double puissance2;
+	for (int i=7;i>=n;i--){
+		puissance2=pow(2,i);
+		quotient=(int) (x/puissance2);
+		reste=x-(quotient*puissance2);
+		x=reste;
+	}
+	printf("quotient %d\n",quotient);
+	return quotient;
 }
 
 
@@ -310,7 +319,7 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	
 }
 int main(int argc, char *argv[]) {
-	valeur_n_eme_bit(2,0);
+	
 	FILE *fichier_source=fopen("test_res.txt","r");
 	FILE *fichier_dest=fopen("fichier_dstination.txt","w");
 	
@@ -327,5 +336,3 @@ int main(int argc, char *argv[]) {
 	fclose(fichier_dest);
 	return 0;
 }
-
-//f0 18 98 59 ae 32 0c 8d db 1a 1e 88 08 00 45 00

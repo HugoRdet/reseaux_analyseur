@@ -11,8 +11,8 @@ couche IP :
 -----------
 	Version : 4
 	Longueur header (IHL) : 20 (5)
-	Differentiated Services Codepoint: 0
-	Explicit Congestion Notification: 0
+	Differentiated Services Codepoint: 4
+	Explicit Congestion Notification: 5
 	longueur totale: 490
 	Identification; 0xe78d (59277)
 	flags :0x4000
