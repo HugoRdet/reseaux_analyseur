@@ -150,10 +150,7 @@ static inline double pow(double x,unsigned int n){
 	return acc;
 } 
 
-//on va travailler sur des hexadecimaux.
-//il y a donc 4 bits.
-//on aurait pu faire une fonction demandant le nombre de bit dans x
-//mais c'est pas necessaire ici. on a donc n C [0;3]
+
 unsigned int valeur_n_eme_bit(unsigned int x, int n){
 	unsigned int reste;
 	unsigned int quotient;
