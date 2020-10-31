@@ -161,7 +161,6 @@ unsigned int valeur_n_eme_bit(unsigned int x, int n){
 		reste=x-(quotient*puissance2);
 		x=reste;
 	}
-	printf("quotient %d\n",quotient);
 	return quotient;
 }
 
@@ -171,7 +170,7 @@ unsigned int valeur_n_eme_bit(unsigned int x, int n){
 //une trame commence a la ligne 0;
 //renvoie la prochaine n ieme ligne d une trame.
 //les lignes avec un offset errone sont ignorees
-static inline int cherche_prochaine_ligne(FILE *fichier_src,int n0_ligne){
+static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_ligne,unsigned int *tab_ligne,unsigned int nb_trame){
 	unsigned int offset=0;
 
 	//il y a 16 octets par ligne.
@@ -227,6 +226,13 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,int n0_ligne){
 		fgetc(fichier_src);
 		fgetc(fichier_src);
 		
+		int nb_octets=charge_ligne(fichier_src,tab_ligne);
+			
+		if (nb_octets!=16){
+			printf("%d octets manquants a la ligne 2 de la trame %d\n",16-nb_octets,nb_trame);
+			return 0;
+		}
+		
 		return 1;
 		
 		}while (offset!=EOF);
@@ -234,28 +240,20 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,int n0_ligne){
 }
 int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	/*variables*/
-	unsigned int nb_octets=0;
 	unsigned int tab_ligne[16];
 	int verif=0;
 	
-	if (cherche_prochaine_ligne(fichier_source,0)==0){
+		
+	
+	verif=cherche_prochaine_ligne(fichier_source,0,tab_ligne,nb_trame);
+	if (!verif){
 		return 0;
 	}
 	
-	
-	
-		
 	fprintf(fichier_dest," TRAME :%d\n",nb_trame);
 	fprintf(fichier_dest,"---------\n");
 	fprintf(fichier_dest,"\n");
-	
-	nb_octets=charge_ligne(fichier_source,tab_ligne);
-	
-	if (nb_octets!=16){
-		printf("%d octets manquants a la ligne 0 de la trame %d\n",16-nb_octets,nb_trame);
-		return 0;
-	}
-	
+		
 	
 	fprintf(fichier_dest,"couche ethernet:\n");
 	fprintf(fichier_dest,"----------------\n");
@@ -289,29 +287,58 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	//le IHL est en quad words ici.
 	unsigned int len_IHL=IHL*4;
 	fprintf(fichier_dest,"\tLongueur header (IHL) : %d (%d)\n",len_IHL,IHL);
-	fprintf(fichier_dest,"\tDifferentiated Services Codepoint: %d\n",val_byte_1(tab_ligne[14]));
-	fprintf(fichier_dest,"\tExplicit Congestion Notification: %d\n",val_byte_0(tab_ligne[14]));
+	fprintf(fichier_dest,"\tDifferentiated Services Codepoint: %d\n",val_byte_1(tab_ligne[15]));
+	fprintf(fichier_dest,"\tExplicit Congestion Notification: %d\n",val_byte_0(tab_ligne[15]));
 	//ligne 2;
 	
-	if (cherche_prochaine_ligne(fichier_source,1)==0){
-		printf("trame nO: %d incomplete\n",nb_trame);
-		return 0;
-	}
 	//chargement de la seconde ligne.
-	nb_octets=charge_ligne(fichier_source,tab_ligne);
-	
-	if (nb_octets!=16){
-		printf("%d octets manquants a la ligne 2 de la trame %d\n",16-nb_octets,nb_trame);
+	verif=cherche_prochaine_ligne(fichier_source,1,tab_ligne,nb_trame);
+	if (!verif){
+		printf("trame %d incomplète \n",nb_trame);
 		return 0;
 	}
-	
 	
 	unsigned int longueur_totale=tab_ligne[0]*256+tab_ligne[1];
 	fprintf(fichier_dest,"\tlongueur totale: %d\n",longueur_totale );
 	fprintf(fichier_dest,"\tIdentification; 0x%.2x%.2x (%d)\n",tab_ligne[2],tab_ligne[3],tab_ligne[2]*256+tab_ligne[3]);
 	fprintf(fichier_dest,"\tflags :0x%.2x%.2x\n",tab_ligne[4],tab_ligne[5]);
 		
-	fprintf(fichier_dest,"\n");
+	fprintf(fichier_dest,"\t\t(R)  Reserved bit  : \t%d\n",valeur_n_eme_bit(tab_ligne[4],7));
+	fprintf(fichier_dest,"\t\t(DF) Don't Fragment: \t%d\n",valeur_n_eme_bit(tab_ligne[4],6));
+	fprintf(fichier_dest,"\t\t(MF) More Fragments: \t%d\n",valeur_n_eme_bit(tab_ligne[4],5));
+	//j'ai préféré ne pas faire de boucle ici car le nombre d'iterations est fixe
+	int Frag_offset=valeur_n_eme_bit(tab_ligne[4],4)*((int) pow(16,12))+
+	valeur_n_eme_bit(tab_ligne[4],3)*((int) pow(16,11))+
+	valeur_n_eme_bit(tab_ligne[4],2)*((int) pow(16,10))+
+	valeur_n_eme_bit(tab_ligne[4],1)*((int) pow(16,9))+
+	valeur_n_eme_bit(tab_ligne[4],0)*((int) pow(16,8))+tab_ligne[5];
+	fprintf(fichier_dest,"\tFragment offset:\t%d\n",Frag_offset);
+	
+	fprintf(fichier_dest,"\tTime To Live:\t%d\n",tab_ligne[6]);
+	fprintf(fichier_dest,"\tProtocol:\t%d ",tab_ligne[7]);
+	fprintf(fichier_dest,"\tHeader Checksum :0x%.2x%.2x\n",tab_ligne[8],tab_ligne[9]);
+	fprintf(fichier_dest,"\tsource :");
+		fprintf(fichier_dest," %.d.",tab_ligne[10]);
+		fprintf(fichier_dest," %.d.",tab_ligne[11]);
+		fprintf(fichier_dest," %.d.",tab_ligne[12]);
+		fprintf(fichier_dest," %.d\n",tab_ligne[13]);
+	
+	
+	fprintf(fichier_dest,"\tsource :");
+	fprintf(fichier_dest," %.d:",tab_ligne[14]);
+	fprintf(fichier_dest," %.d:",tab_ligne[15]);
+	
+	verif=cherche_prochaine_ligne(fichier_source,2,tab_ligne,nb_trame);
+	if (!verif){
+		printf("trame %d incomplète \n",nb_trame);
+		return 0;
+	}	
+	fprintf(fichier_dest," %.d:",tab_ligne[0]);
+	fprintf(fichier_dest," %.d\n",tab_ligne[1]);
+	
+	//fin de la couche IP
+	
+	//LES OPTIONS NE SONT PAS IMPLÉMENTÉES
 	return 1;
 	
 }
