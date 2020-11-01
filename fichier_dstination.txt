@@ -1,19 +1,33 @@
  TRAME :0
 ---------
 
-couche ethernet:
-----------------
-	source : 0c: 8d: db: 1a: 1e: 88
-	destination : f0: 18: 98: 59: ae: 32
-	type: 0x0800 (IPv4)
+	couche ethernet:
+	----------------
+		source : 0c: 8d: db: 1a: 1e: 88
+		destination : f0: 18: 98: 59: ae: 32
+		type: 0x0800 (IPv4)
 
-couche IP :
------------
-	Version : 4
-	Longueur header (IHL) : 20 (5)
-	Differentiated Services Codepoint: 4
-	Explicit Congestion Notification: 5
-	longueur totale: 490
-	Identification; 0xe78d (59277)
-	flags :0x4000
+	couche IP :
+	-----------
+		Version : 4
+		Longueur header (IHL) : 20 (5)
+		Differentiated Services Codepoint: 0
+		Explicit Congestion Notification: 0
+		longueur totale: 490
+		Identification; 0xe78d (59277)
+		flags :0x4000
+			(R)  Reserved bit  : 	0
+			(DF) Don't Fragment: 	1
+			(MF) More Fragments: 	0
+		Fragment offset:	0
+		Time To Live:	45
+		Protocol:	6 		Header Checksum :0xca8c
+		source : 128. 119. 245. 12
+		source : 192: 168: 99: 199
 
+	COUCHE TCP :
+	------------
+		Source Port: 80
+		Destination Port: 60779
+		Sequence number (raw) :2750420605 
+		acknowledgement number (raw) :3230306200 

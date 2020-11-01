@@ -142,7 +142,7 @@ void afficher_tableau(unsigned int tab[16]){
 }
 
 //renvoie x a la puissance n
-static inline double pow(double x,unsigned int n){
+static inline double pow(double x,int n){
 	double acc=1.0;
 	for (int i=0;i<n;i++){
 		acc*=x;
@@ -171,7 +171,7 @@ unsigned int valeur_n_eme_bit(unsigned int x, int n){
 //renvoie la prochaine n ieme ligne d une trame.
 //les lignes avec un offset errone sont ignorees
 static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_ligne,unsigned int *tab_ligne,unsigned int nb_trame){
-	unsigned int offset=0;
+	int offset=0;
 
 	//il y a 16 octets par ligne.
 	unsigned int nombre_octets=n0_ligne*16;
@@ -357,7 +357,7 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	return 1;
 	
 }
-int main(int argc, char *argv[]) {
+int main() {
 	
 	FILE *fichier_source=fopen("test_res.txt","r");
 	FILE *fichier_dest=fopen("fichier_dstination.txt","w");
