@@ -4,7 +4,7 @@
 
 
 int main(int    argc, char **argv) {
-	/*
+	
 	FILE *fichier_source=fopen("test_res.txt","r");
 	FILE *fichier_dest=fopen("fichier_dstination.txt","w");
 	
@@ -21,8 +21,7 @@ int main(int    argc, char **argv) {
 	fclose(fichier_dest);
 	
 
-	return 0;
-	*/
+	
 	
 	GtkApplication *app;
 	int status;
@@ -31,7 +30,7 @@ int main(int    argc, char **argv) {
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 	g_object_unref (app);
 
-		return status;
+	return status;
 	
 	
 	
