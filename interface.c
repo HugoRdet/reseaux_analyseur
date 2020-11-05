@@ -10,11 +10,15 @@ void activate (GtkApplication *app,gpointer        user_data)
 	GtkWidget *window;
 	GtkWidget *button;
 	GtkWidget *button_box;
-
+	
+	//creation de la nouvelle fenetre et de ses boutons
 	window = gtk_application_window_new (app);
-	gtk_window_set_title (GTK_WINDOW (window), "Window");
-	gtk_window_set_default_size (GTK_WINDOW (window), 200, 200);
-
+	//titre de la fenetre
+	gtk_window_set_title (GTK_WINDOW (window), "Analyseur de Trames");
+	//taille de la fenetre
+	gtk_window_set_default_size (GTK_WINDOW (window), 600, 400);
+	
+	
 	button_box = gtk_button_box_new (GTK_ORIENTATION_HORIZONTAL);
 	gtk_container_add (GTK_CONTAINER (window), button_box);
 
