@@ -3,7 +3,11 @@
 
 #include <gtk/gtk.h>
 
-void print_hello (GtkWidget *widget, gpointer   data);
-void activate (GtkApplication *app,gpointer        user_data);
+
+//initialisation de la fenetre
+GtkWidget *init_fenetre(int longueur,int largeur,char *titre);
+
+//fermeture de la fenêtre et arret de la boucle evenementielle
+void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 
 #endif
