@@ -1,7 +1,7 @@
 #include "interface.h"
 
 //initialisation de la fenetre
-GtkWidget *init_fenetre(int longueur,int largeur,char *titre){
+GtkWidget *init_fenetre(int largeur,int hauteur,char *titre){
 	//declaration pointeur fenetre
 	GtkWidget *fenetre;
 	
@@ -12,7 +12,7 @@ GtkWidget *init_fenetre(int longueur,int largeur,char *titre){
 	gtk_window_set_position(GTK_WINDOW(fenetre), GTK_WIN_POS_CENTER );
 	
 	//taille de la fenetre
-	gtk_window_set_default_size(GTK_WINDOW(fenetre), longueur, largeur);
+	gtk_window_set_default_size(GTK_WINDOW(fenetre), hauteur, largeur);
 	
 	//titre de la fenetre
 	gtk_window_set_title(GTK_WINDOW(fenetre), titre);

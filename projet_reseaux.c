@@ -25,7 +25,8 @@ int main(int    argc, char **argv) {
 	
 	gtk_init(&argc,&argv);
 	
-	GtkWidget *fenetre=init_fenetre(600,400,"analyseur trame");
+	//creation de la fenetre
+	GtkWidget *fenetre=init_fenetre(400,600,"analyseur trame");
 	
 
 	//signal fermeture de la fenetre
