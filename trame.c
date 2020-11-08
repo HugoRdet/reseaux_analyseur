@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "trame.h"
+#include "interface.h"
 
 #define val_byte_1(x) ( (int) (x/16.0) )
 #define val_byte_0(x) ( x%16 )
@@ -8,6 +9,7 @@
 
 //renvoie la valeur décimale d'un caractère 
 int val_exa_int(char c){
+	
 	unsigned int val=(int) c;
 		
 	switch (val) 
@@ -173,7 +175,7 @@ unsigned int valeur_n_eme_bit(unsigned int x, int n){
 //les lignes avec un offset errone sont ignorees
 static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_ligne,unsigned int *tab_ligne,unsigned int nb_trame){
 	int offset=0;
-
+	char c;
 	//il y a 16 octets par ligne.
 	unsigned int nombre_octets=n0_ligne*16;
 	
@@ -193,31 +195,52 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 	do{
 		
 		
-		
-		offset=val_exa_int( fgetc(fichier_src) );
+		c=fgetc(fichier_src);
+			if (c==EOF){
+				return 0;
+			}
+		offset=val_exa_int( c );
 		if (offset!=off3){
-			if ((offset==EOF)||(fin_ligne(fichier_src)==0)){
+			if (fin_ligne(fichier_src)==0){
 				return 0;
 			}
 			continue;
 		}
-		offset=val_exa_int( fgetc(fichier_src) );
+		
+		
+		c=fgetc(fichier_src);
+			if (c==EOF){
+				return 0;
+			}
+		offset=val_exa_int( c );
 		if (offset!=off2){
-			if ((offset==EOF)||(fin_ligne(fichier_src)==0)){
+			if (fin_ligne(fichier_src)==0){
 				return 0;
 			}
 			continue;
 		}
-		offset=val_exa_int( fgetc(fichier_src) );
+		
+		
+		c=fgetc(fichier_src);
+			if (c==EOF){
+				return 0;
+			}
+		offset=val_exa_int( c );
 		if (offset!=off1){
-			if ((offset==EOF)||(fin_ligne(fichier_src)==0)){
+			if (fin_ligne(fichier_src)==0){
 				return 0;
 			}
 			continue;
 		}
-		offset=val_exa_int( fgetc(fichier_src) );
+		
+		
+		c=fgetc(fichier_src);
+			if (c==EOF){
+				return 0;
+			}
+		offset=val_exa_int( c );
 		if (offset!=off0){
-			if ((offset==EOF)||(fin_ligne(fichier_src)==0)){
+			if (fin_ligne(fichier_src)==0){
 				return 0;
 			}
 			continue;
@@ -231,7 +254,7 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 			
 		if (nb_octets!=16){
 			printf("%d octets manquants a la ligne 2 de la trame %d\n",16-nb_octets,nb_trame);
-			return 0;
+			return nb_octets;
 		}
 		
 		return 1;
@@ -239,7 +262,29 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		}while (offset!=EOF);
 	return 0;
 }
-int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
+
+
+void ajout_liste(cell **liste,trame *elem,GtkWidget* box){
+	char label[80];
+	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id
+																,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3]
+																,(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]
+																);					
+	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
+	gtk_box_pack_start(GTK_BOX(box),tmp_bouton, FALSE, FALSE, 0);
+	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame),elem);
+	//creation du nouveau bouton correspondant a la trame
+	cell *new_cell=(cell *) malloc(sizeof(cell));
+	new_cell->obj=elem;
+	new_cell->bouton=tmp_bouton;
+	new_cell->suiv=(*liste);
+	*liste=new_cell;
+}
+
+
+
+
+int lecture_trame(FILE *fichier_source,int nb_trame,cell **liste,GtkWidget *box){
 	/*variables*/
 	unsigned int tab_ligne[16];
 	int verif=0;
@@ -248,113 +293,86 @@ int lecture_trame(FILE *fichier_source,FILE *fichier_dest,int nb_trame){
 	
 	verif=cherche_prochaine_ligne(fichier_source,0,tab_ligne,nb_trame);
 	if (!verif){
+		printf("ok\n");
 		return 0;
 	}
 	
-	fprintf(fichier_dest," TRAME :%d\n",nb_trame);
-	fprintf(fichier_dest,"---------\n");
-	fprintf(fichier_dest,"\n");
-		
+	trame *new_trame=(trame *) malloc(sizeof(trame));
+	new_trame->id=nb_trame;
 	
-	fprintf(fichier_dest,"\tcouche ethernet:\n");
-	fprintf(fichier_dest,"\t----------------\n");
-	fprintf(fichier_dest,"\t\tsource :");
-	fprintf(fichier_dest," %.2x:",tab_ligne[6]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[7]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[8]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[9]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[10]);
-	fprintf(fichier_dest," %.2x\n",tab_ligne[11]);
 	
-	fprintf(fichier_dest,"\t\tdestination :");
-	fprintf(fichier_dest," %.2x:",tab_ligne[0]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[1]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[2]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[3]);
-	fprintf(fichier_dest," %.2x:",tab_ligne[4]);
-	fprintf(fichier_dest," %.2x\n",tab_ligne[5]);
 	
-	fprintf(fichier_dest,"\t\ttype: 0x%.2x%.2x",tab_ligne[12],tab_ligne[13]);
-	if ((tab_ligne[12]==8)&&(tab_ligne[13]==0)){
-		fprintf(fichier_dest," (IPv4)\n");
-	}
-	fprintf(fichier_dest,"\n");
-	//fin de la couche ethernet , j'ai pas fait une fonction 
-	//special couche ethernet car on est pas arrivés à la fin de la ligne.		
-	fprintf(fichier_dest,"\tcouche IP :\n");
-	fprintf(fichier_dest,"\t-----------\n");
-	fprintf(fichier_dest,"\t\tVersion : %d\n",val_byte_1(tab_ligne[14]));
-	int IHL=val_byte_0(tab_ligne[14]);
-	//le IHL est en quad words ici.
-	unsigned int len_IHL=IHL*4;
-	fprintf(fichier_dest,"\t\tLongueur header (IHL) : %d (%d)\n",len_IHL,IHL);
-	fprintf(fichier_dest,"\t\tDifferentiated Services Codepoint: %d\n",val_byte_1(tab_ligne[15]));
-	fprintf(fichier_dest,"\t\tExplicit Congestion Notification: %d\n",val_byte_0(tab_ligne[15]));
+	new_trame->mac_dest=(int *) malloc(sizeof(int)*6);
+	new_trame->mac_source=(int *) malloc(sizeof(int)*6);
+	
+	(new_trame->mac_source)[0]=tab_ligne[6];
+	(new_trame->mac_source)[1]=tab_ligne[7];
+	(new_trame->mac_source)[2]=tab_ligne[8];
+	(new_trame->mac_source)[3]=tab_ligne[9];
+	(new_trame->mac_source)[4]=tab_ligne[10];
+	(new_trame->mac_source)[5]=tab_ligne[11];
+	
+	(new_trame->mac_dest)[0]=tab_ligne[0];
+	(new_trame->mac_dest)[1]=tab_ligne[1];
+	(new_trame->mac_dest)[2]=tab_ligne[2];
+	(new_trame->mac_dest)[3]=tab_ligne[3];
+	(new_trame->mac_dest)[4]=tab_ligne[4];
+	(new_trame->mac_dest)[5]=tab_ligne[5];
+	
+	new_trame->ip_type=(int *) malloc(sizeof(int)*2);
+	(new_trame->ip_type)[0]=tab_ligne[12];
+	(new_trame->ip_type)[1]=tab_ligne[13];
+	
+	new_trame->version_HL=tab_ligne[14];
+	new_trame->DSF=tab_ligne[15];
 	//ligne 2;
-	
 	//chargement de la seconde ligne.
 	verif=cherche_prochaine_ligne(fichier_source,1,tab_ligne,nb_trame);
+	printf("ok Bonsoir\n");
 	if (!verif){
-		printf("\ttrame %d incomplète \n",nb_trame);
+		new_trame->nb_ligne_erreur=1;
 		return 0;
 	}
 	
-	unsigned int longueur_totale=tab_ligne[0]*256+tab_ligne[1];
-	fprintf(fichier_dest,"\t\tlongueur totale: %d\n",longueur_totale );
-	fprintf(fichier_dest,"\t\tIdentification; 0x%.2x%.2x (%d)\n",tab_ligne[2],tab_ligne[3],tab_ligne[2]*256+tab_ligne[3]);
-	fprintf(fichier_dest,"\t\tflags :0x%.2x%.2x\n",tab_ligne[4],tab_ligne[5]);
-		
-	fprintf(fichier_dest,"\t\t\t(R)  Reserved bit  : \t%d\n",valeur_n_eme_bit(tab_ligne[4],7));
-	fprintf(fichier_dest,"\t\t\t(DF) Don't Fragment: \t%d\n",valeur_n_eme_bit(tab_ligne[4],6));
-	fprintf(fichier_dest,"\t\t\t(MF) More Fragments: \t%d\n",valeur_n_eme_bit(tab_ligne[4],5));
-	//j'ai préféré ne pas faire de boucle ici car le nombre d'iterations est fixe
-	int Frag_offset=valeur_n_eme_bit(tab_ligne[4],4)*((int) pow(16,12))+
-	valeur_n_eme_bit(tab_ligne[4],3)*((int) pow(16,11))+
-	valeur_n_eme_bit(tab_ligne[4],2)*((int) pow(16,10))+
-	valeur_n_eme_bit(tab_ligne[4],1)*((int) pow(16,9))+
-	valeur_n_eme_bit(tab_ligne[4],0)*((int) pow(16,8))+tab_ligne[5];
-	fprintf(fichier_dest,"\t\tFragment offset:\t%d\n",Frag_offset);
+	new_trame->total_length=(int *) malloc(sizeof(int)*2);
+	(new_trame->total_length)[0]=tab_ligne[0];
+	(new_trame->total_length)[1]=tab_ligne[1];
 	
-	fprintf(fichier_dest,"\t\tTime To Live:\t%d\n",tab_ligne[6]);
-	fprintf(fichier_dest,"\t\tProtocol:\t%d ",tab_ligne[7]);
-	fprintf(fichier_dest,"\t\tHeader Checksum :0x%.2x%.2x\n",tab_ligne[8],tab_ligne[9]);
-	fprintf(fichier_dest,"\t\tsource :");
-		fprintf(fichier_dest," %.d.",tab_ligne[10]);
-		fprintf(fichier_dest," %.d.",tab_ligne[11]);
-		fprintf(fichier_dest," %.d.",tab_ligne[12]);
-		fprintf(fichier_dest," %.d\n",tab_ligne[13]);
+	new_trame->identification=(int *) malloc(sizeof(int)*2);
+	(new_trame->identification)[0]=tab_ligne[2];
+	(new_trame->identification)[1]=tab_ligne[3];
 	
+	new_trame->flags_frag_offset=(int *) malloc(sizeof(int)*2);
+	(new_trame->flags_frag_offset)[0]=tab_ligne[4];
+	(new_trame->flags_frag_offset)[1]=tab_ligne[5];
 	
-	fprintf(fichier_dest,"\t\tsource :");
-	fprintf(fichier_dest," %.d:",tab_ligne[14]);
-	fprintf(fichier_dest," %.d:",tab_ligne[15]);
+	new_trame->TTL=tab_ligne[6];
+	new_trame->protocol=tab_ligne[7];
+	
+	new_trame->header_checksum=(int *) malloc(sizeof(int)*2);
+	(new_trame->header_checksum)[0]=tab_ligne[8];
+	(new_trame->header_checksum)[1]=tab_ligne[9];
+	
+	new_trame->ip_source=(int *) malloc(sizeof(int)*4);
+	(new_trame->ip_source)[0]=tab_ligne[10];
+	(new_trame->ip_source)[1]=tab_ligne[11];
+	(new_trame->ip_source)[2]=tab_ligne[12];
+	(new_trame->ip_source)[3]=tab_ligne[13];
+	
+	new_trame->ip_dest=(int *) malloc(sizeof(int)*4);
+	(new_trame->ip_dest)[0]=tab_ligne[14];
+	(new_trame->ip_dest)[1]=tab_ligne[15];
 	
 	verif=cherche_prochaine_ligne(fichier_source,2,tab_ligne,nb_trame);
 	if (!verif){
-		printf("trame %d incomplète \n",nb_trame);
+		new_trame->nb_ligne_erreur=2;
 		return 0;
-	}	
-	fprintf(fichier_dest," %.d:",tab_ligne[0]);
-	fprintf(fichier_dest," %.d\n",tab_ligne[1]);
-	//fin de la couche IP
-		
-	//LES OPTIONS NE SONT PAS IMPLÉMENTÉES
-	fprintf(fichier_dest,"\n\tCOUCHE TCP :\n");
-	fprintf(fichier_dest,"\t------------\n");
-	fprintf(fichier_dest,"\t\tSource Port: %d\n",(tab_ligne[2])*256+tab_ligne[3]);
-	fprintf(fichier_dest,"\t\tDestination Port: %d\n",(tab_ligne[4])*256+tab_ligne[5]);
+	}
 	
+	(new_trame->ip_dest)[2]=tab_ligne[0];
+	(new_trame->ip_dest)[3]=tab_ligne[1];
 	
-	long int sequence_number=(tab_ligne[6])*((long int)pow(16,6))
-						+(tab_ligne[7])*((int)pow(16,4))
-						+(tab_ligne[8])*((int)pow(16,2))
-						+(tab_ligne[9]);	
-	fprintf(fichier_dest,"\t\tSequence number (raw) :%li \n",sequence_number);
-	long int acknowledgment_number=(tab_ligne[10])*((long int)pow(16,6))
-							+(tab_ligne[11])*((int)pow(16,4))
-							+(tab_ligne[12])*((int)pow(16,2))
-							+(tab_ligne[13]);
-	fprintf(fichier_dest,"\t\tacknowledgement number (raw) :%li \n",acknowledgment_number);
+	ajout_liste(liste,new_trame,box);
 	return 1;
 	
 }

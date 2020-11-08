@@ -26,3 +26,11 @@ void fermeture_fenetre(GtkWidget *pWidget, gpointer pData){
 	//arret de la boucle evenementielle
 	gtk_main_quit();
 }
+
+void affiche_trame(GtkWidget *pWidget, gpointer pData){
+	trame *tmp_trame=(trame *)pData;
+	printf("Mac Dest: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",(tmp_trame->mac_dest)[0],(tmp_trame->mac_dest)[1],(tmp_trame->mac_dest)[2],
+										(tmp_trame->mac_dest)[3],(tmp_trame->mac_dest)[4],(tmp_trame->mac_dest)[5]);
+	
+	
+}
