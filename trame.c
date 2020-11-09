@@ -271,7 +271,7 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box){
 												);					
 	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
 	gtk_box_pack_start(GTK_BOX(box),tmp_bouton, FALSE, FALSE, 0);
-	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame),elem);
+	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame_terminal),elem);
 	//creation du nouveau bouton correspondant a la trame
 	cell *new_cell=(cell *) malloc(sizeof(cell));
 	new_cell->obj=elem;

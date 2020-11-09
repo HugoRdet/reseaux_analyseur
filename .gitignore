@@ -1,2 +1,5 @@
 
 *.o
+*.o
+projet_reseaux.o
+interface.o

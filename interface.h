@@ -10,6 +10,6 @@ GtkWidget *init_fenetre(int largeur,int hauteur,char *titre);
 //fermeture de la fenêtre et arret de la boucle evenementielle
 void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 
-void affiche_trame(GtkWidget *pWidget, gpointer pData);
+void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData);
 
 #endif
