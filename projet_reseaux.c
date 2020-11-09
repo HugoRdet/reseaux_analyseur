@@ -63,9 +63,6 @@ int main(int    argc, char **argv) {
 
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox);
 	
-	
-	GtkWidget* pButton;
-	
 	while (res!=0) {
 		
 			res=lecture_trame(fichier_source,cpt,&liste,pvbox);
@@ -82,17 +79,12 @@ int main(int    argc, char **argv) {
 		tmp=tmp->suiv;
 	}
 	*/
-	pButton = gtk_button_new_with_label("quitter - test 2");
-
-	gtk_box_pack_start(GTK_BOX(pvbox), pButton, FALSE, FALSE, 0);
-	
 
 	
 	
 	gtk_widget_show_all(fenetre);
 	//signal fermeture de la fenetre
 	g_signal_connect(G_OBJECT(fenetre), "destroy", G_CALLBACK(fermeture_fenetre), liste);
-	g_signal_connect(G_OBJECT(pButton),"clicked",G_CALLBACK(fermeture_fenetre),liste);
 	
 	//ouverture de la fenetre a l ecran
 	gtk_widget_show(fenetre);

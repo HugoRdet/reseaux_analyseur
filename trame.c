@@ -196,9 +196,9 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		
 		
 		c=fgetc(fichier_src);
-			if (c==EOF){
-				return 0;
-			}
+		if (c==EOF){
+			return 0;
+		}
 		offset=val_exa_int( c );
 		if (offset!=off3){
 			if (fin_ligne(fichier_src)==0){
@@ -209,9 +209,9 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		
 		
 		c=fgetc(fichier_src);
-			if (c==EOF){
-				return 0;
-			}
+		if (c==EOF){
+			return 0;
+		}
 		offset=val_exa_int( c );
 		if (offset!=off2){
 			if (fin_ligne(fichier_src)==0){
@@ -222,9 +222,9 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		
 		
 		c=fgetc(fichier_src);
-			if (c==EOF){
-				return 0;
-			}
+		if (c==EOF){
+			return 0;
+		}
 		offset=val_exa_int( c );
 		if (offset!=off1){
 			if (fin_ligne(fichier_src)==0){
@@ -235,9 +235,9 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		
 		
 		c=fgetc(fichier_src);
-			if (c==EOF){
-				return 0;
-			}
+		if (c==EOF){
+			return 0;
+		}
 		offset=val_exa_int( c );
 		if (offset!=off0){
 			if (fin_ligne(fichier_src)==0){
@@ -249,7 +249,6 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		fgetc(fichier_src);
 		fgetc(fichier_src);
 		fgetc(fichier_src);
-		
 		int nb_octets=charge_ligne(fichier_src,tab_ligne);
 			
 		if (nb_octets!=16){
@@ -259,7 +258,7 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 		
 		return 1;
 		
-		}while (offset!=EOF);
+		}while (c!=EOF);
 	return 0;
 }
 
@@ -267,9 +266,9 @@ static inline int cherche_prochaine_ligne(FILE *fichier_src,unsigned int n0_lign
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box){
 	char label[80];
 	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id
-																,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3]
-																,(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]
-																);					
+												,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3]
+												,(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]
+												);					
 	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
 	gtk_box_pack_start(GTK_BOX(box),tmp_bouton, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame),elem);
