@@ -12,7 +12,6 @@ int main(int    argc, char **argv) {
 	int cpt=0;
 	
 	
-	printf("trames scanees : %d\n",cpt);
 	fclose(fichier_dest);
 	
 	
@@ -66,8 +65,6 @@ int main(int    argc, char **argv) {
 	while (res!=0) {
 		
 			res=lecture_trame(fichier_source,cpt,&liste,pvbox);
-			printf("res: %d\n",res);
-			printf("%d\n",res);
 			cpt++;
 	}
 	

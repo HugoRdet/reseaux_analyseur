@@ -292,7 +292,6 @@ int lecture_trame(FILE *fichier_source,int nb_trame,cell **liste,GtkWidget *box)
 	
 	verif=cherche_prochaine_ligne(fichier_source,0,tab_ligne,nb_trame);
 	if (!verif){
-		printf("ok\n");
 		return 0;
 	}
 	
@@ -327,7 +326,7 @@ int lecture_trame(FILE *fichier_source,int nb_trame,cell **liste,GtkWidget *box)
 	//ligne 2;
 	//chargement de la seconde ligne.
 	verif=cherche_prochaine_ligne(fichier_source,1,tab_ligne,nb_trame);
-	printf("ok Bonsoir\n");
+	
 	if (!verif){
 		new_trame->nb_ligne_erreur=1;
 		return 0;
