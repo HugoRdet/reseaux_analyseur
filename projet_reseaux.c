@@ -71,7 +71,6 @@ int main(int    argc, char **argv) {
 			while (offset!=0) {
 					cherche_prochaine_ligne(fichier_source,&offset,&ligne);
 				}
-			//afficher_ligne(fichier_source);
 			res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox);
 			cpt++;
 	}
