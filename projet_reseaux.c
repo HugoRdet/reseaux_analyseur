@@ -62,14 +62,16 @@ int main(int    argc, char **argv) {
 	gtk_paned_pack2 (GTK_PANED(panneau),frame_bas,TRUE,TRUE);
 	
 	
-	
-	GtkWidget* pvbox=gtk_box_new(FALSE,0);
-	
-	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox),GTK_ORIENTATION_VERTICAL);
+	/* TOP BOX */	
+	GtkWidget* pvbox_haut=gtk_box_new(FALSE,0);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_haut),GTK_ORIENTATION_VERTICAL);
+	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox_haut);
 
-	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox);
-	
+	/* BOT BOX */
+	GtkWidget* pvbox_bas=gtk_box_new(FALSE,0);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_bas),GTK_ORIENTATION_VERTICAL);
+	gtk_container_add(GTK_CONTAINER(frame_bas),pvbox_bas);
+
 	int ligne=1;
 	int offset=1;
 	
@@ -79,7 +81,7 @@ int main(int    argc, char **argv) {
 			while (offset!=0) {
 					cherche_prochaine_ligne(fichier_source,&offset,&ligne);
 				}
-			res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox);
+			res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox_haut, pvbox_bas);
 			cpt++;
 	}
 	

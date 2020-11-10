@@ -12,4 +12,6 @@ void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 
 void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData);
 
+void remplir_arbre(GtkWidget *pWidget, gpointer pData);
+
 #endif

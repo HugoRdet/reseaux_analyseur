@@ -241,23 +241,23 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 
 }
 
-void ajout_liste(cell **liste,trame *elem,GtkWidget* box){
-	char label[80];
-	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id
-												,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3]
-												,(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]
-												);					
+
+void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
+	char *label[80];
+	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
 	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
-	
-	
-	gtk_box_pack_start(GTK_BOX(box),tmp_bouton, FALSE, FALSE, 0);
-	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame_terminal),elem);
-	//creation du nouveau bouton correspondant a la trame
 	cell *new_cell=(cell *) malloc(sizeof(cell));
+
 	new_cell->obj=elem;
+	new_cell->arbre=NULL;
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	*liste=new_cell;
+	remplir_arbre(NULL, new_cell);
+	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box_bas),new_cell->arbre, FALSE, FALSE, 0);
+	//g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(remplir_arbre),new_cell);
+
 }
 
 //cette fonction va charger le contenu entier d une trame dans tab_ligne
@@ -275,22 +275,11 @@ void affiche_tab(unsigned int *tab){
 static inline int lecture_trame(trame *new_trame){
 	
 	unsigned int *tab_ligne=new_trame->tab;
-	new_trame->mac_dest=(int *) malloc(sizeof(int)*6);
-	new_trame->mac_source=(int *) malloc(sizeof(int)*6);
+	new_trame->mac_dest=(char *) malloc(sizeof(char)*80);
+	new_trame->mac_source=(char *) malloc(sizeof(char)*80);	
 	
-	(new_trame->mac_source)[0]=tab_ligne[6];
-	(new_trame->mac_source)[1]=tab_ligne[7];
-	(new_trame->mac_source)[2]=tab_ligne[8];
-	(new_trame->mac_source)[3]=tab_ligne[9];
-	(new_trame->mac_source)[4]=tab_ligne[10];
-	(new_trame->mac_source)[5]=tab_ligne[11];
-	
-	(new_trame->mac_dest)[0]=tab_ligne[0];
-	(new_trame->mac_dest)[1]=tab_ligne[1];
-	(new_trame->mac_dest)[2]=tab_ligne[2];
-	(new_trame->mac_dest)[3]=tab_ligne[3];
-	(new_trame->mac_dest)[4]=tab_ligne[4];
-	(new_trame->mac_dest)[5]=tab_ligne[5];
+	sprintf(new_trame->mac_source, "%d:%d:%d:%d:%d:%d", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
+	sprintf(new_trame->mac_dest, "%d:%d:%d:%d:%d:%d", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
 	
 	new_trame->ip_type=(int *) malloc(sizeof(int)*2);
 	(new_trame->ip_type)[0]=tab_ligne[12];
@@ -339,7 +328,7 @@ static inline int lecture_trame(trame *new_trame){
 
 
 
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box){
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas){
 	
 	int offset=0;
 	int offset_prec=0;
@@ -370,7 +359,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		//fin de fichier
 		if (verif==0){
 			lecture_trame(new_trame);
-			ajout_liste(liste,new_trame,box);
+			ajout_liste(liste,new_trame,box_haut, box_bas);
 			return 0;
 		}
 		
@@ -385,7 +374,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			new_trame->nb_octet_erreur=offset_prec;
 			new_trame->nb_ligne_erreur=*ligne;
 			lecture_trame(new_trame);
-			ajout_liste(liste,new_trame,box);
+			ajout_liste(liste,new_trame,box_haut, box_bas);
 			return 1;
 		}
 	
@@ -393,7 +382,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	
 		
 	lecture_trame(new_trame);
-	ajout_liste(liste,new_trame,box);
+	ajout_liste(liste,new_trame,box_haut, box_bas);
 	return 1;
 }
 
