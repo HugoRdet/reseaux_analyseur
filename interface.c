@@ -5,6 +5,7 @@ GtkWidget *init_fenetre(int largeur,int hauteur,char *titre){
 	//declaration pointeur fenetre
 	GtkWidget *fenetre;
 	
+	
 	//initialisation de la fenetre
 	fenetre= gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	

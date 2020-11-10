@@ -248,6 +248,8 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box){
 												,(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]
 												);					
 	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
+	
+	
 	gtk_box_pack_start(GTK_BOX(box),tmp_bouton, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(affiche_trame_terminal),elem);
 	//creation du nouveau bouton correspondant a la trame

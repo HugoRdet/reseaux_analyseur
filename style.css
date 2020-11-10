@@ -1,0 +1,13 @@
+.button{
+	border: 1px solid #0000; padding 5px;
+	background-color: #EE2121;
+}
+.button:active{
+	background-color: #EE2121;
+	font: 12px 'Comic Sans';"
+	}
+.button:hover{
+	background-color: #EE2121;
+	}
+.button:focus{
+	"background-color: #EE2121;

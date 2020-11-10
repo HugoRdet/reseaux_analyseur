@@ -20,9 +20,13 @@ int main(int    argc, char **argv) {
 	gtk_init(&argc,&argv);
 	
 	
+	
+	
+	
 	//creation de la fenetre
 	GtkWidget *fenetre=init_fenetre(400,600,"analyseur trame");
-	
+
+		
 	//creation de la grille
 	GtkWidget* grille=gtk_grid_new();
 	
@@ -57,7 +61,11 @@ int main(int    argc, char **argv) {
 	gtk_paned_pack1 (GTK_PANED(panneau),frame_haut,TRUE,TRUE);
 	gtk_paned_pack2 (GTK_PANED(panneau),frame_bas,TRUE,TRUE);
 	
+	
+	
 	GtkWidget* pvbox=gtk_box_new(FALSE,0);
+	
+	
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox),GTK_ORIENTATION_VERTICAL);
 
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox);
