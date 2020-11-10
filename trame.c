@@ -348,7 +348,8 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	trame *new_trame=(trame *) malloc(sizeof(trame));
 	
 	new_trame->id=nb_trame;
-	
+	new_trame->nb_octet_erreur=-1;
+	new_trame->nb_ligne_erreur=-1;
 	unsigned int *tab=(unsigned int *) calloc(1518,sizeof(unsigned int));
 	new_trame->tab=tab;
 	
@@ -372,6 +373,13 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		
 		if (offset-offset_prec>0){
 			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,*ligne);
+			
+			while (offset!=0) {
+					cherche_prochaine_ligne(fichier_src,&offset,ligne);
+			}
+			
+			new_trame->nb_octet_erreur=offset_prec;
+			new_trame->nb_ligne_erreur=*ligne;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box);
 			return 1;

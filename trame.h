@@ -8,6 +8,7 @@ typedef struct trame_{
 	int id;
 	// nb_ligne_erreur est a -1 si il n y aucune erreur
 	int nb_ligne_erreur;
+	int nb_octet_erreur;
 	// la taille maximale d une trame est de 1518 octets
 	//soit 94*16+14
 	
