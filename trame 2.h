@@ -4,7 +4,6 @@
 
 typedef struct trame_{
 	//quand un champ sera erroné il sera placé a -1
-	unsigned int *tab;
 	int id;
 	// nb_ligne_erreur est a -1 si il n y aucune erreur
 	int nb_ligne_erreur;
@@ -40,7 +39,6 @@ typedef struct cell_{
 	struct cell_ *suiv;
 }cell;
 
-void afficher_ligne(FILE *fichier);
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box);
-int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne);
+int lecture_trame(FILE *fichier_source,int nb_trame,cell **liste,GtkWidget *box);
+
 #endif

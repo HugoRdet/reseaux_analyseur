@@ -9,7 +9,7 @@ int main(int    argc, char **argv) {
 	FILE *fichier_dest=fopen("fichier_dstination.txt","w");
 	cell *liste=NULL;
 	int res=1;
-	int cpt=0;
+	int cpt=1;
 	
 	
 	fclose(fichier_dest);
@@ -62,9 +62,16 @@ int main(int    argc, char **argv) {
 
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox);
 	
+	int ligne=1;
+	int offset=1;
+	
+	
+	
 	while (res!=0) {
-		
-			res=lecture_trame(fichier_source,cpt,&liste,pvbox);
+			while (offset!=0) {
+					cherche_prochaine_ligne(fichier_source,&offset,&ligne);
+				}
+			res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox);
 			cpt++;
 	}
 	
