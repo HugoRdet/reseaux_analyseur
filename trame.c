@@ -357,7 +357,11 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		charge_ligne(fichier_src,tab,&offset);
 		offset_prec=offset;
 		
-		verif=cherche_prochaine_ligne(fichier_src,&offset,&tmp_ligne);
+		do{
+			offset=offset_prec;
+			verif=cherche_prochaine_ligne(fichier_src,&offset,&tmp_ligne);
+		}while((offset!=0)&&(offset<=offset_prec_prec));
+		
 		
 		//fin de fichier
 		if (verif==0){
