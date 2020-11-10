@@ -96,10 +96,11 @@ void afficher_ligne(FILE *fichier){
 }
 
 //va jusqu'a la fin de la ligne actuelle d'un fichier
-static inline int fin_ligne(FILE *fichier_source,int *ligne,char c){
-	while ((c!='\n')&&(c!=EOF)){
+static inline int fin_ligne(FILE *fichier_source,int *ligne){
+	char c=' ';
+	do {
 			c=fgetc(fichier_source);
-	};
+	} while ((c!='\n')&&(c!=EOF));
 	(*ligne)++;
 	return !(c==EOF);
 }
@@ -175,7 +176,7 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
-			fin_ligne(fichier_src,ligne,c);
+			fin_ligne(fichier_src,ligne);
 			cpt_lignes++;
 			continue;
 		}else{
@@ -189,7 +190,7 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
-			fin_ligne(fichier_src,ligne,c);
+			fin_ligne(fichier_src,ligne);
 			cpt_lignes++;
 			continue;
 		}else{
@@ -209,7 +210,7 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
-			fin_ligne(fichier_src,ligne,c);
+			fin_ligne(fichier_src,ligne);
 			cpt_lignes++;
 			continue;
 		}else{
@@ -223,7 +224,7 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
-			fin_ligne(fichier_src,ligne,c);
+			fin_ligne(fichier_src,ligne);
 			cpt_lignes++;
 			continue;
 		}else{
@@ -341,7 +342,6 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	
 	int offset=0;
 	int offset_prec=0;
-	int offset_prec_prec=0;
 	int tmp_ligne=0;
 	int verif=1;
 	
@@ -353,7 +353,6 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	new_trame->tab=tab;
 	
 	do{
-		offset_prec_prec=offset_prec;
 		charge_ligne(fichier_src,tab,&offset);
 		offset_prec=offset;
 		
