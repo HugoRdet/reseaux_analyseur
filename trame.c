@@ -361,6 +361,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		do{
 			offset=offset_prec;
 			verif=cherche_prochaine_ligne(fichier_src,&offset,&tmp_ligne);
+			(*ligne)++;
 		}while((offset!=0)&&(offset<=offset_prec_prec));
 		
 		
@@ -376,6 +377,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			
 			while (offset!=0) {
 					cherche_prochaine_ligne(fichier_src,&offset,ligne);
+					(*ligne)++;
 			}
 			
 			new_trame->nb_octet_erreur=offset_prec;
