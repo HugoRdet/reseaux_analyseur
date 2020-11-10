@@ -3,3 +3,4 @@
 *.o
 projet_reseaux.o
 interface.o
+trame.o
