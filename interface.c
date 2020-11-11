@@ -68,7 +68,7 @@ void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	GtkTreeViewColumn *column;
 
 	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes("Infos", renderer, "text", INFOS_COLUMN, NULL);
+	column = gtk_tree_view_column_new_with_attributes("", renderer, "text", INFOS_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column);
 	gtk_widget_grab_focus(tmp_cell->arbre);
 	

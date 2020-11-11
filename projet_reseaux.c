@@ -85,23 +85,11 @@ int main(int    argc, char **argv) {
 			cpt++;
 	}
 	
-	/*
-	while (tmp!=NULL) {
-		tmp_bouton=gtk_button_new_with_label("ouin ouin");
-		gtk_box_pack_start(GTK_BOX(pvbox),tmp_bouton, FALSE, FALSE, 0);
-	
-		tmp=tmp->suiv;
-	}
-	*/
 
-	
 	
 	gtk_widget_show_all(fenetre);
 	//signal fermeture de la fenetre
 	g_signal_connect(G_OBJECT(fenetre), "destroy", G_CALLBACK(fermeture_fenetre), liste);
-	
-	//ouverture de la fenetre a l ecran
-	gtk_widget_show(fenetre);
 	
 	//demarrage de la boucle evenementielle
 	gtk_main();
