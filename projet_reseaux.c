@@ -23,7 +23,7 @@ int main(int    argc, char **argv) {
 	
 	
 	cell *liste=NULL;
-	GtkWidget* menu=init_menu(grille,&liste);
+	GtkWidget* menu=init_menu(grille,&pvbox_haut);
 	
 	
 	//assigne_ui_liste(&liste,pvbox_haut,pvbox_bas);

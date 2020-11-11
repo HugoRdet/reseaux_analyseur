@@ -4,7 +4,7 @@
 
 
 //initialisation de la fenetre
-GtkWidget* init_menu(GtkWidget* grille,cell **liste);
+GtkWidget* init_menu(GtkWidget* grille,GtkWidget** pvbox);
 void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_bas_);
 GtkWidget *init_fenetre(int largeur,int hauteur,char *titre,GtkWidget** grid);
 

@@ -243,7 +243,7 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 
 
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
-	char *label[80];
+	char label[80];
 	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
 	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
 	cell *new_cell=(cell *) malloc(sizeof(cell));

@@ -4,7 +4,7 @@
 
 
 void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
-	cell **liste=(cell **) pData;
+	GtkWidget **pvbox_haut=(GtkWidget **) pData;
 	
 	
 		
@@ -33,7 +33,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
 	
 	switch (res){
-		case GTK_RESPONSE_ACCEPT :
+		case GTK_RESPONSE_OK :
 			{
 				
 				char *filename;
@@ -47,8 +47,13 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				printf("\n");
 				fclose(fichier_source);
 				*/
-	
 				
+				GtkWidget *pButton = gtk_button_new_with_label("quitter - test 2");
+				gtk_box_pack_start(GTK_BOX(*pvbox_haut), pButton, FALSE, FALSE, 0);
+				g_signal_connect(G_OBJECT(pButton),"clicked",G_CALLBACK(fermeture_fenetre),NULL);
+
+				printf("ouin ouin\n");
+				gtk_widget_show_now (*pvbox_haut);
 				break;
 			}
 		default:
@@ -61,7 +66,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 
 
 
-GtkWidget* init_menu(GtkWidget* grille,cell **liste){
+GtkWidget* init_menu(GtkWidget* grille,GtkWidget** pvbox){
 	GtkWidget* menu=gtk_toolbar_new ();
 		//le menu ne vas pas s ellargir si on ellargit la fenetre
 	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),30);
@@ -86,7 +91,7 @@ GtkWidget* init_menu(GtkWidget* grille,cell **liste){
 	
 	
 	
-	g_signal_connect(G_OBJECT(ouvrir_fichier),"clicked",G_CALLBACK(affiche_selection_fichiers),liste);
+	g_signal_connect(G_OBJECT(ouvrir_fichier),"clicked",G_CALLBACK(affiche_selection_fichiers),pvbox);
 		
 	return menu;
 
