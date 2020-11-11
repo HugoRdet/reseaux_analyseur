@@ -13,8 +13,8 @@ typedef struct trame_{
 	//soit 94*16+14
 	
 	//couche ethernet
-	int *mac_dest;
-	int *mac_source;
+	char *mac_dest;
+	char *mac_source;
 	int *ip_type;
 	
 	//couche ip
@@ -25,7 +25,7 @@ typedef struct trame_{
 	int *flags_frag_offset;
 	int TTL;
 	int protocol;
-	int *header_checksum;
+	int *header_checksum; 
 	int *ip_source;
 	int *ip_dest;
 	
@@ -37,11 +37,12 @@ typedef struct trame_{
 
 typedef struct cell_{
 	trame *obj;
+	GtkWidget *arbre;
 	GtkWidget *bouton;
 	struct cell_ *suiv;
 }cell;
 
 void afficher_ligne(FILE *fichier);
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box);
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut,GtkWidget *box_bas);
 int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne);
 #endif
