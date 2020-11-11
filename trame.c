@@ -242,16 +242,10 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 }
 
 
-void afficher_arbre(GtkRevealer *revealer){
-		gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), TRUE);
-}
-
-
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
-	char label[80];
+	char *label[80];
 	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
-	GtkWidget *revealer=gtk_revealer_new();
-	GtkWidget* tmp_bouton=gtk_toggle_button_new_with_label(label);
+	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
 	cell *new_cell=(cell *) malloc(sizeof(cell));
 
 	new_cell->obj=elem;
@@ -259,16 +253,11 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	*liste=new_cell;
-	
 	remplir_arbre(NULL, new_cell);
-	gtk_container_add(GTK_CONTAINER(revealer), new_cell->arbre);
-	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
-	gtk_revealer_set_transition_type(GTK_REVEALER (revealer), GTK_REVEALER_TRANSITION_TYPE_NONE);
-	gtk_revealer_set_transition_duration(GTK_REVEALER (revealer), 0);
 	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, FALSE, 0);
-	g_object_bind_property(tmp_bouton, "active", revealer, "reveal-child", 0);	
-	
+	gtk_box_pack_start(GTK_BOX(box_bas),new_cell->arbre, FALSE, FALSE, 0);
+	//g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(remplir_arbre),new_cell);
+
 }
 
 //cette fonction va charger le contenu entier d une trame dans tab_ligne
