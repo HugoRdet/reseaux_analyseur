@@ -42,19 +42,19 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				FILE *fichier_source=fopen(filename,"r");
 				
 				int res=1;
-				int cpt=1;
 				int ligne=1;
 				int offset=1;
-				cell *liste=NULL;
 				
+
 				while (res!=0) {
 					while (offset!=0) {
 						cherche_prochaine_ligne(fichier_source,&offset,&ligne);
 					}
-					res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox_haut, pvbox_bas);
-					cpt++;
+					res=charge_trame(fichier_source,&ligne,pvbox->taille_liste,pvbox->liste,pvbox_haut, pvbox_bas);
+					
+					pvbox->taille_liste++;
 				}
-				pvbox->liste=liste;
+				
 				
 				break;
 			}

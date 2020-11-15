@@ -6,6 +6,7 @@ typedef struct box_{
 	GtkWidget **pvbox_haut;
 	GtkWidget **pvbox_bas;
 	cell **liste;
+	int taille_liste;
 }box;
 
 //initialisation de la fenetre
