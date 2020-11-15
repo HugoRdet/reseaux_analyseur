@@ -3,11 +3,13 @@
 
 
 
+
 void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
-	GtkWidget **pvbox_haut=(GtkWidget **) pData;
 	
+	box *pvbox=(box*)pData;
+	GtkWidget *pvbox_haut=*(pvbox->pvbox_haut);
+	GtkWidget *pvbox_bas=*(pvbox->pvbox_bas);
 	
-		
 	GtkWidget *fenetre= gtk_window_new(GTK_WINDOW_POPUP);
 	
 	//positions de la fenetre lors de l ouverture
@@ -31,29 +33,29 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		NULL);
 	
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
-	
 	switch (res){
-		case GTK_RESPONSE_OK :
+		case GTK_RESPONSE_ACCEPT :
 			{
-				
 				char *filename;
 				GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
 				filename = gtk_file_chooser_get_filename (chooser);
-				//FILE *fichier_source=fopen(filename,"r");
-				/*printf("\n");
-				for (int i=0;i<50;i++){
-					printf("%c",fgetc(fichier_source));
-				}
-				printf("\n");
-				fclose(fichier_source);
-				*/
+				FILE *fichier_source=fopen(filename,"r");
 				
-				GtkWidget *pButton = gtk_button_new_with_label("quitter - test 2");
-				gtk_box_pack_start(GTK_BOX(*pvbox_haut), pButton, FALSE, FALSE, 0);
-				g_signal_connect(G_OBJECT(pButton),"clicked",G_CALLBACK(fermeture_fenetre),NULL);
-
-				printf("ouin ouin\n");
-				gtk_widget_show_now (*pvbox_haut);
+				int res=1;
+				int cpt=1;
+				int ligne=1;
+				int offset=1;
+				cell *liste=NULL;
+				
+				while (res!=0) {
+					while (offset!=0) {
+						cherche_prochaine_ligne(fichier_source,&offset,&ligne);
+					}
+					res=charge_trame(fichier_source,&ligne,cpt,&liste,pvbox_haut, pvbox_bas);
+					cpt++;
+				}
+				pvbox->liste=liste;
+				
 				break;
 			}
 		default:
@@ -62,11 +64,12 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	
 	gtk_widget_destroy (dialog);
 	
+	
 }
 
 
 
-GtkWidget* init_menu(GtkWidget* grille,GtkWidget** pvbox){
+GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget* menu=gtk_toolbar_new ();
 		//le menu ne vas pas s ellargir si on ellargit la fenetre
 	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),30);

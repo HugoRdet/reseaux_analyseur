@@ -253,9 +253,12 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	*liste=new_cell;
+	
 	remplir_arbre(NULL, new_cell);
 	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(box_bas),new_cell->arbre, FALSE, FALSE, 0);
+	gtk_widget_show (tmp_bouton);
+	gtk_widget_show (new_cell->arbre);
 	//g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(remplir_arbre),new_cell);
 
 }
