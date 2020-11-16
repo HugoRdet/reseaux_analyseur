@@ -1,5 +1,6 @@
 #include "interface.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -23,7 +24,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
 	gint res;
 	
-	dialog = gtk_file_chooser_dialog_new ("Ouvrir un fichier",
+	dialog = gtk_file_chooser_dialog_new ("Ouvrir un fichier (.txt)",
 		GTK_WINDOW(fenetre),
 		action,
 		("_Annuler"),
@@ -67,7 +68,30 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	
 }
 
+void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
+	box *pvbox=(box*)pData;
+	
+	cell *liste=*(pvbox->liste);
+	cell *a_supp=NULL;
+	
+	while (liste!=NULL) {
+		a_supp=liste;
+		liste=liste->suiv;
+		gtk_widget_destroy(a_supp->bouton);
+		gtk_widget_destroy(a_supp->arbre);
+		free(a_supp->obj->tab);
+		free(a_supp->obj->mac_dest);
+		free(a_supp->obj->mac_source);
+		free(a_supp->obj);
+		free(a_supp);
+		
+	}
+	*(pvbox->liste)=NULL;
+}
 
+void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
+	printf("prout alors\n");
+}
 
 GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget* menu=gtk_toolbar_new ();
@@ -84,18 +108,32 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	
 	
 	GtkToolItem *ouvrir_fichier=gtk_tool_button_new (NULL,"ouvrir..");
+	GtkToolItem *fermer_fichier=gtk_tool_button_new (NULL,"fermer");
+	GtkToolItem *sauvegarder_fichier=gtk_tool_button_new (NULL,"sauvegarder");
 	
 	gtk_tool_item_set_homogeneous (ouvrir_fichier,TRUE);
+	gtk_tool_item_set_homogeneous (fermer_fichier,TRUE);
+	gtk_tool_item_set_homogeneous (sauvegarder_fichier,TRUE);
 	gtk_tool_item_set_expand (ouvrir_fichier,FALSE);
+	gtk_tool_item_set_expand (fermer_fichier,FALSE);
+	gtk_tool_item_set_expand (sauvegarder_fichier,FALSE);
 	gtk_tool_item_set_visible_vertical (ouvrir_fichier,TRUE);
+	gtk_tool_item_set_visible_vertical (fermer_fichier,TRUE);
+	gtk_tool_item_set_visible_vertical (sauvegarder_fichier,TRUE);
 	gtk_tool_item_set_tooltip_text (ouvrir_fichier,"ouvrir un fichier");
+	gtk_tool_item_set_tooltip_text (fermer_fichier,"fermer un fichier");
+	gtk_tool_item_set_tooltip_text (sauvegarder_fichier,"sauvegarder un fichier");
 	
+	gtk_toolbar_insert (GTK_TOOLBAR(menu),sauvegarder_fichier,0);
+	gtk_toolbar_insert (GTK_TOOLBAR(menu),fermer_fichier,0);
 	gtk_toolbar_insert (GTK_TOOLBAR(menu),ouvrir_fichier,0);
 	
 	
 	
+	
 	g_signal_connect(G_OBJECT(ouvrir_fichier),"clicked",G_CALLBACK(affiche_selection_fichiers),pvbox);
-		
+	g_signal_connect(G_OBJECT(fermer_fichier),"clicked",G_CALLBACK(fermer_selection_fichiers),pvbox);
+	g_signal_connect(G_OBJECT(sauvegarder_fichier),"clicked",G_CALLBACK(sauvegarder_fichiers),pvbox);
 	return menu;
 
 }
@@ -221,30 +259,3 @@ void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	return;
 }
 
-/*
-void assigne_ui_liste(cell **liste,GtkWidget* box_haut, GtkWidget* box_bas){
-	cell *tmp=*liste;
-	
-	while (tmp!=NULL) {
-		trame *elem=tmp->obj;
-		printf("ok\n");
-		char label[80];
-		sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
-		GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
-		
-		tmp->arbre=NULL;
-		tmp->bouton=tmp_bouton;
-		remplir_arbre(NULL, tmp);
-		
-		//ATTENTION J AI MIS END 
-		gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE, FALSE, 0);
-		gtk_box_pack_start(GTK_BOX(box_bas),tmp->arbre, FALSE, FALSE, 0);
-		//g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(remplir_arbre),new_cell);
-		
-		
-		tmp=tmp->suiv;
-		
-	}
-	
-}
-	*/
