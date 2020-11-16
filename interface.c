@@ -96,7 +96,7 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget* menu=gtk_toolbar_new ();
 		//le menu ne vas pas s ellargir si on ellargit la fenetre
-	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),30);
+	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),32);
 	gtk_widget_set_vexpand (menu, FALSE);
 	gtk_widget_set_hexpand (menu, FALSE);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (menu),GTK_ORIENTATION_HORIZONTAL);
@@ -110,6 +110,17 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkToolItem *ouvrir_fichier=gtk_tool_button_new (NULL,"ouvrir..");
 	GtkToolItem *fermer_fichier=gtk_tool_button_new (NULL,"fermer");
 	GtkToolItem *sauvegarder_fichier=gtk_tool_button_new (NULL,"sauvegarder");
+	
+	
+	
+	GtkWidget * ouvrir_fichier_icone=gtk_image_new_from_file ("icones/ajouter_fichier_32px.png");
+	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
+	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
+	
+	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);
+	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(fermer_fichier),fermer_fichier_icone);
+	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(sauvegarder_fichier),sauvegarder_fichier_icone);
+	
 	
 	gtk_tool_item_set_homogeneous (ouvrir_fichier,TRUE);
 	gtk_tool_item_set_homogeneous (fermer_fichier,TRUE);
