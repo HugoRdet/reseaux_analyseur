@@ -12,7 +12,6 @@ int main(int    argc, char **argv) {
 
 	gtk_init(&argc,&argv);
 	
-	
 	GtkWidget* grille=NULL;
 	//creation de la fenetre
 	GtkWidget *fenetre=init_fenetre(400,600,"analyseur trame",&grille);

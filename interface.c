@@ -4,7 +4,6 @@
 
 
 
-
 void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	
 	box *pvbox=(box*)pData;
@@ -86,6 +85,7 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		free(a_supp);
 		
 	}
+	pvbox->taille_liste=1;
 	*(pvbox->liste)=NULL;
 }
 

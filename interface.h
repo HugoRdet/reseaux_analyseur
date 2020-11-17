@@ -9,6 +9,7 @@ typedef struct box_{
 	int taille_liste;
 }box;
 
+
 //initialisation de la fenetre
 GtkWidget* init_menu(GtkWidget* grille,box* pvbox);
 void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_bas_);
