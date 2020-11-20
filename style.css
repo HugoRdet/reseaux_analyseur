@@ -1,72 +1,70 @@
-GtkWindow {
+#fond_dark{
     background-image: none;
-    background-color: magenta;
+    background-color: #25262A;
+    box-shadow:none;
+    border-style:none;
 }
 
-GtkButton {
+#fond_panneau{
     background-image: none;
+    box-shadow:none;
+    border-style:none;
+    background-color: #292929;
+    
 }
 
-#myGrid {
-    background-color: cyan;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-}
-
-#myChildTop {
+#fond_menu{
     background-image: none;
-    background-color: white;
+    background-color: #2E2E2E;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
 }
 
-#myButton_red{
-    background-color: red;
-    color: white;
+
+#button_dark_mode{
+    background-color: #434343;
+    color: #DFDFDF;
     font-family: DejaVu Sans;
-    font-style: normal;
-    font-weight: bold;
+    font-weight: lighter;
     font-size: 20px;
-    border-radius: 15px;
     background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+
+    padding:3px 0 3px 0;
 }
 
-#myButton_yellow{
-    background-color: yellow;
-    color: white;
+#button_dark_mode:active{
+    background-color: #3593F7;
+    color: #DFDFDF;
+    
     font-family: DejaVu Sans;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 20px;
-    border-radius: 15px;
-    background-image: none;
+    font-weight: lighter;
+    
 }
 
-#myButton_green{
-    background-color: green;
-    color: white;
-    font-family: DejaVu Sans;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 20px;
-    border-radius: 15px;
-    background-image: none;
+#button_dark_mode:hover{
+    background-color: #3593F7;
+    color: #DFDFDF;
 }
 
-#myButton_blue{
-    background-color: blue;
-    color: white;
-    font-family: DejaVu Sans;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 20px;
-    border-radius: 15px;
-    background-image: none;
+#button_dark_mode:link{
+    background-color: #3593F7;
+    color: #DFDFDF;
 }
 
-#myButton_red:hover,
-#myButton_yellow:hover,
-#myButton_green:hover,
-#myButton_blue:hover{
-   background-color: black;
-   background-image: none;
+#button_dark_mode:visited{
+    background-color: #3593F7;
+    color: #DFDFDF;
 }
+
+#scroll_bar_perso{
+    background-image: none;
+    color:  #434343;
+    background-color: #434343;
+    opacity: 1;
+}
+

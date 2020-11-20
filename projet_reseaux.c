@@ -16,6 +16,11 @@ int main(int    argc, char **argv) {
 	//creation de la fenetre
 	GtkWidget *fenetre=init_fenetre(400,600,"analyseur trame",&grille);
 	
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_path(cssProvider, "style.css", NULL);
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),GTK_STYLE_PROVIDER(cssProvider),
+		GTK_STYLE_PROVIDER_PRIORITY_USER);
+	
 	box *pvbox=(box *) malloc(sizeof(box));
 	cell *liste=NULL;
 	GtkWidget *pvbox_haut=NULL;

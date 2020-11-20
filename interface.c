@@ -95,6 +95,7 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 
 GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget* menu=gtk_toolbar_new ();
+	gtk_widget_set_name(menu,"fond_menu");
 		//le menu ne vas pas s ellargir si on ellargit la fenetre
 	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),32);
 	gtk_widget_set_vexpand (menu, FALSE);
@@ -116,6 +117,9 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget * ouvrir_fichier_icone=gtk_image_new_from_file ("icones/ajouter_fichier_32px.png");
 	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
 	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
+	
+
+	
 	
 	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);
 	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(fermer_fichier),fermer_fichier_icone);
@@ -152,6 +156,7 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 
 void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_bas_){
 	GtkWidget *panneau = gtk_paned_new (GTK_ORIENTATION_VERTICAL);
+	gtk_widget_set_name(panneau,"fond_panneau");
 	gtk_widget_set_vexpand (panneau, TRUE);
 	gtk_widget_set_hexpand (panneau, TRUE);
 	gtk_grid_attach(GTK_GRID(grille),panneau,0,1,9,9);
@@ -162,6 +167,10 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(frame_haut),GTK_SHADOW_IN);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(frame_bas),GTK_SHADOW_IN);
 	
+	GtkWidget *scroll_bar_1=gtk_scrolled_window_get_vscrollbar (frame_haut);
+	GtkWidget *scroll_bar_2=gtk_scrolled_window_get_vscrollbar (frame_bas);
+	gtk_widget_set_name(scroll_bar_1,"scroll_bar_perso");
+	gtk_widget_set_name(scroll_bar_2,"scroll_bar_perso");
 	
 	gtk_paned_pack1 (GTK_PANED(panneau),frame_haut,TRUE,TRUE);
 	gtk_paned_pack2 (GTK_PANED(panneau),frame_bas,TRUE,TRUE);
@@ -169,11 +178,13 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	
 	/* TOP BOX */	
 	GtkWidget* pvbox_haut=gtk_box_new(FALSE,0);
+	gtk_widget_set_name(pvbox_haut,"fond_panneau");
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_haut),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox_haut);
 	
 	/* BOT BOX */
 	GtkWidget* pvbox_bas=gtk_box_new(FALSE,0);
+	gtk_widget_set_name(pvbox_bas,"fond_panneau");
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_bas),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(frame_bas),pvbox_bas);
 	
@@ -190,7 +201,7 @@ GtkWidget *init_fenetre(int largeur,int hauteur,char *titre,GtkWidget **grid){
 	
 	//initialisation de la fenetre
 	fenetre= gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	
+	gtk_widget_set_name(fenetre,"fond_dark");
 	//positions de la fenetre lors de l ouverture
 	gtk_window_set_position(GTK_WINDOW(fenetre), GTK_WIN_POS_CENTER );
 	
