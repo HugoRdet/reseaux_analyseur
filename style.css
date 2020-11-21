@@ -8,6 +8,7 @@
     background-color: #25262A;
     box-shadow:none;
     border-style:none;
+    padding: 10px;
 }
 
 
@@ -16,36 +17,25 @@
     background-image: none;
     box-shadow:none;
     border-style:none;
-    background-color: #292929;
+    background: #292929;
+    padding: 10px;
     
 }
 
 #fond_menu{
     background-image: none;
-    background: #2E2E2E;
-    border:#2E2E2E;
+    background: #292929;
     border-radius:0;
     box-shadow:none;
     border-style:none;
     text-shadow: none;
-    
-    
-    
+    padding: 10px;
 }
 
-#fond_menu:hover{
-    background-image: none;
-    background-color: #2E2E2E;
-    color: #2E2E2E;
-    background: #2E2E2E;
-    border:#2E2E2E;
-    border-radius:0;
-    box-shadow:none;
-    border-style:none;
-    text-shadow: none;
-    
-    
+.fond_menu_icons{
+    background: #6D6D6D;
 }
+
 
 
 #button_dark_mode{
@@ -72,12 +62,6 @@
     
 }
 
-#button_dark_mode:hover{
-    background-color: #3593F7;
-    color: #DFDFDF;
-    box-shadow: none;
-    text-shadow: none;
-}
 
 #button_dark_mode:link{
     background-color: #3593F7;
