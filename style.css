@@ -22,8 +22,23 @@
 
 #fond_menu{
     background-image: none;
+    background: #2E2E2E;
+    border:#2E2E2E;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    
+    
+    
+}
+
+#fond_menu:hover{
+    background-image: none;
     background-color: #2E2E2E;
     color: #2E2E2E;
+    background: #2E2E2E;
+    border:#2E2E2E;
     border-radius:0;
     box-shadow:none;
     border-style:none;

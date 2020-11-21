@@ -142,8 +142,16 @@ static inline void charge_ligne(FILE *fichier_src,unsigned int *tab,int *place){
 		
 		c=fgetc(fichier_src);
 		val_exa=val_exa_int(c);
+		
 		if (c=='\n'){
 			*place=i;
+			return;
+		}
+		
+		
+		if (val_exa==-1){
+			*place=i;
+			fin_ligne(fichier_src,place,c);
 			return;
 		}
 		

@@ -118,11 +118,11 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
 	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
 	
-	/*
+	
 	gtk_widget_set_name(ouvrir_fichier_icone,"fond_menu");
 	gtk_widget_set_name(fermer_fichier_icone,"fond_menu");
 	gtk_widget_set_name(sauvegarder_fichier_icone,"fond_menu");
-	*/
+	
 
 	
 	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);
