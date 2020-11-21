@@ -37,6 +37,7 @@ typedef struct cell_{
 	GtkWidget *arbre;
 	GtkWidget *bouton;
 	struct cell_ *suiv;
+	int status_bouton_ip;
 }cell;
 
 void afficher_ligne(FILE *fichier);

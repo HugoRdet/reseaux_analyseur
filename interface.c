@@ -3,6 +3,19 @@
 #include <stdlib.h>
 
 
+void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
+	cell *cellule_obj=(cell *) pData;
+	
+	if (cellule_obj->status_bouton_ip==0){
+		cellule_obj->status_bouton_ip=1;
+		gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode_status_1");
+		gtk_widget_show (GTK_WIDGET(cellule_obj->bouton));
+	}else{
+		cellule_obj->status_bouton_ip=0;
+		gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode");
+		gtk_widget_show (GTK_WIDGET(cellule_obj->bouton));
+	}
+}
 
 void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	
@@ -105,9 +118,6 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	
 	
 	
-	
-	
-	
 	GtkToolItem *ouvrir_fichier=gtk_tool_button_new (NULL,"ouvrir..");
 	GtkToolItem *fermer_fichier=gtk_tool_button_new (NULL,"fermer");
 	GtkToolItem *sauvegarder_fichier=gtk_tool_button_new (NULL,"sauvegarder");
@@ -163,7 +173,7 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_widget_set_name(panneau,"fond_panneau");
 	gtk_widget_set_vexpand (panneau, TRUE);
 	gtk_widget_set_hexpand (panneau, TRUE);
-	gtk_grid_attach(GTK_GRID(grille),panneau,0,1,9,9);
+	gtk_grid_attach(GTK_GRID(grille),panneau,0,2,9,9);
 	//gtk_container_add(GTK_CONTAINER(fenetre),panneau);
 	GtkWidget *frame_haut = gtk_scrolled_window_new (NULL,NULL);
 	GtkWidget *frame_bas = gtk_scrolled_window_new (NULL,NULL);
@@ -186,6 +196,14 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_haut),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox_haut);
 	
+	GtkWidget *menu_label=gtk_toggle_button_new_with_label("Id\t     IP source       \tIP destination");
+	gtk_widget_set_name(menu_label,"label_menu_dark_mode");
+	gtk_widget_set_vexpand (menu_label, FALSE);
+	gtk_widget_set_hexpand (menu_label, FALSE);
+	gtk_box_pack_start(GTK_BOX(pvbox_haut),menu_label, FALSE, FALSE, 0);
+	gtk_widget_show (menu_label);
+
+
 	/* BOT BOX */
 	GtkWidget* pvbox_bas=gtk_box_new(FALSE,0);
 	gtk_widget_set_name(pvbox_bas,"fond_panneau");
@@ -279,6 +297,9 @@ void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes("Infos", renderer, "text", INFOS_COLUMN, NULL);
+	
+	
+	
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column);
 	gtk_widget_grab_focus(tmp_cell->arbre);
 	
