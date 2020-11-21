@@ -171,8 +171,8 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(frame_haut),GTK_SHADOW_IN);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(frame_bas),GTK_SHADOW_IN);
 	
-	GtkWidget *scroll_bar_1=gtk_scrolled_window_get_vscrollbar (frame_haut);
-	GtkWidget *scroll_bar_2=gtk_scrolled_window_get_vscrollbar (frame_bas);
+	GtkWidget *scroll_bar_1=gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW(frame_haut));
+	GtkWidget *scroll_bar_2=gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW(frame_bas));
 	gtk_widget_set_name(scroll_bar_1,"scroll_bar_perso");
 	gtk_widget_set_name(scroll_bar_2,"scroll_bar_perso");
 	
