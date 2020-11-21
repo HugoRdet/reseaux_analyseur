@@ -254,11 +254,11 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	char label[80];
 	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
 	
-	GtkWidget* tmp_bouton=gtk_button_new_with_label(label);
+	GtkWidget* tmp_bouton=gtk_toggle_button_new_with_label(label);
 	gtk_widget_set_name(tmp_bouton,"button_dark_mode");
 	
 	cell *new_cell=(cell *) malloc(sizeof(cell));
-
+	GtkWidget *revealer = gtk_revealer_new();
 	new_cell->obj=elem;
 	new_cell->arbre=NULL;
 	new_cell->bouton=tmp_bouton;
@@ -266,11 +266,14 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	*liste=new_cell;
 	
 	remplir_arbre(NULL, new_cell);
+	gtk_container_add(GTK_CONTAINER(revealer), new_cell->arbre);
+	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
 	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(box_bas),new_cell->arbre, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, FALSE, 0);
 	gtk_widget_show (tmp_bouton);
-	gtk_widget_show (new_cell->arbre);
-	//g_signal_connect(G_OBJECT(tmp_bouton),"clicked",G_CALLBACK(remplir_arbre),new_cell);
+	gtk_widget_show_all(box_bas);
+
+	g_object_bind_property(tmp_bouton, "active", revealer, "reveal-child", 1);
 
 }
 
