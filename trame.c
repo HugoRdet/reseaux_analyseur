@@ -298,15 +298,19 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->mac_dest=(char *) malloc(sizeof(char)*80);
 	new_trame->mac_source=(char *) malloc(sizeof(char)*80);	
 	
-	sprintf(new_trame->mac_source, "%d:%d:%d:%d:%d:%d", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
-	sprintf(new_trame->mac_dest, "%d:%d:%d:%d:%d:%d", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
+	sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
+	sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
+
 	
-	new_trame->ip_type=(int *) malloc(sizeof(int)*2);
-	(new_trame->ip_type)[0]=tab_ligne[12];
-	(new_trame->ip_type)[1]=tab_ligne[13];
+	new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
+	sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
 	
-	new_trame->version_HL=tab_ligne[14];
-	new_trame->DSF=tab_ligne[15];
+
+	new_trame->version=(char *)malloc(sizeof(char)*4);
+	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
+	new_trame->header_length=(char *)malloc(sizeof(char)*10);
+	sprintf(new_trame->header_length, "(%X) - %d bytes",tab_ligne[14]%16, tab_ligne[14]%16*4);
+	
 	
 	new_trame->total_length=(int *) malloc(sizeof(int)*2);
 	(new_trame->total_length)[0]=tab_ligne[16];

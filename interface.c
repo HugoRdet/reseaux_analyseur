@@ -263,11 +263,18 @@ void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData){
 	
 }
 
+void remplir_ethernet(){
 
-void creer_model_arbre(GtkTreeStore *model, trame *trame){
-	
 }
 
+void remplir_tcp_ip(){
+
+}
+
+void remplir_http(){
+
+}
+	
 void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	
 	cell *tmp_cell=(cell *)pData;	
@@ -275,34 +282,57 @@ void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	
 	enum{
 		INFOS_COLUMN,
+		VALUE_COLUMN,
 		N_COLUMNS
 	};
 	
 	GtkTreeIter iter1;
 	GtkTreeIter iter2;
 	
-	model = gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING);
-	
+	model = gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
+
+
+	// ETHERNET //
 	gtk_tree_store_append(model, &iter1, NULL);
-	gtk_tree_store_set(model, &iter1, INFOS_COLUMN, "Ethernet", -1);
+	gtk_tree_store_set(model, &iter1, INFOS_COLUMN, "Ethernet II", VALUE_COLUMN, "", -1);
 	gtk_tree_store_append(model, &iter2, &iter1);
-	gtk_tree_store_set(model, &iter2, INFOS_COLUMN, tmp_cell->obj->mac_source, -1);
+	gtk_tree_store_set(model, &iter2, INFOS_COLUMN, "Destination:", VALUE_COLUMN, tmp_cell->obj->mac_dest, -1);
 	gtk_tree_store_append(model, &iter2, &iter1);
-	gtk_tree_store_set(model, &iter2, INFOS_COLUMN, tmp_cell->obj->mac_dest, -1);
+	gtk_tree_store_set(model, &iter2, INFOS_COLUMN, "Source:", VALUE_COLUMN, tmp_cell->obj->mac_source, -1);
+	gtk_tree_store_append(model, &iter2, &iter1);
+	gtk_tree_store_set(model, &iter2, INFOS_COLUMN, "Type: IPv4", VALUE_COLUMN, tmp_cell->obj->ip_type, -1);
+	gtk_tree_store_append(model, &iter2, &iter1);
+
+	// IP //
+	GtkTreeIter iter3;
+	GtkTreeIter iter4;
+	gtk_tree_store_append(model, &iter3, NULL);
+	gtk_tree_store_set(model, &iter3, INFOS_COLUMN, "Internet Protocol", VALUE_COLUMN, "", -1);
+	gtk_tree_store_append(model, &iter4, &iter3);
+	gtk_tree_store_set(model, &iter4, INFOS_COLUMN, "Version:", VALUE_COLUMN, tmp_cell->obj->version, -1);
+	gtk_tree_store_append(model, &iter4, &iter3);
+	gtk_tree_store_set(model, &iter4, INFOS_COLUMN, "Header Length:", VALUE_COLUMN, tmp_cell->obj->header_length, -1);
+	gtk_tree_store_append(model, &iter4, &iter3);
 	
+
 	tmp_cell->arbre = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 	
-	GtkCellRenderer *renderer;
+	GtkCellRenderer *renderer_col1;
+	GtkCellRenderer *renderer_col2;
 	GtkTreeViewColumn *column;
+	GtkTreeViewColumn *column_2;
 	
-	renderer = gtk_cell_renderer_text_new();
+	renderer_col1 = gtk_cell_renderer_text_new();
+	renderer_col2 = gtk_cell_renderer_text_new();
 	char label[20];
 	sprintf(label,"trame n°%d",tmp_cell->obj->id);
-	column = gtk_tree_view_column_new_with_attributes(label, renderer, "text", INFOS_COLUMN, NULL);
+	column = gtk_tree_view_column_new_with_attributes(label, renderer_col1, "text", INFOS_COLUMN, NULL);
+	column_2 = gtk_tree_view_column_new_with_attributes(label, renderer_col2, "text", VALUE_COLUMN, NULL);
 	
 	
 	
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column_2);
 	gtk_widget_grab_focus(tmp_cell->arbre);
 	
 	return;

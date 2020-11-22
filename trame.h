@@ -12,11 +12,12 @@ typedef struct trame_{
 	//couche ethernet
 	char *mac_dest;
 	char *mac_source;
-	int *ip_type;
+	char *ip_type;
 	
 	//couche ip
-	int version_HL;
-	int DSF;
+	char *version;
+	char *header_length;
+
 	int *total_length;
 	int *identification;
 	int *flags_frag_offset;
