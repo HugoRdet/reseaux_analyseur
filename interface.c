@@ -327,7 +327,7 @@ void remplir_arbre(GtkWidget *pWidget, gpointer pData){
 	char label[20];
 	sprintf(label,"trame n°%d",tmp_cell->obj->id);
 	column = gtk_tree_view_column_new_with_attributes(label, renderer_col1, "text", INFOS_COLUMN, NULL);
-	column_2 = gtk_tree_view_column_new_with_attributes(label, renderer_col2, "text", VALUE_COLUMN, NULL);
+	column_2 = gtk_tree_view_column_new_with_attributes(NULL, renderer_col2, "text", VALUE_COLUMN, NULL);
 	
 	
 	

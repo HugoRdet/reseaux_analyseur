@@ -174,17 +174,15 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 	char c;
 	int offset;
 	int tmp;
-	int cpt_lignes=0;
+	
 	do{
 		c=fgetc(fichier_src);
 		if (c==EOF){
-			(*ligne)+=cpt_lignes;
 			return 0;
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
 			fin_ligne(fichier_src,ligne,c);
-			cpt_lignes++;
 			continue;
 		}else{
 			offset=tmp;
@@ -192,13 +190,11 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		
 		c=fgetc(fichier_src);
 		if (c==EOF){
-			(*ligne)+=cpt_lignes;
 			return 0;
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
 			fin_ligne(fichier_src,ligne,c);
-			cpt_lignes++;
 			continue;
 		}else{
 			offset=offset*16+tmp;
@@ -206,19 +202,16 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		
 		c=fgetc(fichier_src);
 		if (c==' '){
-			(*ligne)+=cpt_lignes;
 			(*pt_offset)=offset;
 			return 1;
 		}
 		
 		if (c==EOF){
-			(*ligne)+=cpt_lignes;
 			return 0;
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
 			fin_ligne(fichier_src,ligne,c);
-			cpt_lignes++;
 			continue;
 		}else{
 			offset=offset*16+tmp;
@@ -226,18 +219,15 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 		
 		c=fgetc(fichier_src);
 		if (c==EOF){
-			(*ligne)+=cpt_lignes;
 			return 0;
 		}
 		tmp=val_exa_int(c);
 		if (tmp==-1){
 			fin_ligne(fichier_src,ligne,c);
-			cpt_lignes++;
 			continue;
 		}else{
 			offset=offset*16+tmp;
 		}
-		(*ligne)+=cpt_lignes;
 		(*pt_offset)=offset;
 		
 		return 1;
@@ -357,7 +347,6 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	int offset=0;
 	int offset_prec=0;
 	int offset_prec_prec=0;
-	int tmp_ligne=0;
 	int verif=1;
 	
 	trame *new_trame=(trame *) malloc(sizeof(trame));
@@ -375,9 +364,9 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		
 		do{
 			offset=offset_prec;
-			verif=cherche_prochaine_ligne(fichier_src,&offset,&tmp_ligne);
+			verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			(*ligne)++;
-		}while((offset!=0)&&(offset<=offset_prec_prec));
+		}while(((offset!=0)&&(offset<=offset_prec_prec))&&(verif!=0));
 		
 		
 		//fin de fichier
@@ -388,23 +377,23 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		}
 		
 		if (offset-offset_prec>0){
-			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,*ligne);
+			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
 			
-			while (offset!=0) {
-					cherche_prochaine_ligne(fichier_src,&offset,ligne);
-					(*ligne)++;
+			while ((offset!=0)&&(verif!=0)) {
+					verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
 			
+			
+			
 			new_trame->nb_octet_erreur=offset_prec;
-			new_trame->nb_ligne_erreur=*ligne;
+			new_trame->nb_ligne_erreur=(*ligne)-2;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
-			return 1;
+			return verif;
 		}
 	
 	}while (offset!=0);
 	
-		
 	lecture_trame(new_trame);
 	ajout_liste(liste,new_trame,box_haut, box_bas);
 	return 1;
