@@ -36,7 +36,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
 	gint res;
 	
-	dialog = gtk_file_chooser_dialog_new ("Ouvrir un fichier (.txt)",
+	dialog = gtk_file_chooser_dialog_new ("Ouvrir un fichier",
 		GTK_WINDOW(fenetre),
 		action,
 		("_Annuler"),
@@ -53,22 +53,30 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
 				filename = gtk_file_chooser_get_filename (chooser);
 				FILE *fichier_source=fopen(filename,"r");
-				
+				printf("%s\n",filename);
+				int verif=1;
 				int res=1;
 				int ligne=1;
 				int offset=1;
 				
 
 				while (res!=0) {
-					while (offset!=0) {
-						cherche_prochaine_ligne(fichier_source,&offset,&ligne);
+					while ((offset!=0)&&(verif!=0)) {
+						verif=cherche_prochaine_ligne(fichier_source,&offset,&ligne);
 					}
+					if (verif==0){
+						break;
+						gtk_widget_destroy (dialog);
+						fclose(fichier_source);
+						return;
+					}
+					
 					res=charge_trame(fichier_source,&ligne,pvbox->taille_liste,pvbox->liste,pvbox_haut, pvbox_bas);
 					
 					pvbox->taille_liste++;
 				}
 				
-				
+				fclose(fichier_source);
 				break;
 			}
 		default:
@@ -128,11 +136,11 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
 	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
 	
-	
+	/*
 	gtk_widget_set_name(ouvrir_fichier_icone,"fond_menu");
 	gtk_widget_set_name(fermer_fichier_icone,"fond_menu");
 	gtk_widget_set_name(sauvegarder_fichier_icone,"fond_menu");
-	
+	*/
 
 	
 	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);

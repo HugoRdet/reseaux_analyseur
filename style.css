@@ -32,8 +32,24 @@
     padding: 0px;
 }
 
+#fond_menu:hover{
+    background-image: none;
+    background: #292929;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding: 0px;
+}
+
 .fond_menu_icons{
     background: #6D6D6D;
+    -unico-inner-stroke-width:0;
+}
+
+.fond_menu_icons:hover{
+    background: #6D6D6D;
+    -unico-inner-stroke-width:0;
 }
 
 
