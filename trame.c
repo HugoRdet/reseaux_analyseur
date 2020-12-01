@@ -342,7 +342,7 @@ static inline int lecture_trame(trame *new_trame){
 	else{
 		new_trame->dont_fragment = "Not Set";
 	}
-	
+
 	bit = valeur_n_eme_bit(tab_ligne[20], 5);
 	new_trame->f2 = bit;
 	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
@@ -384,25 +384,27 @@ static inline int lecture_trame(trame *new_trame){
 	
 	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
 		return 1;
-	
+
+
 	new_trame->source_port =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
-	
+
 	new_trame->destination_port =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
-	
+
 	new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
 	long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
 	sprintf(new_trame->sequence_number_raw, "%ld",raw);
-	
+
 	new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
 	raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
 	sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
-	
+
 	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
 	header_length=tab_ligne[46+i]/16*4;
 	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i], header_length);
-	
+
+
 	new_trame->urg =(char*)malloc(sizeof(char)*7);
 	new_trame->ack =(char*)malloc(sizeof(char)*7);
 	new_trame->push =(char*)malloc(sizeof(char)*7);
@@ -443,10 +445,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	new_trame->window =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
-	
+
+
 	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
 	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
-	
+
+
 	return 1;
 	
 }

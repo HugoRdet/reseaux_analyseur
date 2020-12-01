@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 
 typedef struct trame_{
-	unsigned int *tab;
+	int *tab;
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
