@@ -299,12 +299,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
 	sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
-
+	
 	
 	new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
 	sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
 	
-
+	
 	new_trame->version=(char *)malloc(sizeof(char)*4);
 	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
 	new_trame->header_length=(char *)malloc(sizeof(char)*10);
@@ -315,7 +315,7 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->total_length=(char *) malloc(sizeof(char)*10);
 	int total_length = tab_ligne[16]*256 + tab_ligne[17];
 	sprintf(new_trame->total_length, "%d", total_length);
-
+	
 	new_trame->identification=(char *) malloc(sizeof(char)*20);
 	int identifier=tab_ligne[18]*256+tab_ligne[19];
 	sprintf(new_trame->identification, "0x%X%X\t(%d)", tab_ligne[18], tab_ligne[19], identifier);
@@ -323,29 +323,42 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
 	sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
 	int bit; 
-
+	
 	bit = valeur_n_eme_bit(tab_ligne[20], 7);
+	new_trame->f0 = bit;
 	new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
-	if(bit){new_trame->reserved_bit = "Set";}
-	else{new_trame->reserved_bit = "Not Set";}
+	if(bit){
+		new_trame->reserved_bit = "Set";
+	}else{
+		new_trame->reserved_bit = "Not Set";
+	}
 	
 	bit = valeur_n_eme_bit(tab_ligne[20], 6);
+	new_trame->f1 = bit;
 	new_trame->dont_fragment=(char*)malloc(sizeof(char)*20);
-	if(bit){new_trame->dont_fragment = "Set";}
-	else{new_trame->dont_fragment = "Not Set";}
-
-	bit = valeur_n_eme_bit(tab_ligne[20], 5);
-	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
-	if(bit){new_trame->more_fragment = "Set";}
-	else{new_trame->more_fragment = "Not Set";}
+	if(bit){
+		new_trame->dont_fragment = "Set";
+	}
+	else{
+		new_trame->dont_fragment = "Not Set";
+	}
 	
+	bit = valeur_n_eme_bit(tab_ligne[20], 5);
+	new_trame->f2 = bit;
+	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
+	if(bit){
+		new_trame->more_fragment = "Set";
+	}
+	else{
+		new_trame->more_fragment = "Not Set";
+	}
 	
 	new_trame->frag_offset = (char *)malloc(sizeof(char)*10);
 	int frag = (tab_ligne[20]%64)*256+tab_ligne[21];
 	sprintf(new_trame->frag_offset, "%d",frag);
-		
+	
 	new_trame->TTL=tab_ligne[22];
-
+	
 	new_trame->protocol=(char*)malloc(sizeof(char)*10);
 	if(tab_ligne[23] == 1){
 		sprintf(new_trame->protocol,"ICMP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
@@ -357,7 +370,7 @@ static inline int lecture_trame(trame *new_trame){
 		sprintf(new_trame->protocol,"UDP\t(%d%d)", tab_ligne[23]/16,tab_ligne[23]%16);
 	}
 	
-
+	
 	new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
 	sprintf(new_trame->header_checksum,"0x%X%X%X%X", tab_ligne[24]/16,tab_ligne[24]%16, tab_ligne[25]/16, tab_ligne[25]%16);
 	
@@ -368,6 +381,72 @@ static inline int lecture_trame(trame *new_trame){
 	sprintf(new_trame->ip_dest,"%d.%d.%d.%d", tab_ligne[30],tab_ligne[31],tab_ligne[32],tab_ligne[33]);
 	
 	int i=header_length-20;
+	
+	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
+		return 1;
+	
+	new_trame->source_port =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
+	
+	new_trame->destination_port =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
+	
+	new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
+	long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
+	sprintf(new_trame->sequence_number_raw, "%ld",raw);
+	
+	new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
+	raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
+	sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
+	
+	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
+	header_length=tab_ligne[46+i]/16*4;
+	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i], header_length);
+	
+	new_trame->urg =(char*)malloc(sizeof(char)*7);
+	new_trame->ack =(char*)malloc(sizeof(char)*7);
+	new_trame->push =(char*)malloc(sizeof(char)*7);
+	new_trame->reset =(char*)malloc(sizeof(char)*7);
+	new_trame->syn =(char*)malloc(sizeof(char)*7);
+	new_trame->fin =(char*)malloc(sizeof(char)*7);
+	
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
+	new_trame->tcp_f0=bit;
+	if(bit){
+		sprintf(new_trame->urg,"Set");
+	}else{sprintf(new_trame->urg,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
+	new_trame->tcp_f1=bit;
+	if(bit){
+		sprintf(new_trame->ack,"Set");
+	}else{sprintf(new_trame->ack,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
+	new_trame->tcp_f2=bit;
+	if(bit){
+		sprintf(new_trame->push,"Set");
+	}else{sprintf(new_trame->push,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
+	new_trame->tcp_f3=bit;
+	if(bit){
+		sprintf(new_trame->reset,"Set");
+	}else{sprintf(new_trame->reset,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
+	new_trame->tcp_f4=bit;
+	if(bit){
+		sprintf(new_trame->syn,"Set");
+	}else{sprintf(new_trame->syn,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
+	new_trame->tcp_f5=bit;
+	if(bit){
+		sprintf(new_trame->fin,"Set");
+	}else{sprintf(new_trame->fin,"Not Set");}
+	
+	new_trame->window =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
+	
+	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
+	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
+	
 	return 1;
 	
 }
@@ -413,7 +492,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
 			
 			while ((offset!=0)&&(verif!=0)) {
-					verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
+				verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
 			
 			
@@ -425,7 +504,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			new_trame->place=offset;
 			return verif;
 		}
-	
+		
 	}while (offset!=0);
 	
 	lecture_trame(new_trame);

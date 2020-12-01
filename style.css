@@ -1,3 +1,6 @@
+
+
+
 #fond_dark{
     background-image: none;
     background-color: #25262A;
@@ -22,6 +25,12 @@
     background: #292929;
     padding: 0px;
 }
+
+
+#expander{
+ }
+ #expander:active{
+ }
 
 #expander-tabbed{
     padding: 5px;
@@ -51,6 +60,21 @@
     font-family: DejaVu Sans;
     font-weight: lighter;
     font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#button_dark_mode_error_pop_up{
+    background-color: #434343;
+    color: #DFDFDF;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 14px;
     background-image: none;
     border:0px;
     border-radius:0;

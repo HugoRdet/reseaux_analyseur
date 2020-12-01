@@ -52,7 +52,8 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		("_Ouvrir"),
 		GTK_RESPONSE_ACCEPT,
 		NULL);
-	
+	//gtk_widget_set_name(dialog,"button_dark_mode_error_pop_up");
+	//gtk_widget_show (dialog);
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
 	switch (res){
 		case GTK_RESPONSE_ACCEPT :
@@ -67,7 +68,8 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				int ligne=1;
 				int offset=1;
 				
-
+				int id_liste_avant_ajout=(pvbox->taille_liste);
+				
 				while (res!=0) {
 					while ((offset!=0)&&(verif!=0)) {
 						verif=cherche_prochaine_ligne(fichier_source,&offset,&ligne);
@@ -85,6 +87,25 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				}
 				
 				fclose(fichier_source);
+				
+				if (id_liste_avant_ajout==(pvbox->taille_liste)){
+					
+					GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+					GtkWidget *dialog_error = gtk_message_dialog_new (GTK_WINDOW (*(pvbox->window)),
+						flags,
+						GTK_MESSAGE_ERROR,
+						GTK_BUTTONS_NONE,
+						" Aucune trame trouvée dans le fichier :\n“%s”",filename);
+					
+					gtk_widget_set_name(dialog_error,"button_dark_mode_error_pop_up");
+					
+					g_signal_connect_swapped (dialog_error, "response",
+						G_CALLBACK (gtk_widget_destroy),
+						dialog_error);
+					gtk_widget_show (dialog_error);
+
+				}
+				
 				break;
 			}
 		default:
@@ -147,7 +168,7 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 		GTK_RESPONSE_ACCEPT,
 		NULL);
 	
-	GtkWidget *chooser = GTK_FILE_CHOOSER (dialog);
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
 	
 	
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -326,17 +347,16 @@ void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData){
 	
 	
 }
-
 void remplir_ethernet(GtkWidget *box_ethernet,cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	
-	sprintf(label,"\t\tDestination:  %s\n",(tmp_cell->obj->mac_dest));
+	sprintf(label,"\t\tSource\t:  %s\n",(tmp_cell->obj->mac_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
-
-	sprintf(label,"\t\tSource:  %s\n",(tmp_cell->obj->mac_source));
+	
+	sprintf(label,"\t\tDestination:  %s\n",(tmp_cell->obj->mac_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
@@ -361,18 +381,18 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tTotal Length: %s\n",(tmp_cell->obj->total_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tIdentification: %s\n",(tmp_cell->obj->identification));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
-
+	
+	
 	GtkWidget *flags=gtk_expander_new ("Flags");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(flags),FALSE);
 	gtk_box_pack_start (GTK_BOX(box_ip),flags,FALSE,FALSE,0);
@@ -380,67 +400,149 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	gtk_container_add(GTK_CONTAINER(flags),box_flags);	
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags),GTK_ORIENTATION_VERTICAL);
 	gtk_widget_set_name(GTK_WIDGET(flags),"expander-tabbed");
-
+	
 	sprintf(label,"\t\tValue: %s\n",(tmp_cell->obj->flags_offset));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
-
-	sprintf(label,"\t\tReserved bit: %s\n",(tmp_cell->obj->reserved_bit));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
-
-	sprintf(label,"\t\tDon't Fragment: %s\n",(tmp_cell->obj->dont_fragment));
+	
+	sprintf(label,"\t\t %d... .... = Reserved bit: %s\n",tmp_cell->obj->f0, (tmp_cell->obj->reserved_bit));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\t\tMore Fragments: %s\n",(tmp_cell->obj->more_fragment));
+	sprintf(label,"\t\t .%d.. .... = Don't Fragment: %s\n",tmp_cell->obj->f1,(tmp_cell->obj->dont_fragment));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
-
+	
+	sprintf(label,"\t\t ..%d. .... = More Fragments: %s\n",tmp_cell->obj->f2,(tmp_cell->obj->more_fragment));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+	
 	sprintf(label,"\t\tFragment Offset: %s\n",(tmp_cell->obj->frag_offset));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-		
+	
 	sprintf(label,"\t\tTime to Live: %d\n",(tmp_cell->obj->TTL));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tProtocol: %s\n",(tmp_cell->obj->protocol));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tHeader Checksum: %s\n",(tmp_cell->obj->header_checksum));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tSource Address: %s\n",(tmp_cell->obj->ip_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	
 	sprintf(label,"\t\tDestination Address: %s\n",(tmp_cell->obj->ip_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 }
 
-void remplir_http(){
-
-}
+void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	
+	char label[80];
+	GtkWidget *tmp_label=NULL;
+	
+	sprintf(label,"\t\tSource Port: %s\n",(tmp_cell->obj->source_port));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tDestination Port: %s\n",(tmp_cell->obj->destination_port));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tSequence Number (raw): %s\n",(tmp_cell->obj->sequence_number_raw));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tAcknowledgment Number (raw): %s\n",(tmp_cell->obj->acknowledgment_number_raw));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->tcp_header_length));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	GtkWidget *tcp_flags=gtk_expander_new ("Flags");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_flags),FALSE);
+	gtk_box_pack_start (GTK_BOX(box_tcp),tcp_flags,FALSE,FALSE,0);
+	GtkWidget *box_flags_2=gtk_box_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(tcp_flags),box_flags_2);	
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags_2),GTK_ORIENTATION_VERTICAL);
+	gtk_widget_set_name(GTK_WIDGET(tcp_flags),"expander-tabbed");
+	
+	
+	sprintf(label,"\t\t..%d. .... = Urgent: %s\n",tmp_cell->obj->tcp_f0, (tmp_cell->obj->urg));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\t...%d .... = Acknowledgement: %s\n",tmp_cell->obj->tcp_f1, (tmp_cell->obj->ack));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\t.... %d... = Push: %s\n",tmp_cell->obj->tcp_f2, (tmp_cell->obj->push));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\t.... .%d.. = Reset: %s\n",tmp_cell->obj->tcp_f3, (tmp_cell->obj->reset));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\t.... ..%d. = Syn: %s\n",tmp_cell->obj->tcp_f4, (tmp_cell->obj->syn));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\t.... ...%d = Fin: %s\n",tmp_cell->obj->tcp_f5, (tmp_cell->obj->fin));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tWindow: %s\n",(tmp_cell->obj->window));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tChecksum: %s\n",(tmp_cell->obj->tcp_checksum));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+}
+
 void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	
 	cell *tmp_cell=(cell *)pData;
+	char tmp_label[40];
+	sprintf(tmp_label,"trame n°%d",tmp_cell->obj->id);
+	GtkWidget *label_trame=gtk_label_new (tmp_label);
+	gtk_label_set_xalign (GTK_LABEL(label_trame),0);
+	gtk_box_pack_start (GTK_BOX(new_box),label_trame,FALSE,FALSE,0);
 	
-	GtkWidget *ethernet=gtk_expander_new ("Ethernet II");
+	GtkWidget *ethernet=gtk_expander_new ("\nEthernet II\n");
+	gtk_widget_set_name(GTK_WIDGET(ethernet),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(ethernet),FALSE);
 	gtk_box_pack_start (GTK_BOX(new_box),ethernet,FALSE,FALSE,0);
 	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
@@ -448,55 +550,22 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
 	remplir_ethernet(box_ethernet,tmp_cell);	
 	
-	GtkWidget *IP=gtk_expander_new ("Internet Protocol");
+	GtkWidget *IP=gtk_expander_new ("\nInternet Protocol\n");
+	gtk_widget_set_name(GTK_WIDGET(IP),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
 	gtk_box_pack_start (GTK_BOX(new_box),IP,FALSE,FALSE,0);
 	GtkWidget *box_ip=gtk_box_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(IP),box_ip);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-
 	remplir_ip(box_ip, tmp_cell);	
-
-}		
-	/*
-	GtkTreeStore *arbre=gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-	GtkTreeIter header_ethernet;
-	GtkTreeIter contenu_ethernet;
-	GtkTreeIter header_IP;
-	GtkTreeIter contenu_IP;
 	
-	gtk_tree_store_insert (arbre,&header_ethernet,NULL,-1);
-	gtk_tree_store_set(arbre, &header_ethernet,0,"Ethernet II",1,NULL, -1);
-	
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "Source:",1,tmp_cell->obj->mac_source, -1);
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-}
-
-void remplir_http(){
+	GtkWidget *tcp=gtk_expander_new ("\nTransmission Control Protocol\n");
+	gtk_widget_set_name(GTK_WIDGET(tcp),"expander");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp),FALSE);
+	gtk_box_pack_start (GTK_BOX(new_box),tcp,FALSE,FALSE,0);
+	GtkWidget *box_tcp=gtk_box_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(tcp),box_tcp);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_tcp),GTK_ORIENTATION_VERTICAL);
+	remplir_tcp(box_tcp, tmp_cell);	
 
 }
-	
-void remplir_arbre(GtkWidget *new_box, gpointer pData){
-	
-	cell *tmp_cell=(cell *)pData;
-	
-	GtkWidget *ethernet=gtk_expander_new ("Ethernet II");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(ethernet),FALSE);
-	gtk_box_pack_start (GTK_BOX(new_box),ethernet,FALSE,FALSE,0);
-	
-	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
-	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
-	remplir_ethernet(box_ethernet,tmp_cell);	
-	
-	GtkWidget *IP=gtk_expander_new ("Internet Protocol");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
-	gtk_box_pack_start (GTK_BOX(new_box),IP,FALSE,FALSE,0);
-	
-	GtkWidget *box_ip=gtk_box_new(FALSE,0);
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-	gtk_container_add(GTK_CONTAINER(IP),box_ip);
-	remplir_ip(box_ip,tmp_cell);	
-		
-	return;*/
