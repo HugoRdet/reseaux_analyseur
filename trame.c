@@ -307,7 +307,7 @@ static inline int lecture_trame(trame *new_trame){
 	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
 	new_trame->header_length=(char *)malloc(sizeof(char)*10);
 	int header_length=tab_ligne[14]%16*4;
-	sprintf(new_trame->header_length, "(%X) - %d bytes",tab_ligne[14]%16, header_length);
+	sprintf(new_trame->header_length, "(%X)\t%d bytes",tab_ligne[14]%16, header_length);
 	
 	
 	new_trame->total_length=(char *) malloc(sizeof(char)*10);
@@ -316,7 +316,7 @@ static inline int lecture_trame(trame *new_trame){
 
 	new_trame->identification=(char *) malloc(sizeof(char)*20);
 	int identifier=tab_ligne[18]*256+tab_ligne[19];
-	sprintf(new_trame->identification, "0x%X%X - (%d)", tab_ligne[18], tab_ligne[19], identifier);
+	sprintf(new_trame->identification, "0x%X%X\t(%d)", tab_ligne[18], tab_ligne[19], identifier);
 	
 	new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
 	sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
@@ -336,14 +336,30 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
 	if(bit){new_trame->more_fragment = "Set";}
 	else{new_trame->more_fragment = "Not Set";}
+	
+	
+	new_trame->frag_offset = (char *)malloc(sizeof(char)*10);
+	int frag = (tab_ligne[20]%64)*256+tab_ligne[21];
+	sprintf(new_trame->frag_offset, "%d",frag);
 		
 	new_trame->TTL=tab_ligne[22];
-	new_trame->protocol=tab_ligne[23];
+
+	new_trame->protocol=(char*)malloc(sizeof(char)*10);
+	if(tab_ligne[23] == 1){
+		sprintf(new_trame->protocol,"ICMP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+	}
+	if(tab_ligne[23] == 6){
+		sprintf(new_trame->protocol,"TCP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+	}
+	if(tab_ligne[23] == 23){
+		sprintf(new_trame->protocol,"UDP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+	}
 	
-	new_trame->header_checksum=(int *) malloc(sizeof(int)*2);
+/*
+	new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
 	(new_trame->header_checksum)[0]=tab_ligne[24];
 	(new_trame->header_checksum)[1]=tab_ligne[25];
-	
+*/	
 	new_trame->ip_source=(int *) malloc(sizeof(int)*4);
 	(new_trame->ip_source)[0]=tab_ligne[26];
 	(new_trame->ip_source)[1]=tab_ligne[27];

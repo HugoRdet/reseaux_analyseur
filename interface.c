@@ -401,7 +401,20 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 
+	sprintf(label,"\t\tFragment Offset : %s\n",(tmp_cell->obj->frag_offset));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+	sprintf(label,"\t\tTime to Live : %d\n",(tmp_cell->obj->TTL));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
+	sprintf(label,"\t\tProtocol : %s\n",(tmp_cell->obj->protocol));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 }
 
 void remplir_http(){
@@ -429,7 +442,7 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 
 	remplir_ip(box_ip, tmp_cell);	
 
-	
+}		
 	/*
 	GtkTreeStore *arbre=gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 	GtkTreeIter header_ethernet;
@@ -471,6 +484,4 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	gtk_container_add(GTK_CONTAINER(IP),box_ip);
 	remplir_ip(box_ip,tmp_cell);	
 		
-	return;
-}
-	
+	return;*/
