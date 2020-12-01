@@ -260,7 +260,7 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_haut),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox_haut);
 	
-	GtkWidget *menu_label=gtk_toggle_button_new_with_label("Id\t     IP source       \tIP destination");
+	GtkWidget *menu_label=gtk_toggle_button_new_with_label("Id\t     Source       \tDestination       \tProtocol");
 	gtk_widget_set_name(menu_label,"label_menu_dark_mode");
 	gtk_widget_set_vexpand (menu_label, FALSE);
 	gtk_widget_set_hexpand (menu_label, FALSE);
@@ -412,6 +412,21 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
 	sprintf(label,"\t\tProtocol : %s\n",(tmp_cell->obj->protocol));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tHeader Checksum : %s\n",(tmp_cell->obj->header_checksum));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tSource Address : %s\n",(tmp_cell->obj->ip_source));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tDestination Address : %s\n",(tmp_cell->obj->ip_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);

@@ -242,7 +242,9 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
 	char label[80];
-	sprintf(label,"%d\t%d:%d:%d:%d\t%d:%d:%d:%d",elem->id,(elem->ip_source)[0],(elem->ip_source)[1],(elem->ip_source)[2],(elem->ip_source)[3],(elem->ip_dest)[0],(elem->ip_dest)[1],(elem->ip_dest)[2],(elem->ip_dest)[3]);					
+	char protocol_code[4];
+	strncpy(protocol_code, elem->protocol,3);
+	sprintf(label,"%d\t %s\t %s\t %s",elem->id,elem->ip_source, elem->ip_dest,protocol_code);					
 	
 	
 	GtkWidget* tmp_bouton=gtk_toggle_button_new_with_label(label);
@@ -355,30 +357,17 @@ static inline int lecture_trame(trame *new_trame){
 		sprintf(new_trame->protocol,"UDP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
 	}
 	
-/*
+
 	new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
-	(new_trame->header_checksum)[0]=tab_ligne[24];
-	(new_trame->header_checksum)[1]=tab_ligne[25];
-*/	
-	new_trame->ip_source=(int *) malloc(sizeof(int)*4);
-	(new_trame->ip_source)[0]=tab_ligne[26];
-	(new_trame->ip_source)[1]=tab_ligne[27];
-	(new_trame->ip_source)[2]=tab_ligne[28];
-	(new_trame->ip_source)[3]=tab_ligne[29];
+	sprintf(new_trame->header_checksum,"0x%X%X%X%X", tab_ligne[24]/16,tab_ligne[24]%16, tab_ligne[25]/16, tab_ligne[25]%16);
 	
-	new_trame->ip_dest=(int *) malloc(sizeof(int)*4);
-	(new_trame->ip_dest)[0]=tab_ligne[30];
-	(new_trame->ip_dest)[1]=tab_ligne[31];
+	new_trame->ip_source=(char *) malloc(sizeof(char)*15);
+	sprintf(new_trame->ip_source,"%d.%d.%d.%d", tab_ligne[26],tab_ligne[27],tab_ligne[28],tab_ligne[29]);
 	
-	
-	(new_trame->ip_dest)[2]=tab_ligne[32];
-	(new_trame->ip_dest)[3]=tab_ligne[33];
+	new_trame->ip_dest=(char *) malloc(sizeof(char)*15);
+	sprintf(new_trame->ip_dest,"%d.%d.%d.%d", tab_ligne[30],tab_ligne[31],tab_ligne[32],tab_ligne[33]);
 	
 	int i=header_length-20;
-	
-	
-	
-	
 	return 1;
 	
 }

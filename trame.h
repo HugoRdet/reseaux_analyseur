@@ -27,9 +27,9 @@ typedef struct trame_{
 	char *frag_offset;
 	int TTL;
 	char *protocol;
-	int *header_checksum; 
-	int *ip_source;
-	int *ip_dest;
+	char *header_checksum; 
+	char *ip_source;
+	char *ip_dest;
 	
 	//couche tcp
 	int source_port;
