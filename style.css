@@ -23,6 +23,11 @@
     padding: 0px;
 }
 
+#expander{
+}
+#expander::active{
+}
+
 #expander-tabbed{
     padding: 5px;
     margin-left:38px;

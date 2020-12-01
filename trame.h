@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 
 typedef struct trame_{
-	unsigned int *tab;
+	int *tab;
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
@@ -25,6 +25,9 @@ typedef struct trame_{
 	char *dont_fragment;
 	char *more_fragment;
 	char *frag_offset;
+	int f0;
+	int f1;
+	int f2;
 	int TTL;
 	char *protocol;
 	char *header_checksum; 
@@ -32,16 +35,29 @@ typedef struct trame_{
 	char *ip_dest;
 	
 	//couche tcp
-	int source_port;
-	int destination_port;
-	int stream_index;
-	int tcp_seg_len;
+	char *source_port;
+	char *destination_port;
 	char* sequence_number;
-	int sequence_number_raw;
+	char* sequence_number_raw;
 	char *next_sequence_number;
 	char *acknowledgment_number;
-	int acknowledgment_number_raw;
+	char *acknowledgment_number_raw;
 	char *tcp_header_length;
+	char *urg;
+	char *ack;
+	char *push;
+	char *reset;
+	char *syn;
+	char *fin;
+	int tcp_f0;
+	int tcp_f1;
+	int tcp_f2;
+	int tcp_f3;
+	int tcp_f4;
+	int tcp_f5;
+	char *window;
+	char *tcp_checksum;
+	//...
 }trame;
 
 typedef struct cell_{
