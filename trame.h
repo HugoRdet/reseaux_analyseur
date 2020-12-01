@@ -7,7 +7,11 @@ typedef struct trame_{
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
+<<<<<<< HEAD
 	int place;	
+=======
+	int place;
+>>>>>>> cb4cd1def5fbe5e41fd36ff1cbe4b3e10a8848cd
 	
 	//couche ethernet
 	char *mac_dest;
@@ -45,11 +49,11 @@ typedef struct trame_{
 
 typedef struct cell_{
 	trame *obj;
-	GtkWidget *arbre;
 	GtkWidget *bouton;
 	GtkWidget *revealer;
 	struct cell_ *suiv;
 	int status_bouton_ip;
+	
 	
 }cell;
 

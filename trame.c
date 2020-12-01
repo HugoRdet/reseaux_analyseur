@@ -254,7 +254,6 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	cell *new_cell=(cell *) malloc(sizeof(cell));
 	
 	new_cell->obj=elem;
-	new_cell->arbre=NULL;
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	new_cell->status_bouton_ip=0;

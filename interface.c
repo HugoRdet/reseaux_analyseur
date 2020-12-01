@@ -11,7 +11,7 @@ void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
 		gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode_status_1");
 		gtk_widget_show (GTK_WIDGET(cellule_obj->bouton));
 		gtk_revealer_set_reveal_child (GTK_REVEALER(cellule_obj->revealer),TRUE);
-		//gtk_widget_show_all(GTK_WIDGET(cellule_obj->arbre));
+		
 	}else{
 		cellule_obj->status_bouton_ip=0;
 		
@@ -106,7 +106,8 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		a_supp=liste;
 		liste=liste->suiv;
 		gtk_widget_destroy(a_supp->bouton);
-		gtk_widget_destroy(a_supp->arbre);
+		gtk_widget_destroy(a_supp->revealer);
+		
 		free(a_supp->obj->tab);
 		free(a_supp->obj->mac_dest);
 		free(a_supp->obj->mac_source);
@@ -116,10 +117,57 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	}
 	pvbox->taille_liste=1;
 	*(pvbox->liste)=NULL;
+	
 }
 
 void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
-	printf("prout alors\n");
+	box *pvbox=(box*)pData;
+	GtkWidget *pvbox_haut=*(pvbox->pvbox_haut);
+	GtkWidget *pvbox_bas=*(pvbox->pvbox_bas);
+	
+	GtkWidget *fenetre= gtk_window_new(GTK_WINDOW_POPUP);
+	
+	//positions de la fenetre lors de l ouverture
+	gtk_window_set_position(GTK_WINDOW(fenetre), GTK_WIN_POS_CENTER );
+	
+	//taille de la fenetre
+	gtk_window_set_default_size(GTK_WINDOW(fenetre),600, 500);
+	
+	
+	GtkWidget *dialog;
+	GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_SAVE;
+	gint res;
+	
+	dialog = gtk_file_chooser_dialog_new ("Sauvegarder un fichier",
+		GTK_WINDOW(fenetre),
+		action,
+		("_Annuler"),
+		GTK_RESPONSE_CANCEL,
+		("_Sauvegarder"),
+		GTK_RESPONSE_ACCEPT,
+		NULL);
+	
+	GtkWidget *chooser = GTK_FILE_CHOOSER (dialog);
+	
+	
+	res = gtk_dialog_run (GTK_DIALOG (dialog));
+	switch (res){
+		case GTK_RESPONSE_ACCEPT :
+			{
+				char *filename;
+				
+				filename = gtk_file_chooser_get_filename (chooser);
+				FILE *fichier=fopen(filename,"w");
+				
+				fprintf(fichier,"%s\n",filename);
+				fclose(fichier);
+				break;
+			}
+		default:
+			break;
+	}
+	
+	gtk_widget_destroy (dialog);
 }
 
 GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
@@ -422,56 +470,7 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(IP),box_ip);
 	remplir_ip(box_ip,tmp_cell);	
-	/*
-	GtkTreeStore *arbre=gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-	GtkTreeIter header_ethernet;
-	GtkTreeIter contenu_ethernet;
-	GtkTreeIter header_IP;
-	GtkTreeIter contenu_IP;
-	
-	gtk_tree_store_insert (arbre,&header_ethernet,NULL,-1);
-	gtk_tree_store_set(arbre, &header_ethernet,0,"Ethernet II",1,NULL, -1);
-	
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "Source:",1,tmp_cell->obj->mac_source, -1);
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "Destination:",1,tmp_cell->obj->mac_dest, -1);
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "type:",1,tmp_cell->obj->ip_type, -1);
-	
-	gtk_tree_store_insert(arbre,&header_IP,NULL,-1);
-	gtk_tree_store_set(arbre,&header_IP,0,"Internet Protocol",1,"", -1);
-	
-	gtk_tree_store_insert(arbre,&contenu_IP,&header_IP,-1);
-	gtk_tree_store_set(arbre,&contenu_IP,0,"IP Version:",1,tmp_cell->obj->version, -1);
-	gtk_tree_store_insert(arbre,&contenu_IP,&header_IP,-1);
-	gtk_tree_store_set(arbre,&contenu_IP,0,"IP Version:",1,tmp_cell->obj->version, -1);
-	gtk_tree_store_insert(arbre,&contenu_IP,&header_IP,-1);
-	gtk_tree_store_set(arbre,&contenu_IP,0,"IP Version:",1,tmp_cell->obj->version, -1);
-	
-
-	tmp_cell->arbre = gtk_tree_view_new_with_model(GTK_TREE_MODEL(arbre));
-	
-	GtkCellRenderer *renderer_col_0;
-	GtkCellRenderer *renderer_col_1;
-	GtkTreeViewColumn *column_0;
-	GtkTreeViewColumn *column_1;
-	
-	
-	char label[20];
-	sprintf(label,"trame n°%d",tmp_cell->obj->id);
-
-	renderer_col_0 = gtk_cell_renderer_text_new();
-	renderer_col_1 = gtk_cell_renderer_text_new();
-	
-	column_0 = gtk_tree_view_column_new_with_attributes(label, renderer_col_0, "text", 0, NULL);
-	column_1 = gtk_tree_view_column_new_with_attributes(NULL, renderer_col_1, "text",1, NULL);
-	
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column_0);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tmp_cell->arbre), column_1);
-	
-	*/
-	
+		
 	return;
 }
 	
