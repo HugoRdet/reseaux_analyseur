@@ -1,9 +1,4 @@
-
-
-
 #fond_dark{
-    border:0px;
-    border-radius:0;
     background-image: none;
     background-color: #25262A;
     box-shadow:none;
@@ -25,22 +20,10 @@
 #fond_menu{
     background-image: none;
     background: #292929;
-    border-radius:0;
-    box-shadow:none;
-    border-style:none;
-    text-shadow: none;
     padding: 0px;
 }
 
-#fond_menu:hover{
-    background-image: none;
-    background: #292929;
-    border-radius:0;
-    box-shadow:none;
-    border-style:none;
-    text-shadow: none;
-    padding: 0px;
-}
+
 
 .fond_menu_icons{
     background: #6D6D6D;
@@ -84,6 +67,23 @@
     padding:2px 0 2px 0;
 }
 
+#button_dark_mode_erreur{
+    background-color: #434343;
+    color: #D85757;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+
+
 #tree_dark_mode{
     background-color: #434343;
     color: #DFDFDF;
@@ -117,32 +117,28 @@
 #button_dark_mode:active{
     background-color: #3593F7;
     color: #DFDFDF;
-    box-shadow: none;
-    font-family: DejaVu Sans;
-    font-weight: lighter;
-    
+}
+
+#button_dark_mode_erreur:active{
+    background-color: #3593F7;
+    color: #D85757;
 }
 
 
-#button_dark_mode:link{
-    background-color: #3593F7;
+
+#button_dark_mode_erreur:hover{
+    background-color: #D06868;
     color: #DFDFDF;
-    box-shadow: none;
-    text-shadow: none;
 }
 
 #button_dark_mode:hover{
     background-color: #3593F7;
     color: #DFDFDF;
-    text-shadow: none;
-    box-shadow: none;
 }
 
 #button_dark_mode_status_1:hover{
     background-color: #3593F7;
     color: #DFDFDF;
-    text-shadow: none;
-    box-shadow: none;
 }
 
 #scroll_bar_perso{

@@ -30,15 +30,24 @@ typedef struct trame_{
 	//couche tcp
 	int source_port;
 	int destination_port;
-	int tcp_segment_len;
+	int stream_index;
+	int tcp_seg_len;
+	char* sequence_number;
+	int sequence_number_raw;
+	char *next_sequence_number;
+	char *acknowledgment_number;
+	int acknowledgment_number_raw;
+	char *tcp_header_length;
 }trame;
 
 typedef struct cell_{
 	trame *obj;
 	GtkWidget *arbre;
 	GtkWidget *bouton;
+	GtkWidget *revealer;
 	struct cell_ *suiv;
 	int status_bouton_ip;
+	
 }cell;
 
 void afficher_ligne(FILE *fichier);

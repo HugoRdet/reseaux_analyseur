@@ -246,10 +246,13 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	
 	
 	GtkWidget* tmp_bouton=gtk_toggle_button_new_with_label(label);
-	gtk_widget_set_name(tmp_bouton,"button_dark_mode");
-	
+	if (elem->nb_ligne_erreur==-1){
+		gtk_widget_set_name(tmp_bouton,"button_dark_mode");
+	}else {
+		gtk_widget_set_name(tmp_bouton,"button_dark_mode_erreur");
+	}
 	cell *new_cell=(cell *) malloc(sizeof(cell));
-	GtkWidget *revealer = gtk_revealer_new();
+	
 	new_cell->obj=elem;
 	new_cell->arbre=NULL;
 	new_cell->bouton=tmp_bouton;
@@ -257,16 +260,21 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->status_bouton_ip=0;
 	*liste=new_cell;
 	
-	remplir_arbre(NULL, new_cell);
-	gtk_widget_set_name(new_cell->arbre,"tree_dark_mode");
-	gtk_container_add(GTK_CONTAINER(revealer), new_cell->arbre);
+	GtkWidget *revealer = gtk_revealer_new();
+	new_cell->revealer=revealer;
+	GtkWidget *new_box=gtk_box_new(FALSE,0);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (new_box),GTK_ORIENTATION_VERTICAL);
+	
+	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
+	remplir_arbre(new_box, new_cell);
+	gtk_widget_set_name(new_box,"tree_dark_mode");
+	gtk_container_add(GTK_CONTAINER(revealer), new_box);
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
 	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, TRUE, 0);
 	gtk_widget_show (tmp_bouton);
 	gtk_widget_show_all(box_bas);
 	g_signal_connect(G_OBJECT(tmp_bouton), "clicked", G_CALLBACK(action_bouton_ip),new_cell);
-	g_object_bind_property(tmp_bouton, "active", revealer, "reveal-child", 1);
 
 }
 
@@ -299,7 +307,8 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->version=(char *)malloc(sizeof(char)*4);
 	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
 	new_trame->header_length=(char *)malloc(sizeof(char)*10);
-	sprintf(new_trame->header_length, "(%X) - %d bytes",tab_ligne[14]%16, tab_ligne[14]%16*4);
+	int header_length=tab_ligne[14]%16*4;
+	sprintf(new_trame->header_length, "(%X) - %d bytes",tab_ligne[14]%16, header_length);
 	
 	
 	new_trame->total_length=(int *) malloc(sizeof(int)*2);
@@ -334,6 +343,10 @@ static inline int lecture_trame(trame *new_trame){
 	
 	(new_trame->ip_dest)[2]=tab_ligne[32];
 	(new_trame->ip_dest)[3]=tab_ligne[33];
+	
+	int i=header_length-20;
+	
+	
 	
 	
 	return 1;

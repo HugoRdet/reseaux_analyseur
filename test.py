@@ -56,19 +56,34 @@ def list_to_str(liste):
                      res += str(x) + "', '" + str(y) + "')])]"
                      cpt2 = 1
     return res
+
+def list_to_str2(liste):
+    res = ""
+    
+    for e in liste:
+        res += str(e) + "\n"
+    return res
+    
       
 
 def offset_valides(tupl1, tupl2):
     a, b = tupl1
     x, y = tupl2  
     try:
-        
-        return HexToDec(x) == (int((len(b) + 1) / 3)) + HexToDec(a)
+        return HexToDec(x) >= (int((len(b) + 1) / 3)) + HexToDec(a)
     except ValueError:
-       # print("Offset invalide")
         return 1 == 2
-        
+    
+def octetManquant(tupl1, tupl2)  :
+    a, b = tupl1
+    x, y = tupl2 
 
+    if offset_valides(tupl1, tupl2):
+        if HexToDec(x) > (int((len(b) + 1) / 3)) + HexToDec(a):
+            
+            return HexToDec(x) - (int((len(b) + 1) / 3)) + HexToDec(a) 
+    return 0  
+        
     
 def verif(text): 
     """Verifie si l'octet est bien un nombre en hexadecimal"""
@@ -105,7 +120,7 @@ def trouve_deb_tram(liste):
         
     
 def trouve_list_tram(liste):
-    """liste(str) -> list(tuple(str, list(str))
+    """liste(str) -> list(tuple(str, list(tuple(str, str))
     
     Separe en 'sous-trame' chaque partie de la liste
     séparé par un offset 0000"""
@@ -123,6 +138,7 @@ def trouve_list_tram(liste):
     
     cpt = 0 
     cpt2 = 1
+    nligne = 0
     
     lignex = ("0000", "0")
     lignexp1 = ("", "")
@@ -132,7 +148,6 @@ def trouve_list_tram(liste):
     
     
     for e in liste:
-        print(e)
         if len(e) >= 4:
             if (e[caractere] == "0") and (e[caractere + 1] == "0") and (e[caractere + 2] == "0") and (e[caractere + 3] == "0"):
                 if (len(e) > 5):
@@ -153,10 +168,15 @@ def trouve_list_tram(liste):
             else:
                 ligne += i
         offtrame = (offset, ligne)
+        
         lignexp1 = offtrame
-        if (offset_valides(lignex, lignexp1)):
-               list_offtrame.append(offtrame) 
-               lignex = lignexp1
+        if (offset_valides(lignex, lignexp1) and (octetManquant(lignex, lignexp1) == 0)):
+            list_offtrame.append(offtrame) 
+            lignex = lignexp1
+        elif (offset_valides(lignex, lignexp1) and (octetManquant(lignex, lignexp1) != 0)):
+            print("Trame n°" + str(numero) + ", ligne n°" + str(nligne - 1) +": " + str(octetManquant(lignex, lignexp1)) + " octets manquant \n" )
+            lignex = lignexp1
+        nligne += 1
         offset = ""
         ligne = ""
         prems_espace = True
@@ -170,14 +190,31 @@ def trouve_list_tram(liste):
         
     return list_trame
 
-
-
-             
-            
+def trameXpur(liste):
+    """ list(tuple(str, list(tuple(str, str)))) -> liste(str)
+        retourne la liste de ligne d'une trame demandé sans ses 
+        offset"""
+    cpt = 0
+    res = []
+    
+    for t in liste:
+        cpt += 1
+    print(str(cpt) + " trame(s) a(ont) été capturé(es)")
+    print("laquelle choisissez vous?")
+    numero = input()
+    numero = int(numero)
+    
+    for t in liste:
+        a, b = t
+        if a == numero:
+            for l in b:
+                x, y = l
+                print(y)
+                res.append(y)
+            break
         
-            
-        
-            
+    return res
+
             
             
 
@@ -191,7 +228,7 @@ cpt = 0
 ligne = ""
 
 
-f = open("test_res.txt", "r")
+f = open("test_res.txt" , "r")
 tab = f.read()
 while i < (len(tab)):
     if tab[i] != "\n":
@@ -201,22 +238,24 @@ while i < (len(tab)):
         ligne = ""
         cpt += 1  
     i += 1
-print(ligne + "\n")
 liste_lignes.append(ligne)
 ligne = ""
 cpt += 1  
-
 f.close()
+
 liste_trame = trouve_list_tram(liste_lignes)
-f2 = open("Fvide.txt", "w")
+f2 = open("Fvide.txt", "x")
 trame_str = list_to_str(liste_trame)
 f2.write(trame_str)
 f2.close()
 
+trameX = trameXpur(liste_trame)
+f3 = open("Trame_pur.txt", "x")
+trameStr = list_to_str2(trameX)
+f3.write(trameStr)
+f3.close()
 
-x = ('00n0', 'f0 18 98 59 ae 32 0c 8d db 1a 1e 88 08 00 45 00')
-y = ('0010', '01 ea e7 8d 40 00 2d 06 ca 8c 80 77 f5 0c c0 a8')
-z = ('0020', '63 c7 00 50 ed 6b a3 f0 16 7d c0 8a 8f 98 80 18')
+
 
 
 
