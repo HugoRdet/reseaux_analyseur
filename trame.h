@@ -7,7 +7,7 @@ typedef struct trame_{
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
-	
+	int place;
 	
 	//couche ethernet
 	char *mac_dest;
@@ -42,11 +42,11 @@ typedef struct trame_{
 
 typedef struct cell_{
 	trame *obj;
-	GtkWidget *arbre;
 	GtkWidget *bouton;
 	GtkWidget *revealer;
 	struct cell_ *suiv;
 	int status_bouton_ip;
+	
 	
 }cell;
 

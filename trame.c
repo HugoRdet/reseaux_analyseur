@@ -254,7 +254,6 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	cell *new_cell=(cell *) malloc(sizeof(cell));
 	
 	new_cell->obj=elem;
-	new_cell->arbre=NULL;
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	new_cell->status_bouton_ip=0;
@@ -386,6 +385,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		if (verif==0){
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
+			new_trame->place=offset;
 			return 0;
 		}
 		
@@ -402,6 +402,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			new_trame->nb_ligne_erreur=(*ligne)-2;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
+			new_trame->place=offset;
 			return verif;
 		}
 	
@@ -409,6 +410,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	
 	lecture_trame(new_trame);
 	ajout_liste(liste,new_trame,box_haut, box_bas);
+	new_trame->place=offset;
 	return 1;
 }
 
