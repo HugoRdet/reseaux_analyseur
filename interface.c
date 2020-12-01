@@ -283,31 +283,118 @@ void remplir_ethernet(GtkWidget *box_ethernet,cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	
-	sprintf(label,"\tSource\t\t:  %s\n",(tmp_cell->obj->mac_source));
+	sprintf(label,"\t\tSource\t\t:  %s\n",(tmp_cell->obj->mac_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\tDestination\t:  %s\n",(tmp_cell->obj->mac_dest));
+	sprintf(label,"\t\tDestination\t:  %s\n",(tmp_cell->obj->mac_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\ttype\t\t:  %s\n",(tmp_cell->obj->ip_type));
+	sprintf(label,"\t\ttype\t\t:  %s\n",(tmp_cell->obj->ip_type));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
 	
 }
 
-void remplir_ip(GtkWidget *box_ip,cell *tmp_cell){
+void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	
-	sprintf(label,"\tVersion\t\t:  %s\n",(tmp_cell->obj->version));
+	sprintf(label,"\t\tVersion\t\t:  %s\n",(tmp_cell->obj->version));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tHeader Length : %s\n",(tmp_cell->obj->header_length));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tTotal Length : %s\n",(tmp_cell->obj->total_length));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tIdentification : %s\n",(tmp_cell->obj->identification));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+
+
+	GtkWidget *flags=gtk_expander_new ("Flags");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(flags),FALSE);
+	gtk_box_pack_start (GTK_BOX(box_ip),flags,FALSE,FALSE,0);
+	GtkWidget *box_flags=gtk_box_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(flags),box_flags);	
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags),GTK_ORIENTATION_VERTICAL);
+	gtk_widget_set_name(GTK_WIDGET(flags),"expander-tabbed");
+
+	sprintf(label,"\t\tValue : %s\n",(tmp_cell->obj->flags_offset));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tReserved bit : %s\n",(tmp_cell->obj->reserved_bit));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tDon't Fragments : %s\n",(tmp_cell->obj->dont_fragment));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+	
+	sprintf(label,"\t\tMore Fragments : %s\n",(tmp_cell->obj->more_fragment));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+
+
+}
+
+void remplir_http(){
+
+}
+	
+void remplir_arbre(GtkWidget *new_box, gpointer pData){
+	
+	cell *tmp_cell=(cell *)pData;
+	
+	GtkWidget *ethernet=gtk_expander_new ("Ethernet II");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(ethernet),FALSE);
+	gtk_box_pack_start (GTK_BOX(new_box),ethernet,FALSE,FALSE,0);
+	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
+	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
+	remplir_ethernet(box_ethernet,tmp_cell);	
+	
+	GtkWidget *IP=gtk_expander_new ("Internet Protocol");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
+	gtk_box_pack_start (GTK_BOX(new_box),IP,FALSE,FALSE,0);
+	GtkWidget *box_ip=gtk_box_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(IP),box_ip);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
+
+	remplir_ip(box_ip, tmp_cell);	
+
+	
+	/*
+	GtkTreeStore *arbre=gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	GtkTreeIter header_ethernet;
+	GtkTreeIter contenu_ethernet;
+	GtkTreeIter header_IP;
+	GtkTreeIter contenu_IP;
+	
+	gtk_tree_store_insert (arbre,&header_ethernet,NULL,-1);
+	gtk_tree_store_set(arbre, &header_ethernet,0,"Ethernet II",1,NULL, -1);
+	
+	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
+	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "Source:",1,tmp_cell->obj->mac_source, -1);
+	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
 }
 
 void remplir_http(){

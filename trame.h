@@ -7,7 +7,7 @@ typedef struct trame_{
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
-	
+	int place;	
 	
 	//couche ethernet
 	char *mac_dest;
@@ -18,9 +18,12 @@ typedef struct trame_{
 	char *version;
 	char *header_length;
 
-	int *total_length;
-	int *identification;
-	int *flags_frag_offset;
+	char *total_length;
+	char *identification;
+	char *flags_offset;
+	char *reserved_bit;
+	char *dont_fragment;
+	char *more_fragment;
 	int TTL;
 	int protocol;
 	int *header_checksum; 

@@ -311,18 +311,33 @@ static inline int lecture_trame(trame *new_trame){
 	sprintf(new_trame->header_length, "(%X) - %d bytes",tab_ligne[14]%16, header_length);
 	
 	
-	new_trame->total_length=(int *) malloc(sizeof(int)*2);
-	(new_trame->total_length)[0]=tab_ligne[16];
-	(new_trame->total_length)[1]=tab_ligne[17];
+	new_trame->total_length=(char *) malloc(sizeof(char)*10);
+	int total_length = tab_ligne[16]*256 + tab_ligne[17];
+	sprintf(new_trame->total_length, "%d", total_length);
+
+	new_trame->identification=(char *) malloc(sizeof(char)*20);
+	int identifier=tab_ligne[18]*256+tab_ligne[19];
+	sprintf(new_trame->identification, "0x%X%X - (%d)", tab_ligne[18], tab_ligne[19], identifier);
 	
-	new_trame->identification=(int *) malloc(sizeof(int)*2);
-	(new_trame->identification)[0]=tab_ligne[18];
-	(new_trame->identification)[1]=tab_ligne[19];
+	new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
+	sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
+	int bit; 
+
+	bit = valeur_n_eme_bit(tab_ligne[20], 7);
+	new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
+	if(bit){new_trame->reserved_bit = "Set";}
+	else{new_trame->reserved_bit = "Not Set";}
 	
-	new_trame->flags_frag_offset=(int *) malloc(sizeof(int)*2);
-	(new_trame->flags_frag_offset)[0]=tab_ligne[20];
-	(new_trame->flags_frag_offset)[1]=tab_ligne[21];
-	
+	bit = valeur_n_eme_bit(tab_ligne[20], 6);
+	new_trame->dont_fragment=(char*)malloc(sizeof(char)*20);
+	if(bit){new_trame->dont_fragment = "Set";}
+	else{new_trame->dont_fragment = "Not Set";}
+
+	bit = valeur_n_eme_bit(tab_ligne[20], 5);
+	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
+	if(bit){new_trame->more_fragment = "Set";}
+	else{new_trame->more_fragment = "Not Set";}
+		
 	new_trame->TTL=tab_ligne[22];
 	new_trame->protocol=tab_ligne[23];
 	
@@ -386,6 +401,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		if (verif==0){
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
+			new_trame->place=offset;
 			return 0;
 		}
 		
@@ -402,6 +418,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			new_trame->nb_ligne_erreur=(*ligne)-2;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
+			new_trame->place=offset;
 			return verif;
 		}
 	
@@ -409,6 +426,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	
 	lecture_trame(new_trame);
 	ajout_liste(liste,new_trame,box_haut, box_bas);
+	new_trame->place=offset;
 	return 1;
 }
 
