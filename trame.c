@@ -354,7 +354,7 @@ static inline int lecture_trame(trame *new_trame){
 		sprintf(new_trame->protocol,"TCP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
 	}
 	if(tab_ligne[23] == 23){
-		sprintf(new_trame->protocol,"UDP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+		sprintf(new_trame->protocol,"UDP\t(%d%d)", tab_ligne[23]/16,tab_ligne[23]%16);
 	}
 	
 

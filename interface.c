@@ -331,17 +331,17 @@ void remplir_ethernet(GtkWidget *box_ethernet,cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	
-	sprintf(label,"\t\tSource\t\t:  %s\n",(tmp_cell->obj->mac_source));
+	sprintf(label,"\t\tDestination:  %s\n",(tmp_cell->obj->mac_dest));
+	tmp_label=gtk_label_new(label);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
+
+	sprintf(label,"\t\tSource:  %s\n",(tmp_cell->obj->mac_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\t\tDestination\t:  %s\n",(tmp_cell->obj->mac_dest));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\ttype\t\t:  %s\n",(tmp_cell->obj->ip_type));
+	sprintf(label,"\t\tType:  %s\n",(tmp_cell->obj->ip_type));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
@@ -352,22 +352,22 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	
-	sprintf(label,"\t\tVersion\t\t:  %s\n",(tmp_cell->obj->version));
+	sprintf(label,"\t\tVersion:  %s\n",(tmp_cell->obj->version));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\t\tHeader Length : %s\n",(tmp_cell->obj->header_length));
+	sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->header_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tTotal Length : %s\n",(tmp_cell->obj->total_length));
+	sprintf(label,"\t\tTotal Length: %s\n",(tmp_cell->obj->total_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tIdentification : %s\n",(tmp_cell->obj->identification));
+	sprintf(label,"\t\tIdentification: %s\n",(tmp_cell->obj->identification));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
@@ -381,52 +381,52 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags),GTK_ORIENTATION_VERTICAL);
 	gtk_widget_set_name(GTK_WIDGET(flags),"expander-tabbed");
 
-	sprintf(label,"\t\tValue : %s\n",(tmp_cell->obj->flags_offset));
+	sprintf(label,"\t\tValue: %s\n",(tmp_cell->obj->flags_offset));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tReserved bit : %s\n",(tmp_cell->obj->reserved_bit));
+	sprintf(label,"\t\tReserved bit: %s\n",(tmp_cell->obj->reserved_bit));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tDon't Fragments : %s\n",(tmp_cell->obj->dont_fragment));
+	sprintf(label,"\t\tDon't Fragment: %s\n",(tmp_cell->obj->dont_fragment));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 	
-	sprintf(label,"\t\tMore Fragments : %s\n",(tmp_cell->obj->more_fragment));
+	sprintf(label,"\t\tMore Fragments: %s\n",(tmp_cell->obj->more_fragment));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tFragment Offset : %s\n",(tmp_cell->obj->frag_offset));
+	sprintf(label,"\t\tFragment Offset: %s\n",(tmp_cell->obj->frag_offset));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 		
-	sprintf(label,"\t\tTime to Live : %d\n",(tmp_cell->obj->TTL));
+	sprintf(label,"\t\tTime to Live: %d\n",(tmp_cell->obj->TTL));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tProtocol : %s\n",(tmp_cell->obj->protocol));
+	sprintf(label,"\t\tProtocol: %s\n",(tmp_cell->obj->protocol));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tHeader Checksum : %s\n",(tmp_cell->obj->header_checksum));
+	sprintf(label,"\t\tHeader Checksum: %s\n",(tmp_cell->obj->header_checksum));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tSource Address : %s\n",(tmp_cell->obj->ip_source));
+	sprintf(label,"\t\tSource Address: %s\n",(tmp_cell->obj->ip_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 
-	sprintf(label,"\t\tDestination Address : %s\n",(tmp_cell->obj->ip_dest));
+	sprintf(label,"\t\tDestination Address: %s\n",(tmp_cell->obj->ip_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
