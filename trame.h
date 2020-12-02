@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 
 typedef struct trame_{
-	int *tab;
+	unsigned int *tab;
 	int id;
 	int nb_ligne_erreur;
 	int nb_octet_erreur;
@@ -66,12 +66,13 @@ typedef struct cell_{
 	GtkWidget *bouton;
 	GtkWidget *revealer;
 	struct cell_ *suiv;
+	struct cell_ **bouton_actif;
 	int status_bouton_ip;
 	
 	
 }cell;
 
 void afficher_ligne(FILE *fichier);
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut,GtkWidget *box_bas);
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut,GtkWidget *box_bas,char *filename);
 int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne);
 #endif

@@ -254,6 +254,12 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 		gtk_widget_set_name(tmp_bouton,"button_dark_mode_erreur");
 	}
 	cell *new_cell=(cell *) malloc(sizeof(cell));
+	if (*liste==NULL){
+		new_cell->bouton_actif=(cell **) malloc(sizeof(cell *));
+		*(new_cell->bouton_actif)=NULL;
+	}else {
+		new_cell->bouton_actif=(*liste)->bouton_actif;
+	}
 	
 	new_cell->obj=elem;
 	new_cell->bouton=tmp_bouton;
@@ -261,20 +267,23 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->status_bouton_ip=0;
 	*liste=new_cell;
 	
+	
 	GtkWidget *revealer = gtk_revealer_new();
 	new_cell->revealer=revealer;
+	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	GtkWidget *new_box=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (new_box),GTK_ORIENTATION_VERTICAL);
-	
-	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	remplir_arbre(new_box, new_cell);
 	gtk_widget_set_name(new_box,"tree_dark_mode");
 	gtk_container_add(GTK_CONTAINER(revealer), new_box);
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
-	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, TRUE, 0);
-	gtk_widget_show (tmp_bouton);
+	
+	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
 	gtk_widget_show_all(box_bas);
+	
+	gtk_widget_show (tmp_bouton);
+	
 	g_signal_connect(G_OBJECT(tmp_bouton), "clicked", G_CALLBACK(action_bouton_ip),new_cell);
 
 }
@@ -457,7 +466,7 @@ static inline int lecture_trame(trame *new_trame){
 
 
 
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas){
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas,char *filename){
 	
 	int offset=0;
 	int offset_prec=0;
@@ -471,6 +480,9 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	new_trame->nb_ligne_erreur=-1;
 	unsigned int *tab=(unsigned int *) calloc(1518,sizeof(unsigned int));
 	new_trame->tab=tab;
+	
+	new_trame->nom_fichier=(char *) malloc(sizeof(char)*80);
+	strcpy(new_trame->nom_fichier,filename);
 	
 	do{
 		offset_prec_prec=offset_prec;

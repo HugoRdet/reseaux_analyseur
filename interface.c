@@ -1,18 +1,13 @@
 #include "interface.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
 	cell *cellule_obj=(cell *) pData;
 	
-	if (cellule_obj->status_bouton_ip==0){
-		cellule_obj->status_bouton_ip=1;
-		gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode_status_1");
-		gtk_widget_show (GTK_WIDGET(cellule_obj->bouton));
-		gtk_revealer_set_reveal_child (GTK_REVEALER(cellule_obj->revealer),TRUE);
-		
-	}else{
+	if(cellule_obj->status_bouton_ip==1){
 		cellule_obj->status_bouton_ip=0;
 		
 		if (cellule_obj->obj->nb_ligne_erreur==-1){
@@ -22,7 +17,36 @@ void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
 		}
 		gtk_revealer_set_reveal_child (GTK_REVEALER(cellule_obj->revealer),FALSE);
 		gtk_widget_show(GTK_WIDGET(cellule_obj->bouton));
+		*(cellule_obj->bouton_actif)=NULL;
+		return;
 	}
+	
+	cell *tmp=*(cellule_obj->bouton_actif);
+	
+	if (tmp!=NULL){
+		tmp->status_bouton_ip=0;
+		
+		if (tmp->obj->nb_ligne_erreur==-1){
+			gtk_widget_set_name(GTK_WIDGET(tmp->bouton),"button_dark_mode");
+		}else {
+			gtk_widget_set_name(GTK_WIDGET(tmp->bouton),"button_dark_mode_erreur");
+		}
+		gtk_revealer_set_reveal_child (GTK_REVEALER(tmp->revealer),FALSE);
+		gtk_widget_show(GTK_WIDGET(tmp->bouton));
+	}
+	
+	*(cellule_obj->bouton_actif)=cellule_obj;
+	
+	
+	if (cellule_obj->status_bouton_ip==0){
+		cellule_obj->status_bouton_ip=1;
+		gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode_status_1");
+		gtk_widget_show (GTK_WIDGET(cellule_obj->bouton));
+		gtk_revealer_set_reveal_child (GTK_REVEALER(cellule_obj->revealer),TRUE);
+		
+	}
+	
+	
 }
 
 void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
@@ -66,7 +90,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				int res=1;
 				int ligne=1;
 				int offset=1;
-				
+				int taille_liste_prec=pvbox->taille_liste;
 
 				while (res!=0) {
 					while ((offset!=0)&&(verif!=0)) {
@@ -79,9 +103,28 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 						return;
 					}
 					
-					res=charge_trame(fichier_source,&ligne,pvbox->taille_liste,pvbox->liste,pvbox_haut, pvbox_bas);
-					
+					res=charge_trame(fichier_source,&ligne,pvbox->taille_liste,pvbox->liste,pvbox_haut, pvbox_bas,filename);
 					pvbox->taille_liste++;
+				}
+				
+				if (taille_liste_prec==pvbox->taille_liste){
+					
+					
+					GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+					GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(*(pvbox->window)),
+						flags,
+						GTK_MESSAGE_ERROR,
+						GTK_BUTTONS_NONE,
+						"Aucune trame trouvée dans le fichier:\n “%s” ",
+						filename);
+					
+					// Destroy the dialog when the user responds to it
+					// (e.g. clicks a button)
+					gtk_widget_set_name(dialog,"button_dark_mode_error_pop_up");
+					gtk_widget_show(dialog);
+					g_signal_connect_swapped (dialog, "destroy",
+						G_CALLBACK (gtk_widget_destroy),
+						dialog);
 				}
 				
 				fclose(fichier_source);
@@ -147,7 +190,7 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 		GTK_RESPONSE_ACCEPT,
 		NULL);
 	
-	GtkWidget *chooser = GTK_FILE_CHOOSER (dialog);
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
 	
 	
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -515,6 +558,16 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	
 	cell *tmp_cell=(cell *)pData;
+	char tmp_label[256];
+	sprintf(tmp_label," trame n°%d\n fichier source:%s",tmp_cell->obj->id,tmp_cell->obj->nom_fichier);
+	GtkWidget *label_nom_trame=gtk_label_new(tmp_label);
+	if (tmp_cell->obj->nb_ligne_erreur==-1){
+		gtk_widget_set_name(label_nom_trame,"label_trame_dark_mode");
+	}else{
+		gtk_widget_set_name(label_nom_trame,"label_trame_dark_mode_erreur");
+	}
+	gtk_label_set_xalign (GTK_LABEL(label_nom_trame),0);
+	gtk_box_pack_start (GTK_BOX(new_box),label_nom_trame,FALSE,FALSE,0);
 	
 	GtkWidget *ethernet=gtk_expander_new ("\nEthernet II\n");
 	gtk_widget_set_name(GTK_WIDGET(ethernet),"expander");
@@ -586,3 +639,4 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	remplir_ip(box_ip,tmp_cell);	
 		
 	return;*/
+	
