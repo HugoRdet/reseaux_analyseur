@@ -5,9 +5,7 @@
 
 ### How to install ?
 Requirements : 
-
 git
-
 make
 
 #### Unix user
