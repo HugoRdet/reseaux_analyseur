@@ -29,6 +29,7 @@ int main(int    argc, char **argv) {
 	pvbox->liste=&liste;
 	pvbox->pvbox_haut=&pvbox_haut;
 	pvbox->pvbox_bas=&pvbox_bas;
+	pvbox->window=&fenetre;
 	
 	init_panneau(grille,(pvbox->pvbox_haut),(pvbox->pvbox_bas));
 	GtkWidget* menu=init_menu(grille,pvbox);

@@ -254,6 +254,12 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 		gtk_widget_set_name(tmp_bouton,"button_dark_mode_erreur");
 	}
 	cell *new_cell=(cell *) malloc(sizeof(cell));
+	if (*liste==NULL){
+		new_cell->bouton_actif=(cell **) malloc(sizeof(cell *));
+		*(new_cell->bouton_actif)=NULL;
+	}else {
+		new_cell->bouton_actif=(*liste)->bouton_actif;
+	}
 	
 	new_cell->obj=elem;
 	new_cell->bouton=tmp_bouton;
@@ -261,20 +267,23 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->status_bouton_ip=0;
 	*liste=new_cell;
 	
+	
 	GtkWidget *revealer = gtk_revealer_new();
 	new_cell->revealer=revealer;
+	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	GtkWidget *new_box=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (new_box),GTK_ORIENTATION_VERTICAL);
-	
-	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	remplir_arbre(new_box, new_cell);
 	gtk_widget_set_name(new_box,"tree_dark_mode");
 	gtk_container_add(GTK_CONTAINER(revealer), new_box);
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
-	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, TRUE, 0);
-	gtk_widget_show (tmp_bouton);
+	
+	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
 	gtk_widget_show_all(box_bas);
+	
+	gtk_widget_show (tmp_bouton);
+	
 	g_signal_connect(G_OBJECT(tmp_bouton), "clicked", G_CALLBACK(action_bouton_ip),new_cell);
 
 }
@@ -299,12 +308,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
 	sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
-
+	
 	
 	new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
 	sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
 	
-
+	
 	new_trame->version=(char *)malloc(sizeof(char)*4);
 	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
 	new_trame->header_length=(char *)malloc(sizeof(char)*10);
@@ -315,7 +324,7 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->total_length=(char *) malloc(sizeof(char)*10);
 	int total_length = tab_ligne[16]*256 + tab_ligne[17];
 	sprintf(new_trame->total_length, "%d", total_length);
-
+	
 	new_trame->identification=(char *) malloc(sizeof(char)*20);
 	int identifier=tab_ligne[18]*256+tab_ligne[19];
 	sprintf(new_trame->identification, "0x%X%X\t(%d)", tab_ligne[18], tab_ligne[19], identifier);
@@ -323,7 +332,7 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
 	sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
 	int bit; 
-
+	
 	bit = valeur_n_eme_bit(tab_ligne[20], 7);
 	new_trame->f0 = bit;
 	new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
@@ -356,9 +365,9 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->frag_offset = (char *)malloc(sizeof(char)*10);
 	int frag = (tab_ligne[20]%64)*256+tab_ligne[21];
 	sprintf(new_trame->frag_offset, "%d",frag);
-		
+	
 	new_trame->TTL=tab_ligne[22];
-
+	
 	new_trame->protocol=(char*)malloc(sizeof(char)*10);
 	if(tab_ligne[23] == 1){
 		sprintf(new_trame->protocol,"ICMP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
@@ -370,7 +379,7 @@ static inline int lecture_trame(trame *new_trame){
 		sprintf(new_trame->protocol,"UDP\t(%d%d)", tab_ligne[23]/16,tab_ligne[23]%16);
 	}
 	
-
+	
 	new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
 	sprintf(new_trame->header_checksum,"0x%X%X%X%X", tab_ligne[24]/16,tab_ligne[24]%16, tab_ligne[25]/16, tab_ligne[25]%16);
 	
@@ -384,6 +393,7 @@ static inline int lecture_trame(trame *new_trame){
 	
 	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
 		return 1;
+
 
 	new_trame->source_port =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
@@ -402,6 +412,7 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
 	header_length=tab_ligne[46+i]/16*4;
 	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i], header_length);
+
 
 	new_trame->urg =(char*)malloc(sizeof(char)*7);
 	new_trame->ack =(char*)malloc(sizeof(char)*7);
@@ -444,8 +455,10 @@ static inline int lecture_trame(trame *new_trame){
 	new_trame->window =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
 
+
 	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
 	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
+
 
 	return 1;
 	
@@ -453,7 +466,7 @@ static inline int lecture_trame(trame *new_trame){
 
 
 
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas){
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas,char *filename){
 	
 	int offset=0;
 	int offset_prec=0;
@@ -467,6 +480,9 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	new_trame->nb_ligne_erreur=-1;
 	unsigned int *tab=(unsigned int *) calloc(1518,sizeof(unsigned int));
 	new_trame->tab=tab;
+	
+	new_trame->nom_fichier=(char *) malloc(sizeof(char)*80);
+	strcpy(new_trame->nom_fichier,filename);
 	
 	do{
 		offset_prec_prec=offset_prec;
@@ -492,7 +508,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
 			
 			while ((offset!=0)&&(verif!=0)) {
-					verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
+				verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
 			
 			
@@ -504,7 +520,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			new_trame->place=offset;
 			return verif;
 		}
-	
+		
 	}while (offset!=0);
 	
 	lecture_trame(new_trame);

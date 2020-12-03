@@ -1,3 +1,6 @@
+
+
+
 #fond_dark{
     background-image: none;
     background-color: #25262A;
@@ -23,16 +26,18 @@
     padding: 0px;
 }
 
+
 #expander{
-}
-#expander::active{
-}
+ }
+ #expander:active{
+ }
 
 #expander-tabbed{
     padding: 5px;
     margin-left:38px;
     margin-bottom:4px;
 }
+
 
 #label_menu_dark_mode{
     background-color: #6C6D6C;
@@ -49,6 +54,35 @@
     padding:2px 0 2px 0;
 }
 
+#label_trame_dark_mode{
+    background-color: #3593F7;
+    color: #DFDFDF;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#label_trame_dark_mode_erreur{
+    background-color: #D06868;
+    color: #25262A;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
 
 #button_dark_mode{
     background-color: #434343;
@@ -56,6 +90,21 @@
     font-family: DejaVu Sans;
     font-weight: lighter;
     font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#button_dark_mode_error_pop_up{
+    background-color: #434343;
+    color: #DFDFDF;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 14px;
     background-image: none;
     border:0px;
     border-radius:0;

@@ -5,6 +5,7 @@
 typedef struct box_{
 	GtkWidget **pvbox_haut;
 	GtkWidget **pvbox_bas;
+	GtkWidget **window;
 	cell **liste;
 	int taille_liste;
 }box;
