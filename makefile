@@ -19,6 +19,7 @@ projet_reseaux.o: projet_reseaux.c trame.h interface.h
 	
 projet_reseaux: projet_reseaux.o trame.o interface.o 
 	$(CC)  -o projet_reseaux projet_reseaux.o trame.o interface.o  $(GTKLIBS)
+	$(CC)  -o projet_reseaux.exe projet_reseaux.o trame.o interface.o  $(GTKLIBS)
 	
 clean:
 	rm -f *.o $(EXEC)
