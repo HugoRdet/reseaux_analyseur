@@ -6,10 +6,9 @@
 ### How to install ?
 
 #### Unix user
+
 ```
+git clone "https://github.com/HugoRdet/reseaux_analyseur" &&
+cd reseaux_analyseur &&
 make
-
 ```
-#### Windows user
-
-Simply unzip the archive and f
