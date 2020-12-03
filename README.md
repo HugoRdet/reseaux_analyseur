@@ -8,8 +8,10 @@ make
 #### Unix user
 Simply clone the repository and compile from there.
 ```
-git clone "https://github.com/HugoRdet/reseaux_analyseur" &&
-cd reseaux_analyseur && make
+git clone "https://github.com/HugoRdet/reseaux_analyseur" && cd reseaux_analyseur 
+```
+```
+make clean update && make
 ```
 ### Usage 
 * Fetch a .txt file using the "Open File" icon.
