@@ -15,4 +15,4 @@ cd reseaux_analyseur &&
 ### Usage 
 * Fetch a .txt file using the "Open File" icon.
 * Display the data in the tree view by clicking on the frame in the upper panel.
-* Save the newly parsed data using the "Save File" icon
+* Save the newly parsed data using the "Save File" icon.
