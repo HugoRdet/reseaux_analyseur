@@ -300,6 +300,152 @@ void affiche_tab(unsigned int *tab){
 	printf("\n");
 }
 
+void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
+	
+	new_trame->source_port =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
+
+	new_trame->destination_port =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
+
+	new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
+	long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
+	sprintf(new_trame->sequence_number_raw, "%ld",raw);
+
+	new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
+	raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
+	sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
+
+	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
+	int header_length=tab_ligne[46+i]/16*4;
+	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length);
+
+	new_trame->urg =(char*)malloc(sizeof(char)*7);
+	new_trame->ack =(char*)malloc(sizeof(char)*7);
+	new_trame->push =(char*)malloc(sizeof(char)*7);
+	new_trame->reset =(char*)malloc(sizeof(char)*7);
+	new_trame->syn =(char*)malloc(sizeof(char)*7);
+	new_trame->fin =(char*)malloc(sizeof(char)*7);
+	
+	int bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
+	new_trame->tcp_f0=bit;
+	if(bit){
+		sprintf(new_trame->urg,"Set");
+	}else{sprintf(new_trame->urg,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
+	new_trame->tcp_f1=bit;
+	if(bit){
+		sprintf(new_trame->ack,"Set");
+	}else{sprintf(new_trame->ack,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
+	new_trame->tcp_f2=bit;
+	if(bit){
+		sprintf(new_trame->push,"Set");
+	}else{sprintf(new_trame->push,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
+	new_trame->tcp_f3=bit;
+	if(bit){
+		sprintf(new_trame->reset,"Set");
+	}else{sprintf(new_trame->reset,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
+	new_trame->tcp_f4=bit;
+	if(bit){
+		sprintf(new_trame->syn,"Set");
+	}else{sprintf(new_trame->syn,"Not Set");}
+	bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
+	new_trame->tcp_f5=bit;
+	if(bit){
+		sprintf(new_trame->fin,"Set");
+	}else{sprintf(new_trame->fin,"Not Set");}
+	
+	new_trame->window =(char *)malloc(sizeof(char)*5);
+	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
+
+
+	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
+	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
+	
+	new_trame->urgent = (char*)malloc(sizeof(char)*10);
+	sprintf(new_trame->urgent, "0x%X%X%X%X", tab_ligne[52+i]/16,tab_ligne[52]%16,tab_ligne[53]/16,tab_ligne[53]%16);
+	new_trame->no_option = NULL;
+	if(header_length <= 5){
+		new_trame->no_option = (char *)malloc(sizeof(char)*10);
+		sprintf(new_trame->no_option, "0x00  (EOL)");
+		return;
+	}
+	printf("%d",header_length);	
+	int option_length = (header_length/4 - 5) * 4;
+	new_trame->option_length =(char*)malloc(sizeof(char)*30);
+	sprintf(new_trame->option_length, "Options:\t(%d bytes)", option_length);
+	new_trame->option_tab = (char **)malloc(sizeof(char *)*6);
+	int k=0;
+	for(int j=0; j<5; j++){
+		new_trame->option_tab[j] = NULL;
+		if(tab_ligne[54+i+k]==1){
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*30);
+			sprintf(new_trame->option_tab[j],"No Operation (NOP)");
+			k++;
+			j++;
+		}
+		if(tab_ligne[54+i+k]==2){
+			new_trame->option_tab[j] = (char*)malloc(sizeof(char)*40);
+			sprintf(new_trame->option_tab[j], "Maximum Segment Size (MSS)");
+			new_trame->option_mss_length = (char *)malloc(sizeof(char)*2);
+			int option_length =  tab_ligne[54+i+k+1];
+			sprintf(new_trame->option_mss_length, "%d",option_length);
+			new_trame->option_mss = (char *)malloc(sizeof(char)*10);
+			k+=2;
+			int option_value = tab_ligne[54+i+k]*256 + tab_ligne[54+i+k+1];
+			sprintf(new_trame->option_mss,"%d bytes", option_value);
+			k+=2 ;
+			j++;
+		}
+		if(tab_ligne[54+i+k]==3){
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*20);
+			sprintf(new_trame->option_tab[j], "Window Scale (WScale)");
+			new_trame->option_wscale = (char *)malloc(sizeof(char)*10);
+			k+=2;
+			sprintf(new_trame->option_wscale, "%d", tab_ligne[54+i+k]);
+			k++;
+			j++;
+		}
+		if(tab_ligne[54+i+k]==4 || tab_ligne[54+i+k]==5){
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*20);
+			sprintf(new_trame->option_tab[j], "Selective Acknowledgment (SACK)");
+			int option_sack = tab_ligne[54+i+k];
+			int option_sack_length = tab_ligne[54+i+k+1];
+			new_trame->option_sack = (char *)malloc(sizeof(char)*20);
+			new_trame->option_sack_length = (char *)malloc(sizeof(char)*2);
+			if(option_sack == 5)
+				sprintf(new_trame->option_sack, "SACK");
+			else{
+				sprintf(new_trame->option_sack, "SACK permitted");
+			}
+			sprintf(new_trame->option_sack_length, "%", option_sack_length);
+			k+=2;
+			j++;
+		}
+		if(tab_ligne[54+i+k]==8){
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*30);
+			sprintf(new_trame->option_tab[j], "Timestamps (TS)");
+			new_trame->option_ts_val = (char *)malloc(sizeof(char)*20);
+			new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*20);
+			k++;
+			long val = (long)tab_ligne[54+i+k]*16777216 + tab_ligne[54+i+k+1]*65536 + tab_ligne[54+i+k+2]*256 + tab_ligne[54+i+k+3];
+			k+=4;
+			long ecr = (long)tab_ligne[54+i+k]*16777216 + tab_ligne[54+i+k+1]*65536 + tab_ligne[54+i+k+2]*256 + tab_ligne[54+i+k+3];
+			sprintf(new_trame->option_ts_val, "%ld", val);
+			sprintf(new_trame->option_ts_ecr, "%ld", ecr);
+			k+=4;
+			j++;
+		}
+		j++;
+	}
+
+		 
+	return; 
+}
+
 static inline int lecture_trame(trame *new_trame){
 	
 	unsigned int *tab_ligne=new_trame->tab;
@@ -394,72 +540,7 @@ static inline int lecture_trame(trame *new_trame){
 	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
 		return 1;
 
-
-	new_trame->source_port =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
-
-	new_trame->destination_port =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
-
-	new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
-	long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
-	sprintf(new_trame->sequence_number_raw, "%ld",raw);
-
-	new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
-	raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
-	sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
-
-	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
-	header_length=tab_ligne[46+i]/16*4;
-	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i], header_length);
-
-
-	new_trame->urg =(char*)malloc(sizeof(char)*7);
-	new_trame->ack =(char*)malloc(sizeof(char)*7);
-	new_trame->push =(char*)malloc(sizeof(char)*7);
-	new_trame->reset =(char*)malloc(sizeof(char)*7);
-	new_trame->syn =(char*)malloc(sizeof(char)*7);
-	new_trame->fin =(char*)malloc(sizeof(char)*7);
-	
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
-	new_trame->tcp_f0=bit;
-	if(bit){
-		sprintf(new_trame->urg,"Set");
-	}else{sprintf(new_trame->urg,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
-	new_trame->tcp_f1=bit;
-	if(bit){
-		sprintf(new_trame->ack,"Set");
-	}else{sprintf(new_trame->ack,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
-	new_trame->tcp_f2=bit;
-	if(bit){
-		sprintf(new_trame->push,"Set");
-	}else{sprintf(new_trame->push,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
-	new_trame->tcp_f3=bit;
-	if(bit){
-		sprintf(new_trame->reset,"Set");
-	}else{sprintf(new_trame->reset,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
-	new_trame->tcp_f4=bit;
-	if(bit){
-		sprintf(new_trame->syn,"Set");
-	}else{sprintf(new_trame->syn,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
-	new_trame->tcp_f5=bit;
-	if(bit){
-		sprintf(new_trame->fin,"Set");
-	}else{sprintf(new_trame->fin,"Not Set");}
-	
-	new_trame->window =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
-
-
-	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
-	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
-
-
+	remplir_tcp_2(new_trame, tab_ligne, i);
 	return 1;
 	
 }
