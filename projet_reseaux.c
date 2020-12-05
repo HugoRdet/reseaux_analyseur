@@ -14,7 +14,7 @@ int main(int    argc, char **argv) {
 	
 	GtkWidget* grille=NULL;
 	//creation de la fenetre
-	GtkWidget *fenetre=init_fenetre(400,600,"analyseur trame",&grille);
+	GtkWidget *fenetre=init_fenetre(400,600,"Baby Shark",&grille);
 	
 	GtkCssProvider *cssProvider = gtk_css_provider_new();
 	gtk_css_provider_load_from_path(cssProvider, "style.css", NULL);

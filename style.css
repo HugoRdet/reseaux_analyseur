@@ -23,7 +23,14 @@
 #fond_menu{
     background-image: none;
     background: #292929;
-    padding: 0px;
+    border-image: none;
+    padding: 3px;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    -gtk-icon-shadow:none;
+    box-shadow:none;
 }
 
 

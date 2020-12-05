@@ -214,63 +214,54 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 }
 
 GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
-	GtkWidget* menu=gtk_toolbar_new ();
-	gtk_widget_set_name(menu,"fond_menu");
-		//le menu ne vas pas s ellargir si on ellargit la fenetre
-	gtk_toolbar_set_icon_size (GTK_TOOLBAR(menu),32);
-	gtk_widget_set_vexpand (menu, FALSE);
-	gtk_widget_set_hexpand (menu, FALSE);
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (menu),GTK_ORIENTATION_HORIZONTAL);
-	gtk_grid_attach(GTK_GRID(grille),menu,0,0,9,1);
 	
+	GtkWidget* menu_box=gtk_box_new(FALSE,0);
+	gtk_widget_set_vexpand (menu_box, FALSE);
+	gtk_widget_set_hexpand (menu_box, FALSE);
+	gtk_widget_set_name(menu_box,"fond_menu");
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (menu_box),GTK_ORIENTATION_HORIZONTAL);
+	gtk_grid_attach(GTK_GRID(grille),menu_box,0,0,9,1);
+
 	
+	GtkWidget *ouvrir_fichier=gtk_button_new ();
+	GtkWidget *fermer_fichier=gtk_button_new ();
+	GtkWidget *sauvegarder_fichier=gtk_button_new ();
 	
-	GtkToolItem *ouvrir_fichier=gtk_tool_button_new (NULL,"ouvrir..");
-	GtkToolItem *fermer_fichier=gtk_tool_button_new (NULL,"fermer");
-	GtkToolItem *sauvegarder_fichier=gtk_tool_button_new (NULL,"sauvegarder");
-	
+	gtk_widget_set_name(ouvrir_fichier,"fond_menu");
+	gtk_widget_set_name(fermer_fichier,"fond_menu");
+	gtk_widget_set_name(sauvegarder_fichier,"fond_menu");
+
 	
 	
 	GtkWidget * ouvrir_fichier_icone=gtk_image_new_from_file ("icones/ajouter_fichier_32px.png");
 	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
 	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
 	
-	/*
+
+	
+	gtk_button_set_image(GTK_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);
+	gtk_button_set_image(GTK_BUTTON(fermer_fichier),fermer_fichier_icone);
+	gtk_button_set_image(GTK_BUTTON(sauvegarder_fichier),sauvegarder_fichier_icone);
+	
+	
 	gtk_widget_set_name(ouvrir_fichier_icone,"fond_menu");
 	gtk_widget_set_name(fermer_fichier_icone,"fond_menu");
 	gtk_widget_set_name(sauvegarder_fichier_icone,"fond_menu");
-	*/
-
 	
-	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(ouvrir_fichier),ouvrir_fichier_icone);
-	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(fermer_fichier),fermer_fichier_icone);
-	gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON(sauvegarder_fichier),sauvegarder_fichier_icone);
+	gtk_widget_set_tooltip_text (ouvrir_fichier,"ouvrir un fichier");
+	gtk_widget_set_tooltip_text (fermer_fichier,"fermer un fichier");
+	gtk_widget_set_tooltip_text (sauvegarder_fichier,"sauvegarder un fichier");
 	
 	
-	gtk_tool_item_set_homogeneous (ouvrir_fichier,TRUE);
-	gtk_tool_item_set_homogeneous (fermer_fichier,TRUE);
-	gtk_tool_item_set_homogeneous (sauvegarder_fichier,TRUE);
-	gtk_tool_item_set_expand (ouvrir_fichier,FALSE);
-	gtk_tool_item_set_expand (fermer_fichier,FALSE);
-	gtk_tool_item_set_expand (sauvegarder_fichier,FALSE);
-	gtk_tool_item_set_visible_vertical (ouvrir_fichier,TRUE);
-	gtk_tool_item_set_visible_vertical (fermer_fichier,TRUE);
-	gtk_tool_item_set_visible_vertical (sauvegarder_fichier,TRUE);
-	gtk_tool_item_set_tooltip_text (ouvrir_fichier,"ouvrir un fichier");
-	gtk_tool_item_set_tooltip_text (fermer_fichier,"fermer un fichier");
-	gtk_tool_item_set_tooltip_text (sauvegarder_fichier,"sauvegarder un fichier");
-	
-	gtk_toolbar_insert (GTK_TOOLBAR(menu),sauvegarder_fichier,0);
-	gtk_toolbar_insert (GTK_TOOLBAR(menu),fermer_fichier,0);
-	gtk_toolbar_insert (GTK_TOOLBAR(menu),ouvrir_fichier,0);
-	
-	
-	
+	gtk_box_pack_start (GTK_BOX(menu_box),ouvrir_fichier,FALSE,FALSE,0);
+	gtk_box_pack_start (GTK_BOX(menu_box),fermer_fichier,FALSE,FALSE,0);
+	gtk_box_pack_start (GTK_BOX(menu_box),sauvegarder_fichier,FALSE,FALSE,0);
 	
 	g_signal_connect(G_OBJECT(ouvrir_fichier),"clicked",G_CALLBACK(affiche_selection_fichiers),pvbox);
 	g_signal_connect(G_OBJECT(fermer_fichier),"clicked",G_CALLBACK(fermer_selection_fichiers),pvbox);
 	g_signal_connect(G_OBJECT(sauvegarder_fichier),"clicked",G_CALLBACK(sauvegarder_fichiers),pvbox);
-	return menu;
+	gtk_widget_show_all (menu_box);
+	return menu_box;
 
 }
 
