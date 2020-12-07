@@ -32,7 +32,7 @@ int main(int    argc, char **argv) {
 	pvbox->window=&fenetre;
 	
 	init_panneau(grille,(pvbox->pvbox_haut),(pvbox->pvbox_bas));
-	GtkWidget* menu=init_menu(grille,pvbox);
+	init_menu(grille,pvbox);
 	gtk_widget_show_all(fenetre);
 	//signal fermeture de la fenetre
 	g_signal_connect(G_OBJECT(fenetre), "destroy", G_CALLBACK(fermeture_fenetre), liste);

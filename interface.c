@@ -11,12 +11,12 @@ void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
 		cellule_obj->status_bouton_ip=0;
 		
 		if (cellule_obj->obj->nb_ligne_erreur==-1){
-			gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode");
+			gtk_widget_set_name(pWidget,"button_dark_mode");
 		}else {
-			gtk_widget_set_name(GTK_WIDGET(cellule_obj->bouton),"button_dark_mode_erreur");
+			gtk_widget_set_name(pWidget,"button_dark_mode_erreur");
 		}
 		gtk_revealer_set_reveal_child (GTK_REVEALER(cellule_obj->revealer),FALSE);
-		gtk_widget_show(GTK_WIDGET(cellule_obj->bouton));
+		gtk_widget_show(pWidget);
 		*(cellule_obj->bouton_actif)=NULL;
 		return;
 	}
@@ -133,10 +133,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		default:
 			break;
 	}
-	
 	gtk_widget_destroy (dialog);
-	
-	
 }
 
 void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
@@ -165,9 +162,7 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 
 void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 	box *pvbox=(box*)pData;
-	GtkWidget *pvbox_haut=*(pvbox->pvbox_haut);
-	GtkWidget *pvbox_bas=*(pvbox->pvbox_bas);
-	
+	cell *liste=*(pvbox->liste);
 	GtkWidget *fenetre= gtk_window_new(GTK_WINDOW_POPUP);
 	
 	//positions de la fenetre lors de l ouverture
@@ -213,7 +208,7 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 	gtk_widget_destroy (dialog);
 }
 
-GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
+void init_menu(GtkWidget* grille,box *pvbox){
 	
 	GtkWidget* menu_box=gtk_box_new(FALSE,0);
 	gtk_widget_set_vexpand (menu_box, FALSE);
@@ -261,7 +256,6 @@ GtkWidget* init_menu(GtkWidget* grille,box *pvbox){
 	g_signal_connect(G_OBJECT(fermer_fichier),"clicked",G_CALLBACK(fermer_selection_fichiers),pvbox);
 	g_signal_connect(G_OBJECT(sauvegarder_fichier),"clicked",G_CALLBACK(sauvegarder_fichiers),pvbox);
 	gtk_widget_show_all (menu_box);
-	return menu_box;
 
 }
 
