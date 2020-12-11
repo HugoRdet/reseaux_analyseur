@@ -1,29 +1,29 @@
 Ethernet:
-		Source	:  F0:18:98:59AE:32
-		Destination:  C:8D:DB:1A:1E:88
+		Source	:  C:8D:DB:1A1E:88
+		Destination:  F0:18:98:59:AE:32
 		Type:  (0x0800)
 
 Internet Protocol:
 		Version:  4
 		Header Length: (5)	20 bytes
-		Total Length: 598
-		Identification: 0x00	(0)
+		Total Length: 490
+		Identification: 0xE78D	(59277)
 		Value: 0x40
 		 0... .... = Reserved bit: Not Set
 		 .1.. .... = Don't Fragment: Set
 		 ..0. .... = More Fragments: Not Set
 		Fragment Offset: 0
-		Time to Live: 64
+		Time to Live: 45
 		Protocol: TCP	(6)
-		Header Checksum: 0x9EAE
-		Source Address: 192.168.99.199
-		Destination Address: 128.119.245.12
+		Header Checksum: 0xCA8C
+		Source Address: 128.119.245.12
+		Destination Address: 192.168.99.199
 
 TCP:
-		Source Port: 60779
-		Destination Port: 80
-		Sequence Number (raw): 3230305654
-		Acknowledgment Number (raw): 2750420605
+		Source Port: 80
+		Destination Port: 60779
+		Sequence Number (raw): 2750420605
+		Acknowledgment Number (raw): 3230306200
 		Header Length: (C)	32 bytes
 			..0. .... = Urgent: Not Set
 			...1 .... = Acknowledgement: Set
@@ -31,10 +31,9 @@ TCP:
 			.... .0.. = Reset: Not Set
 			.... ..0. = Syn: Not Set
 			.... ...0 = Fin: Not Set
-		Window: 2058
-		Checksum: 0x27DF
+		Window: 0
+		Checksum: 0x0000
 		Urgent Pointer: 0x0000
 
 
 
-/Users/hugoriffaud/Desktop/gitres/reseaux_analyseur/test_impression.txt

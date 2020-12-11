@@ -490,52 +490,70 @@ void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData){
 	
 }
 
-void remplir_ethernet(GtkWidget *box_ethernet,cell *tmp_cell){
+int remplir_ethernet(GtkWidget *box_ethernet,cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
+	int place=tmp_cell->obj->place;
 	
-	sprintf(label,"\t\tSource\t:  %s\n",(tmp_cell->obj->mac_source));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
+	if (place>11){
+		sprintf(label,"\t\tSource\t:  %s\n",(tmp_cell->obj->mac_source));
+		tmp_label=gtk_label_new(label);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	
+	if (place>5){
 	sprintf(label,"\t\tDestination:  %s\n",(tmp_cell->obj->mac_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	if (place>13){
 	sprintf(label,"\t\tType:  %s\n",(tmp_cell->obj->ip_type));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	return 1;
 }
 
-void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
+int remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
+	int place=tmp_cell->obj->place;
 	
+	if (place>14){
 	sprintf(label,"\t\tVersion:  %s\n",(tmp_cell->obj->version));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
 	
+	
+
 	sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->header_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>17){
 	sprintf(label,"\t\tTotal Length: %s\n",(tmp_cell->obj->total_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>19){
 	sprintf(label,"\t\tIdentification: %s\n",(tmp_cell->obj->identification));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
-
+	}else{ return 0; }
+	
+	if (place>20){
 	GtkWidget *flags=gtk_expander_new ("Flags");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(flags),FALSE);
 	gtk_box_pack_start (GTK_BOX(box_ip),flags,FALSE,FALSE,0);
@@ -563,68 +581,97 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>21){
 	sprintf(label,"\t\tFragment Offset: %s\n",(tmp_cell->obj->frag_offset));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-		
+	}else{ return 0; }
+	
+	if (place>22){
 	sprintf(label,"\t\tTime to Live: %d\n",(tmp_cell->obj->TTL));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else { return 0; }
+	
+	if (place>23){
 	sprintf(label,"\t\tProtocol: %s\n",(tmp_cell->obj->protocol));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place > 25){
 	sprintf(label,"\t\tHeader Checksum: %s\n",(tmp_cell->obj->header_checksum));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place > 29){
 	sprintf(label,"\t\tSource Address: %s\n",(tmp_cell->obj->ip_source));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place> 33){
 	sprintf(label,"\t\tDestination Address: %s\n",(tmp_cell->obj->ip_dest));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
+	
+	return 1;
+	
 }
 
-void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
+int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	
 	char label[80];
 	GtkWidget *tmp_label=NULL;
-
+	int place=tmp_cell->obj->place;
+	int i=(tmp_cell->obj->header_length_)-20;
+	
+	if (place>(35+i)){
 	sprintf(label,"\t\tSource Port: %s\n",(tmp_cell->obj->source_port));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>(37+i)){
 	sprintf(label,"\t\tDestination Port: %s\n",(tmp_cell->obj->destination_port));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>(41+i)){
 	sprintf(label,"\t\tSequence Number (raw): %s\n",(tmp_cell->obj->sequence_number_raw));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	if (place>(45+i)){
 	sprintf(label,"\t\tAcknowledgment Number (raw): %s\n",(tmp_cell->obj->acknowledgment_number_raw));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>(46+i)){
 	sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->tcp_header_length));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>(47+i)){
 	GtkWidget *tcp_flags=gtk_expander_new ("Flags");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_flags),FALSE);
 	gtk_box_pack_start (GTK_BOX(box_tcp),tcp_flags,FALSE,FALSE,0);
@@ -663,28 +710,36 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	if (place>(49+i)){
 	sprintf(label,"\t\tWindow: %s\n",(tmp_cell->obj->window));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-
+	}else{ return 0; }
+	
+	if (place>(51+i)){
 	sprintf(label,"\t\tChecksum: %s\n",(tmp_cell->obj->tcp_checksum));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
 	
+	if (place>(53+i)){
 	sprintf(label,"\t\tUrgent Pointer: %s\n",(tmp_cell->obj->urgent));
 	tmp_label=gtk_label_new(label);
 	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 	gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+	}else{ return 0; }
+	
 	
 	if(tmp_cell->obj->no_option){
 		sprintf(label,"\t\tNo Options: %s\n",(tmp_cell->obj->no_option));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-		return;
+		return 1;
 	}
 	/*
 	GtkWidget *tcp_options=gtk_expander_new (tmp_cell->obj->option_length);
@@ -807,7 +862,7 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 		
 	}
 	*/
-	return;
+	return 1;
 }
 
 void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut){
@@ -867,7 +922,7 @@ void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut){
 	}
 }
 
-void creation_ethernet(GtkWidget *new_box,cell *tmp_cell){
+int creation_ethernet(GtkWidget *new_box,cell *tmp_cell){
 	
 	
 	GtkWidget *ethernet=gtk_expander_new ("\nEthernet II\n");
@@ -877,14 +932,18 @@ void creation_ethernet(GtkWidget *new_box,cell *tmp_cell){
 	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
-	remplir_ethernet(box_ethernet,tmp_cell);	
-
+	return remplir_ethernet(box_ethernet,tmp_cell);	
+	
+	
 	
 }
 
 
-void creation_ip(GtkWidget *new_box,cell *tmp_cell){
+int creation_ip(GtkWidget *new_box,cell *tmp_cell){
 	
+	int place=tmp_cell->obj->place;
+	
+	if (place>14){
 	GtkWidget *IP=gtk_expander_new ("\nInternet Protocol\n");
 	gtk_widget_set_name(GTK_WIDGET(IP),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
@@ -892,13 +951,22 @@ void creation_ip(GtkWidget *new_box,cell *tmp_cell){
 	GtkWidget *box_ip=gtk_box_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(IP),box_ip);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-	remplir_ip(box_ip, tmp_cell);
+	return remplir_ip(box_ip, tmp_cell);
+	}else{
+		return 0;
+	}
+	return 1;
 	
 }
 
 
-void creation_tcp(GtkWidget *new_box,cell *tmp_cell){
+int creation_tcp(GtkWidget *new_box,cell *tmp_cell){
 	
+	int place=tmp_cell->obj->place;
+	int i=(tmp_cell->obj->header_length_)-20;
+	
+	if (place>(35+i)){
+		
 	GtkWidget *tcp=gtk_expander_new ("\nTransmission Control Protocol\n");
 	gtk_widget_set_name(GTK_WIDGET(tcp),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp),FALSE);
@@ -906,8 +974,12 @@ void creation_tcp(GtkWidget *new_box,cell *tmp_cell){
 	GtkWidget *box_tcp=gtk_box_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(tcp),box_tcp);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_tcp),GTK_ORIENTATION_VERTICAL);
-	remplir_tcp(box_tcp, tmp_cell);	
+	return remplir_tcp(box_tcp, tmp_cell);	
 	
+	}else {
+		return 0;
+	}
+	return 1;
 }
 
 void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
@@ -915,9 +987,17 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	cell *tmp_cell=(cell *)pData;
 	
 	set_bouton_menu_trame(new_box,tmp_cell,statut);
-	creation_ethernet(new_box,tmp_cell);
-	creation_ip(new_box,tmp_cell);
-	creation_tcp(new_box,tmp_cell);
+	if ( creation_ethernet(new_box,tmp_cell) == 0){
+		return ;
+	}
+	
+	if ( creation_ip(new_box,tmp_cell) == 0 ){
+		return ;
+	}
+	
+	if ( creation_tcp(new_box,tmp_cell) ==0 ){
+		return ;
+	}
 	
 }		
 	

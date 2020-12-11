@@ -17,7 +17,7 @@ typedef struct trame_{
 	//couche ip
 	char *version;
 	char *header_length;
-	
+	int header_length_;
 	char *total_length;
 	char *identification;
 	char *flags_offset;

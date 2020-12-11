@@ -288,11 +288,6 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 
 }
 
-//cette fonction va charger le contenu entier d une trame dans tab_ligne
-//tab_ligne doit faire 1518octets taille maximale d une trame ethernet
-
-//on suppose que quand on lance cette fonction fichier_src pointe deja vers le premier octet (on viens de trouver le premier offset;
-
 void affiche_tab(unsigned int *tab){
 	for (int i=0;i<16;i++){
 		printf("%d ",tab[i]);
@@ -300,77 +295,278 @@ void affiche_tab(unsigned int *tab){
 	printf("\n");
 }
 
-void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
-	new_trame->source_port =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
 
-	new_trame->destination_port =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
 
-	new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
-	long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
-	sprintf(new_trame->sequence_number_raw, "%ld",raw);
-
-	new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
-	raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
-	sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
-
-	new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
-	int header_length=tab_ligne[46+i]/16*4;
-	sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length);
-
-	new_trame->urg =(char*)malloc(sizeof(char)*7);
-	new_trame->ack =(char*)malloc(sizeof(char)*7);
-	new_trame->push =(char*)malloc(sizeof(char)*7);
-	new_trame->reset =(char*)malloc(sizeof(char)*7);
-	new_trame->syn =(char*)malloc(sizeof(char)*7);
-	new_trame->fin =(char*)malloc(sizeof(char)*7);
+int remplir_ethernet_(trame *new_trame){
 	
-	int bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
-	new_trame->tcp_f0=bit;
-	if(bit){
-		sprintf(new_trame->urg,"Set");
-	}else{sprintf(new_trame->urg,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
-	new_trame->tcp_f1=bit;
-	if(bit){
-		sprintf(new_trame->ack,"Set");
-	}else{sprintf(new_trame->ack,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
-	new_trame->tcp_f2=bit;
-	if(bit){
-		sprintf(new_trame->push,"Set");
-	}else{sprintf(new_trame->push,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
-	new_trame->tcp_f3=bit;
-	if(bit){
-		sprintf(new_trame->reset,"Set");
-	}else{sprintf(new_trame->reset,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
-	new_trame->tcp_f4=bit;
-	if(bit){
-		sprintf(new_trame->syn,"Set");
-	}else{sprintf(new_trame->syn,"Not Set");}
-	bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
-	new_trame->tcp_f5=bit;
-	if(bit){
-		sprintf(new_trame->fin,"Set");
-	}else{sprintf(new_trame->fin,"Not Set");}
+	int place=new_trame->place;
 	
-	new_trame->window =(char *)malloc(sizeof(char)*5);
-	sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
+	unsigned int *tab_ligne=new_trame->tab;
+	
+		
+	if (place>5){
+		
+		new_trame->mac_dest=(char *) malloc(sizeof(char)*80);
+		sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);	
+		
+	}else{ return 0; }
+	
+	if (place>11){
+		
+		new_trame->mac_source=(char *) malloc(sizeof(char)*80);	
+		sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
+		
+	}else{ return 0; }
+	
+	if (place>13){
+		new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
+		sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
+	}else{ return 0; }
+	
+	return 1;
+}
+
+int remplir_ip_(trame *new_trame){
+	
+	int place=new_trame->place;
+	unsigned int *tab_ligne=new_trame->tab;
+	
+	
+	if (place>14){
+		
+		new_trame->version=(char *)malloc(sizeof(char)*4);
+		sprintf(new_trame->version, "%X", tab_ligne[14]/16),
+		new_trame->header_length=(char *)malloc(sizeof(char)*10);
+		int header_length=tab_ligne[14]%16*4;
+		new_trame->header_length_=header_length;
+		sprintf(new_trame->header_length, "(%X)\t%d bytes",tab_ligne[14]%16, header_length);
+	
+	}else{ return 0; }
+	
+	if (place>17){
+		
+		new_trame->total_length=(char *) malloc(sizeof(char)*10);
+		int total_length = tab_ligne[16]*256 + tab_ligne[17];
+		sprintf(new_trame->total_length, "%d", total_length);
+		
+	}else{ return 0; }
+		
+	if (place>19){
+		new_trame->identification=(char *) malloc(sizeof(char)*20);
+		int identifier=tab_ligne[18]*256+tab_ligne[19];
+		sprintf(new_trame->identification, "0x%X%X\t(%d)", tab_ligne[18], tab_ligne[19], identifier);
+	}else{ return 0; }
+	
+	if (place>20){
+		
+		new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
+		sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
+	
+		int bit ;
+		bit= valeur_n_eme_bit(tab_ligne[20], 7);
+		new_trame->f0 = bit;
+		new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
+		if(bit){
+			new_trame->reserved_bit = "Set";
+		}else{
+			new_trame->reserved_bit = "Not Set";
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[20], 6);
+		new_trame->f1 = bit;
+		new_trame->dont_fragment=(char*)malloc(sizeof(char)*20);
+		if(bit){
+			new_trame->dont_fragment = "Set";
+		}
+		else{
+			new_trame->dont_fragment = "Not Set";
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[20], 5);
+		new_trame->f2 = bit;
+		new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
+		if(bit){
+			new_trame->more_fragment = "Set";
+		}
+		else{
+			new_trame->more_fragment = "Not Set";
+		}
+	
+	}else{ return 0; }
+	
+	if (place>21){
+		
+		new_trame->frag_offset = (char *)malloc(sizeof(char)*10);
+		int frag = (tab_ligne[20]%64)*256+tab_ligne[21];
+		sprintf(new_trame->frag_offset, "%d",frag);
+		
+	}else{ return 0; }
+	
+	if (place>22){
+		
+		new_trame->TTL=tab_ligne[22];
+		
+	}else { return 0; }
+	
+	if (place>23){
+		
+		new_trame->protocol=(char*)malloc(sizeof(char)*10);
+		if(tab_ligne[23] == 1){
+			sprintf(new_trame->protocol,"ICMP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+		}
+
+		if(tab_ligne[23] == 6){
+			sprintf(new_trame->protocol,"TCP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
+		}
+		
+		if(tab_ligne[23] == 23){
+			sprintf(new_trame->protocol,"UDP\t(%d%d)", tab_ligne[23]/16,tab_ligne[23]%16);
+		}
+	}else{ return 0; }
+	
+	if (place > 25){
+		
+		new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
+		sprintf(new_trame->header_checksum,"0x%X%X%X%X", tab_ligne[24]/16,tab_ligne[24]%16, tab_ligne[25]/16, tab_ligne[25]%16);
+		
+	}else{ return 0; }
+	
+	if (place > 29){
+		
+		new_trame->ip_source=(char *) malloc(sizeof(char)*15);
+		sprintf(new_trame->ip_source,"%d.%d.%d.%d", tab_ligne[26],tab_ligne[27],tab_ligne[28],tab_ligne[29]);
+		
+	}else{ return 0; }
+	
+	if (place> 33){
+		
+		new_trame->ip_dest=(char *) malloc(sizeof(char)*15);
+		sprintf(new_trame->ip_dest,"%d.%d.%d.%d", tab_ligne[30],tab_ligne[31],tab_ligne[32],tab_ligne[33]);
+		
+	}else{ return 0; }
+	
+	
+	return 1;
+}
 
 
-	new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
-	sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
+
+int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 	
-	new_trame->urgent = (char*)malloc(sizeof(char)*10);
-	sprintf(new_trame->urgent, "0x%X%X%X%X", tab_ligne[52+i]/16,tab_ligne[52]%16,tab_ligne[53]/16,tab_ligne[53]%16);
-	new_trame->no_option = NULL;
-	if(header_length <= 5){
+	int place=new_trame->place;
+	int i=(new_trame->header_length_)-20;
+	
+	if (place>(35+i)){
+		new_trame->source_port =(char *)malloc(sizeof(char)*5);
+		sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
+	}else{ return 0; }
+	
+	if (place>(37+i)){
+		new_trame->destination_port =(char *)malloc(sizeof(char)*5);
+		sprintf(new_trame->destination_port, "%d", tab_ligne[36+i]*256 + tab_ligne[37+i]);
+	}else{ return 0; }
+		
+	if (place>(41+i)){
+		new_trame->sequence_number_raw =(char *)malloc(sizeof(char)*5);
+		long raw = (long)tab_ligne[38+i]*16777216 + tab_ligne[39+i]*65536 + tab_ligne[40+i]*256 + tab_ligne[41+i];
+		sprintf(new_trame->sequence_number_raw, "%ld",raw);
+	}else{ return 0; }
+		
+	if (place>(45+i)){
+		new_trame->acknowledgment_number_raw =(char *)malloc(sizeof(char)*5);
+		long int raw = (long)tab_ligne[42+i]*16777216 + tab_ligne[43+i]*65536 + tab_ligne[44+i]*256 + tab_ligne[45+i];
+		sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
+	}else{ return 0; }
+		
+	if (place>(46+i)){
+		new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
+		int header_length=tab_ligne[46+i]/16*4;
+		sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length);
+	}else{ return 0; }
+	
+	if (place>(47+i)){
+		new_trame->urg =(char*)malloc(sizeof(char)*7);
+		new_trame->ack =(char*)malloc(sizeof(char)*7);
+		new_trame->push =(char*)malloc(sizeof(char)*7);
+		new_trame->reset =(char*)malloc(sizeof(char)*7);
+		new_trame->syn =(char*)malloc(sizeof(char)*7);
+		new_trame->fin =(char*)malloc(sizeof(char)*7);
+	
+		int bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
+		new_trame->tcp_f0=bit;
+		
+		if(bit){
+			sprintf(new_trame->urg,"Set");
+		}else{
+			sprintf(new_trame->urg,"Not Set");
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
+		new_trame->tcp_f1=bit;
+	
+		if(bit){
+			sprintf(new_trame->ack,"Set");
+		}else{
+			sprintf(new_trame->ack,"Not Set");
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
+		new_trame->tcp_f2=bit;
+	
+		if(bit){
+			sprintf(new_trame->push,"Set");
+		}else{
+			sprintf(new_trame->push,"Not Set");
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
+		new_trame->tcp_f3=bit;
+		
+		if(bit){
+			sprintf(new_trame->reset,"Set");
+		}else{
+			sprintf(new_trame->reset,"Not Set");
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
+		new_trame->tcp_f4=bit;
+	
+		if(bit){
+			sprintf(new_trame->syn,"Set");
+		}else{
+			sprintf(new_trame->syn,"Not Set");
+		}
+		
+		bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
+		new_trame->tcp_f5=bit;
+		
+		if(bit){
+			sprintf(new_trame->fin,"Set");
+		}else{
+			sprintf(new_trame->fin,"Not Set");}
+	
+	}else{ return 0; }
+		
+	if (place>(49+i)){
+		new_trame->window =(char *)malloc(sizeof(char)*5);
+		sprintf(new_trame->window, "%d",tab_ligne[48+i]*256+tab_ligne[49]);
+	}else{ return 0; }
+	
+	if (place>(51+i)){
+		new_trame->tcp_checksum =(char *)malloc(sizeof(char)*6);
+		sprintf(new_trame->tcp_checksum, "0x%X%X%X%X",tab_ligne[50+i]/16,tab_ligne[50+i]%16,tab_ligne[51+i]/16,tab_ligne[51+i]%16);
+	}else{ return 0; }
+		
+	if (place>(53+i)){
+		new_trame->urgent = (char*)malloc(sizeof(char)*10);
+		sprintf(new_trame->urgent, "0x%X%X%X%X", tab_ligne[52+i]/16,tab_ligne[52]%16,tab_ligne[53]/16,tab_ligne[53]%16);
+		new_trame->no_option = NULL;
+	}else{ return 0; }
+	
+	if((new_trame->header_length_) <= 5){
 		new_trame->no_option = (char *)malloc(sizeof(char)*10);
 		sprintf(new_trame->no_option, "0x00  (EOL)");
-		return;
+		return 1;
 	}
 	/*
 	//printf("%d",header_length);	
@@ -446,104 +642,31 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 	}
 	*/
 		 
-	return; 
+	return 1; 
 }
 
 static inline int lecture_trame(trame *new_trame){
 	
+	
 	unsigned int *tab_ligne=new_trame->tab;
-	new_trame->mac_dest=(char *) malloc(sizeof(char)*80);
-	new_trame->mac_source=(char *) malloc(sizeof(char)*80);	
 	
-	sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
-	sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);
-	
-	
-	new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
-	sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
-	
-	
-	new_trame->version=(char *)malloc(sizeof(char)*4);
-	sprintf(new_trame->version, "%X", tab_ligne[14]/16),
-	new_trame->header_length=(char *)malloc(sizeof(char)*10);
-	int header_length=tab_ligne[14]%16*4;
-	sprintf(new_trame->header_length, "(%X)\t%d bytes",tab_ligne[14]%16, header_length);
-	
-	
-	new_trame->total_length=(char *) malloc(sizeof(char)*10);
-	int total_length = tab_ligne[16]*256 + tab_ligne[17];
-	sprintf(new_trame->total_length, "%d", total_length);
-	
-	new_trame->identification=(char *) malloc(sizeof(char)*20);
-	int identifier=tab_ligne[18]*256+tab_ligne[19];
-	sprintf(new_trame->identification, "0x%X%X\t(%d)", tab_ligne[18], tab_ligne[19], identifier);
-	
-	new_trame->flags_offset=(char *) malloc(sizeof(char)*10);
-	sprintf(new_trame->flags_offset, "0x%X%X",tab_ligne[20]/16,tab_ligne[20]%16);
-	int bit; 
-	
-	bit = valeur_n_eme_bit(tab_ligne[20], 7);
-	new_trame->f0 = bit;
-	new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
-	if(bit){
-		new_trame->reserved_bit = "Set";
-	}else{
-		new_trame->reserved_bit = "Not Set";
-	}
-	
-	bit = valeur_n_eme_bit(tab_ligne[20], 6);
-	new_trame->f1 = bit;
-	new_trame->dont_fragment=(char*)malloc(sizeof(char)*20);
-	if(bit){
-		new_trame->dont_fragment = "Set";
-	}
-	else{
-		new_trame->dont_fragment = "Not Set";
-	}
-
-	bit = valeur_n_eme_bit(tab_ligne[20], 5);
-	new_trame->f2 = bit;
-	new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
-	if(bit){
-		new_trame->more_fragment = "Set";
-	}
-	else{
-		new_trame->more_fragment = "Not Set";
-	}
-	
-	new_trame->frag_offset = (char *)malloc(sizeof(char)*10);
-	int frag = (tab_ligne[20]%64)*256+tab_ligne[21];
-	sprintf(new_trame->frag_offset, "%d",frag);
-	
-	new_trame->TTL=tab_ligne[22];
-	
-	new_trame->protocol=(char*)malloc(sizeof(char)*10);
-	if(tab_ligne[23] == 1){
-		sprintf(new_trame->protocol,"ICMP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
-	}
-	if(tab_ligne[23] == 6){
-		sprintf(new_trame->protocol,"TCP\t(%d)", tab_ligne[23]/16+tab_ligne[23]%16);
-	}
-	if(tab_ligne[23] == 23){
-		sprintf(new_trame->protocol,"UDP\t(%d%d)", tab_ligne[23]/16,tab_ligne[23]%16);
-	}
-	
-	
-	new_trame->header_checksum=(char *) malloc(sizeof(char)*10);
-	sprintf(new_trame->header_checksum,"0x%X%X%X%X", tab_ligne[24]/16,tab_ligne[24]%16, tab_ligne[25]/16, tab_ligne[25]%16);
-	
-	new_trame->ip_source=(char *) malloc(sizeof(char)*15);
-	sprintf(new_trame->ip_source,"%d.%d.%d.%d", tab_ligne[26],tab_ligne[27],tab_ligne[28],tab_ligne[29]);
-	
-	new_trame->ip_dest=(char *) malloc(sizeof(char)*15);
-	sprintf(new_trame->ip_dest,"%d.%d.%d.%d", tab_ligne[30],tab_ligne[31],tab_ligne[32],tab_ligne[33]);
-	
-	int i=header_length-20;
-	
-	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
+	if (remplir_ethernet_(new_trame)==0){
 		return 1;
+	}
 	
-	remplir_tcp_2(new_trame, tab_ligne, i);
+	
+	
+	if (remplir_ip_(new_trame)==0){
+		return 1;
+	}
+	
+	
+	
+	if (remplir_tcp_2(new_trame,tab_ligne)==0){
+		return 1;
+	}
+	
+	
 	
 	return 1;
 	
@@ -564,7 +687,8 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	new_trame->id=nb_trame;
 	new_trame->nb_octet_erreur=-1;
 	new_trame->nb_ligne_erreur=-1;
-	unsigned int *tab=(unsigned int *) calloc(1518,sizeof(unsigned int));
+	new_trame->place=1518;
+	unsigned int *tab=(unsigned int *) malloc(sizeof(unsigned int)*1518);
 	new_trame->tab=tab;
 	
 	new_trame->nom_fichier=(char *) malloc(sizeof(char)*80);
@@ -584,9 +708,12 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		
 		//fin de fichier
 		if (verif==0){
+			new_trame->place=offset_prec;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
-			new_trame->place=offset;
+			
+			
+			
 			return 0;
 		}
 		
@@ -597,18 +724,22 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 			while ((offset!=0)&&(verif!=0)) {
 				verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
-		
+			
+			new_trame->place=offset_prec;
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
-			new_trame->place=offset;
+			
+			
 			return verif;
 		}
 		
 	}while (offset!=0);
 	
+	new_trame->place=offset_prec;
 	lecture_trame(new_trame);
+	
 	ajout_liste(liste,new_trame,box_haut, box_bas);
-	new_trame->place=offset;
+	
 	return 1;
 }
 
