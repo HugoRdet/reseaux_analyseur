@@ -20,6 +20,6 @@ GtkWidget *init_fenetre(int largeur,int hauteur,char *titre,GtkWidget** grid);
 void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 
 void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData);
-void remplir_arbre(GtkWidget *new_box, gpointer pData);
+void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut);
 void assigne_ui_liste(cell **liste,GtkWidget* box_haut, GtkWidget* box_bas);
 #endif

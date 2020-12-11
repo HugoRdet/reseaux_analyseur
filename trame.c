@@ -273,7 +273,7 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	GtkWidget *new_box=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (new_box),GTK_ORIENTATION_VERTICAL);
-	remplir_arbre(new_box, new_cell);
+	remplir_arbre(new_box, new_cell,1);
 	gtk_widget_set_name(new_box,"tree_dark_mode");
 	gtk_container_add(GTK_CONTAINER(revealer), new_box);
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
@@ -301,7 +301,6 @@ void affiche_tab(unsigned int *tab){
 }
 
 void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
-	
 	new_trame->source_port =(char *)malloc(sizeof(char)*5);
 	sprintf(new_trame->source_port, "%d", tab_ligne[34+i]*256 +tab_ligne[35+i]);
 
@@ -373,16 +372,20 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 		sprintf(new_trame->no_option, "0x00  (EOL)");
 		return;
 	}
-	printf("%d",header_length);	
-	int option_length = (header_length/4 - 5) * 4;
+	/*
+	//printf("%d",header_length);	
+	int option_length =(int) ( (header_length/4 - 5) * 4 );
 	new_trame->option_length =(char*)malloc(sizeof(char)*30);
 	sprintf(new_trame->option_length, "Options:\t(%d bytes)", option_length);
 	new_trame->option_tab = (char **)malloc(sizeof(char *)*6);
 	int k=0;
-	for(int j=0; j<5; j++){
+	
+	int j=0;
+	
+	while (j<5){
 		new_trame->option_tab[j] = NULL;
 		if(tab_ligne[54+i+k]==1){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*30);
+			new_trame->option_tab[j] = (char *) malloc(sizeof(char)*40);
 			sprintf(new_trame->option_tab[j],"No Operation (NOP)");
 			k++;
 			j++;
@@ -401,7 +404,7 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 			j++;
 		}
 		if(tab_ligne[54+i+k]==3){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*20);
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
 			sprintf(new_trame->option_tab[j], "Window Scale (WScale)");
 			new_trame->option_wscale = (char *)malloc(sizeof(char)*10);
 			k+=2;
@@ -410,7 +413,7 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 			j++;
 		}
 		if(tab_ligne[54+i+k]==4 || tab_ligne[54+i+k]==5){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*20);
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
 			sprintf(new_trame->option_tab[j], "Selective Acknowledgment (SACK)");
 			int option_sack = tab_ligne[54+i+k];
 			int option_sack_length = tab_ligne[54+i+k+1];
@@ -421,12 +424,12 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 			else{
 				sprintf(new_trame->option_sack, "SACK permitted");
 			}
-			sprintf(new_trame->option_sack_length, "%", option_sack_length);
+			sprintf(new_trame->option_sack_length, "%d", option_sack_length);
 			k+=2;
 			j++;
 		}
 		if(tab_ligne[54+i+k]==8){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*30);
+			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
 			sprintf(new_trame->option_tab[j], "Timestamps (TS)");
 			new_trame->option_ts_val = (char *)malloc(sizeof(char)*20);
 			new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*20);
@@ -441,7 +444,7 @@ void remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne, int i){
 		}
 		j++;
 	}
-
+	*/
 		 
 	return; 
 }
@@ -539,9 +542,11 @@ static inline int lecture_trame(trame *new_trame){
 	
 	if(strcmp(new_trame->protocol, "TCP\t(6)") != 0)
 		return 1;
-
+	
 	remplir_tcp_2(new_trame, tab_ligne, i);
+	
 	return 1;
+	
 	
 }
 
@@ -587,15 +592,12 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		
 		if (offset-offset_prec>0){
 			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
-			
+			new_trame->nb_ligne_erreur=(*ligne)-2;
+			new_trame->nb_octet_erreur=offset-offset_prec;
 			while ((offset!=0)&&(verif!=0)) {
 				verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
-			
-			
-			
-			new_trame->nb_octet_erreur=offset_prec;
-			new_trame->nb_ligne_erreur=(*ligne)-2;
+		
 			lecture_trame(new_trame);
 			ajout_liste(liste,new_trame,box_haut, box_bas);
 			new_trame->place=offset;

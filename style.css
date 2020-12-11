@@ -59,6 +59,23 @@
     border-style:none;
     text-shadow: none;
     padding:2px 0 2px 0;
+    
+}
+
+#label_menu_trame_dark_mode{
+    background-color: #6C6D6C;
+    color: #DFDFDF;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+    
 }
 
 #label_trame_dark_mode{
@@ -73,8 +90,10 @@
     box-shadow:none;
     border-style:none;
     text-shadow: none;
-    padding:2px 0 2px 0;
+    padding:2px 7px 2px 0;
+    -gtk-icon-shadow:none;
 }
+
 
 #label_trame_dark_mode_erreur{
     background-color: #D06868;
@@ -88,7 +107,8 @@
     box-shadow:none;
     border-style:none;
     text-shadow: none;
-    padding:2px 0 2px 0;
+    padding:2px 7px 2px 0;
+    -gtk-icon-shadow:none;
 }
 
 #button_dark_mode{

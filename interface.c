@@ -136,6 +136,43 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	gtk_widget_destroy (dialog);
 }
 
+void agrandir_trame(GtkWidget *pWidget, gpointer pData){
+	
+	cell *liste=pData;	
+	GtkWidget *	fenetre= gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_name(fenetre,"fond_dark");
+	gtk_window_set_position(GTK_WINDOW(fenetre), GTK_WIN_POS_CENTER_ON_PARENT );
+	gtk_window_set_default_size(GTK_WINDOW(fenetre), 600,400);
+	
+	char tmp_titre[20];
+	sprintf(tmp_titre,"trame n°%d",liste->obj->id);
+	gtk_window_set_title(GTK_WINDOW(fenetre),tmp_titre);
+	
+	
+	GtkWidget *scroll_fenetre= gtk_scrolled_window_new (NULL,NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll_fenetre),GTK_SHADOW_IN);
+	gtk_widget_set_name(scroll_fenetre,"scroll_bar_perso");
+
+	
+	GtkWidget* box_trame=gtk_box_new(FALSE,0);
+	gtk_box_set_homogeneous (GTK_BOX(box_trame),FALSE);
+	gtk_widget_set_name(box_trame,"tree_dark_mode");
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_trame),GTK_ORIENTATION_VERTICAL);
+	
+	GtkWidget *scroll_bar=gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW(scroll_fenetre));
+	gtk_widget_set_name(scroll_bar,"scroll_bar_perso");
+	
+	gtk_container_add(GTK_CONTAINER(fenetre),scroll_fenetre);
+	gtk_container_add(GTK_CONTAINER(scroll_fenetre),box_trame);
+	
+	remplir_arbre(box_trame,liste,0);
+	gtk_widget_show_all(fenetre);
+	g_signal_connect_swapped (fenetre, "destroy",G_CALLBACK (gtk_widget_destroy),fenetre);
+	
+	
+}
+
+
 void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	box *pvbox=(box*)pData;
 	
@@ -158,6 +195,51 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	pvbox->taille_liste=1;
 	*(pvbox->liste)=NULL;
 	
+}
+
+
+void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
+	
+	fprintf(fichier,"Ethernet:\n");
+	fprintf(fichier,"\t\tSource\t:  %s\n",(tmp_trame->mac_source));
+	fprintf(fichier,"\t\tDestination:  %s\n",(tmp_trame->mac_dest));
+	fprintf(fichier,"\t\tType:  %s\n\n",(tmp_trame->ip_type));
+	
+	
+	fprintf(fichier,"Internet Protocol:\n");
+	fprintf(fichier,"\t\tVersion:  %s\n",(tmp_trame->version));
+	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->header_length));
+	fprintf(fichier,"\t\tTotal Length: %s\n",(tmp_trame->total_length));
+	fprintf(fichier,"\t\tIdentification: %s\n",(tmp_trame->identification));
+	fprintf(fichier,"\t\tValue: %s\n",(tmp_trame->flags_offset));
+	fprintf(fichier,"\t\t %d... .... = Reserved bit: %s\n",tmp_trame->f0, (tmp_trame->reserved_bit));
+	fprintf(fichier,"\t\t .%d.. .... = Don't Fragment: %s\n",tmp_trame->f1,(tmp_trame->dont_fragment));
+	fprintf(fichier,"\t\t ..%d. .... = More Fragments: %s\n",tmp_trame->f2,(tmp_trame->more_fragment));
+	fprintf(fichier,"\t\tFragment Offset: %s\n",(tmp_trame->frag_offset));
+	fprintf(fichier,"\t\tTime to Live: %d\n",(tmp_trame->TTL));
+	fprintf(fichier,"\t\tProtocol: %s\n",(tmp_trame->protocol));
+	fprintf(fichier,"\t\tHeader Checksum: %s\n",(tmp_trame->header_checksum));
+	fprintf(fichier,"\t\tSource Address: %s\n",(tmp_trame->ip_source));
+	fprintf(fichier,"\t\tDestination Address: %s\n\n",(tmp_trame->ip_dest));
+	
+	fprintf(fichier,"TCP:\n");
+	fprintf(fichier,"\t\tSource Port: %s\n",(tmp_trame->source_port));
+	fprintf(fichier,"\t\tDestination Port: %s\n",(tmp_trame->destination_port));
+	fprintf(fichier,"\t\tSequence Number (raw): %s\n",(tmp_trame->sequence_number_raw));
+	fprintf(fichier,"\t\tAcknowledgment Number (raw): %s\n",(tmp_trame->acknowledgment_number_raw));
+	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->tcp_header_length));
+	fprintf(fichier,"\t\t\t..%d. .... = Urgent: %s\n",tmp_trame->tcp_f0, (tmp_trame->urg));
+	fprintf(fichier,"\t\t\t...%d .... = Acknowledgement: %s\n",tmp_trame->tcp_f1, (tmp_trame->ack));
+	fprintf(fichier,"\t\t\t.... %d... = Push: %s\n",tmp_trame->tcp_f2, (tmp_trame->push));
+	fprintf(fichier,"\t\t\t.... .%d.. = Reset: %s\n",tmp_trame->tcp_f3, (tmp_trame->reset));
+	fprintf(fichier,"\t\t\t.... ..%d. = Syn: %s\n",tmp_trame->tcp_f4, (tmp_trame->syn));
+	fprintf(fichier,"\t\t\t.... ...%d = Fin: %s\n",tmp_trame->tcp_f5, (tmp_trame->fin));
+	fprintf(fichier,"\t\tWindow: %s\n",(tmp_trame->window));
+	fprintf(fichier,"\t\tChecksum: %s\n",(tmp_trame->tcp_checksum));
+	fprintf(fichier,"\t\tUrgent Pointer: %s\n\n",(tmp_trame->urgent));
+	
+	fprintf(fichier,"\n\n");
+	return;
 }
 
 void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
@@ -197,7 +279,60 @@ void sauvegarder_fichiers(GtkWidget *pWidget, gpointer pData){
 				filename = gtk_file_chooser_get_filename (chooser);
 				FILE *fichier=fopen(filename,"w");
 				
-				fprintf(fichier,"%s\n",filename);
+				while (liste!=NULL) {
+					sauvegarde_fichier(fichier, liste->obj);
+					liste=liste->suiv;
+				}
+				
+				fclose(fichier);
+				break;
+			}
+		default:
+			break;
+	}
+	
+	gtk_widget_destroy (dialog);
+}
+
+void sauvegarder_fichier_unique(GtkWidget *pWidget, gpointer pData){
+	
+	cell *liste=pData;
+	GtkWidget *fenetre= gtk_window_new(GTK_WINDOW_POPUP);
+	
+	//positions de la fenetre lors de l ouverture
+	gtk_window_set_position(GTK_WINDOW(fenetre), GTK_WIN_POS_CENTER );
+	
+	//taille de la fenetre
+	gtk_window_set_default_size(GTK_WINDOW(fenetre),600, 500);
+	
+	
+	GtkWidget *dialog;
+	GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_SAVE;
+	gint res;
+	
+	dialog = gtk_file_chooser_dialog_new ("Sauvegarder un fichier",
+		GTK_WINDOW(fenetre),
+		action,
+		("_Annuler"),
+		GTK_RESPONSE_CANCEL,
+		("_Sauvegarder"),
+		GTK_RESPONSE_ACCEPT,
+		NULL);
+	
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+	
+	
+	res = gtk_dialog_run (GTK_DIALOG (dialog));
+	switch (res){
+		case GTK_RESPONSE_ACCEPT :
+			{
+				char *filename;
+				
+				filename = gtk_file_chooser_get_filename (chooser);
+				FILE *fichier=fopen(filename,"w");
+				
+				sauvegarde_fichier(fichier, liste->obj);
+				
 				fclose(fichier);
 				break;
 			}
@@ -461,7 +596,7 @@ void remplir_ip(GtkWidget *box_ip, cell *tmp_cell){
 }
 
 void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
-
+	
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 
@@ -497,7 +632,7 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	gtk_container_add(GTK_CONTAINER(tcp_flags),box_flags_2);	
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags_2),GTK_ORIENTATION_VERTICAL);
 	gtk_widget_set_name(GTK_WIDGET(tcp_flags),"expander-tabbed");
-
+	
 
 	sprintf(label,"\t\t..%d. .... = Urgent: %s\n",tmp_cell->obj->tcp_f0, (tmp_cell->obj->urg));
 	tmp_label=gtk_label_new(label);
@@ -551,6 +686,7 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
 		return;
 	}
+	/*
 	GtkWidget *tcp_options=gtk_expander_new (tmp_cell->obj->option_length);
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options),FALSE);
 	gtk_box_pack_start (GTK_BOX(box_tcp),tcp_options,FALSE,FALSE,0);
@@ -561,7 +697,8 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	
 	int i = 0;
 	while(tmp_cell->obj->option_tab[i]){
-		if(strcmp(tmp_cell->obj->option_tab[i], "No Operation (NOP)") == 0){
+		
+		if(strcmp((tmp_cell->obj->option_tab)[i], "No Operation (NOP)") == 0){
 			GtkWidget *tcp_options_1 =gtk_expander_new ("TCP Option - No-Operation");
 			gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_1),FALSE);
 			gtk_box_pack_start (GTK_BOX(box_options),tcp_options_1,FALSE,FALSE,0);
@@ -601,6 +738,7 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
 				
 		}		
+		
 		if(strcmp(tmp_cell->obj->option_tab[i], "Window Scale (WScale)") == 0){
 			GtkWidget *tcp_options_3 =gtk_expander_new ("TCP Option - Window scale");
 			gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_3),FALSE);
@@ -666,22 +804,71 @@ void remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
 		}
 		i++;
+		
 	}
+	*/
 	return;
 }
-void remplir_arbre(GtkWidget *new_box, gpointer pData){
+
+void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut){
 	
-	cell *tmp_cell=(cell *)pData;
 	char tmp_label[256];
 	sprintf(tmp_label," trame n°%d\n fichier source:%s",tmp_cell->obj->id,tmp_cell->obj->nom_fichier);
 	GtkWidget *label_nom_trame=gtk_label_new(tmp_label);
+	gtk_label_set_xalign (GTK_LABEL(label_nom_trame),0);
+	
+	GtkWidget *box_titre=gtk_box_new (FALSE,0);
+	gtk_box_set_homogeneous (GTK_BOX(box_titre),FALSE);
+	gtk_box_pack_start (GTK_BOX(new_box),box_titre,FALSE,FALSE,0);
+	gtk_box_pack_start (GTK_BOX(box_titre),label_nom_trame,FALSE,FALSE,0);
+	
+	GtkWidget *bouton_menu_trame=gtk_menu_button_new ();
+	GtkWidget *menu_bouton_menu_trame =gtk_menu_new ();
+	gtk_widget_set_name(menu_bouton_menu_trame,"label_menu_trame_dark_mode");
+	gtk_menu_button_set_popup (GTK_MENU_BUTTON(bouton_menu_trame),menu_bouton_menu_trame);
+	
+	GtkWidget *agrandir=gtk_menu_item_new_with_label ("agrandir");
+	GtkWidget *sauvegarder=gtk_menu_item_new_with_label ("Sauvegarder la trame");
+	
+	if (statut){
+		g_signal_connect(G_OBJECT(agrandir), "activate", G_CALLBACK(agrandir_trame),tmp_cell);
+		gtk_menu_attach (GTK_MENU(menu_bouton_menu_trame),agrandir,0,2,0,1);
+	}
+	g_signal_connect(G_OBJECT(sauvegarder), "activate", G_CALLBACK(sauvegarder_fichier_unique),tmp_cell);
+	
+	
+	
+	gtk_menu_attach (GTK_MENU(menu_bouton_menu_trame),sauvegarder,0,2,1,2);
+	
+	GtkWidget *bouton_menu_trame_icone=gtk_image_new_from_file ("icones/options_32px.png");
+	gtk_button_set_image(GTK_BUTTON(bouton_menu_trame),bouton_menu_trame_icone);
+	gtk_box_pack_end (GTK_BOX(box_titre),bouton_menu_trame,FALSE,FALSE,0);
+	
+	gtk_widget_show_all(menu_bouton_menu_trame);
+	
 	if (tmp_cell->obj->nb_ligne_erreur==-1){
 		gtk_widget_set_name(label_nom_trame,"label_trame_dark_mode");
+		gtk_widget_set_name(box_titre,"label_trame_dark_mode");
+		gtk_widget_set_name(bouton_menu_trame,"label_trame_dark_mode");
 	}else{
 		gtk_widget_set_name(label_nom_trame,"label_trame_dark_mode_erreur");
+		gtk_widget_set_name(box_titre,"label_trame_dark_mode_erreur");
+		gtk_widget_set_name(bouton_menu_trame,"label_trame_dark_mode_erreur");
+		GtkWidget *erreur_expander=gtk_expander_new ("\nErreur\n");
+		gtk_box_pack_start (GTK_BOX(new_box),erreur_expander,FALSE,FALSE,0);
+		gtk_widget_set_name(GTK_WIDGET(erreur_expander),"expander");
+		gtk_expander_set_resize_toplevel (GTK_EXPANDER(erreur_expander),FALSE);
+		GtkWidget *box_erreur=gtk_box_new(FALSE,0);
+		gtk_container_add(GTK_CONTAINER(erreur_expander),box_erreur);
+		sprintf(tmp_label,"\t\t%d octets manquants à la ligne %d du fichier source.",tmp_cell->obj->nb_octet_erreur,tmp_cell->obj->nb_ligne_erreur);
+		GtkWidget *tmp_label_erreur=gtk_label_new(tmp_label);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label_erreur),0);
+		gtk_box_pack_start(GTK_BOX(box_erreur),tmp_label_erreur, FALSE, FALSE, 0);
 	}
-	gtk_label_set_xalign (GTK_LABEL(label_nom_trame),0);
-	gtk_box_pack_start (GTK_BOX(new_box),label_nom_trame,FALSE,FALSE,0);
+}
+
+void creation_ethernet(GtkWidget *new_box,cell *tmp_cell){
+	
 	
 	GtkWidget *ethernet=gtk_expander_new ("\nEthernet II\n");
 	gtk_widget_set_name(GTK_WIDGET(ethernet),"expander");
@@ -691,6 +878,12 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
 	remplir_ethernet(box_ethernet,tmp_cell);	
+
+	
+}
+
+
+void creation_ip(GtkWidget *new_box,cell *tmp_cell){
 	
 	GtkWidget *IP=gtk_expander_new ("\nInternet Protocol\n");
 	gtk_widget_set_name(GTK_WIDGET(IP),"expander");
@@ -699,8 +892,13 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	GtkWidget *box_ip=gtk_box_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(IP),box_ip);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-	remplir_ip(box_ip, tmp_cell);	
+	remplir_ip(box_ip, tmp_cell);
+	
+}
 
+
+void creation_tcp(GtkWidget *new_box,cell *tmp_cell){
+	
 	GtkWidget *tcp=gtk_expander_new ("\nTransmission Control Protocol\n");
 	gtk_widget_set_name(GTK_WIDGET(tcp),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp),FALSE);
@@ -709,48 +907,17 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData){
 	gtk_container_add(GTK_CONTAINER(tcp),box_tcp);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_tcp),GTK_ORIENTATION_VERTICAL);
 	remplir_tcp(box_tcp, tmp_cell);	
-
-}		
-	/*
-	GtkTreeStore *arbre=gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-	GtkTreeIter header_ethernet;
-	GtkTreeIter contenu_ethernet;
-	GtkTreeIter header_IP;
-	GtkTreeIter contenu_IP;
 	
-	gtk_tree_store_insert (arbre,&header_ethernet,NULL,-1);
-	gtk_tree_store_set(arbre, &header_ethernet,0,"Ethernet II",1,NULL, -1);
-	
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
-	gtk_tree_store_set(arbre,&contenu_ethernet, 0, "Source:",1,tmp_cell->obj->mac_source, -1);
-	gtk_tree_store_insert (arbre,&contenu_ethernet,&header_ethernet,-1);
 }
 
-void remplir_http(){
-
-}
-	
-void remplir_arbre(GtkWidget *new_box, gpointer pData){
+void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	
 	cell *tmp_cell=(cell *)pData;
 	
-	GtkWidget *ethernet=gtk_expander_new ("Ethernet II");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(ethernet),FALSE);
-	gtk_box_pack_start (GTK_BOX(new_box),ethernet,FALSE,FALSE,0);
+	set_bouton_menu_trame(new_box,tmp_cell,statut);
+	creation_ethernet(new_box,tmp_cell);
+	creation_ip(new_box,tmp_cell);
+	creation_tcp(new_box,tmp_cell);
 	
-	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
-	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
-	remplir_ethernet(box_ethernet,tmp_cell);	
-	
-	GtkWidget *IP=gtk_expander_new ("Internet Protocol");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
-	gtk_box_pack_start (GTK_BOX(new_box),IP,FALSE,FALSE,0);
-	
-	GtkWidget *box_ip=gtk_box_new(FALSE,0);
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-	gtk_container_add(GTK_CONTAINER(IP),box_ip);
-	remplir_ip(box_ip,tmp_cell);	
-		
-	return;*/
+}		
 	
