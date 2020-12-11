@@ -182,12 +182,211 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 	while (liste!=NULL) {
 		a_supp=liste;
 		liste=liste->suiv;
+		
+		int place=a_supp->obj->place;
+		
+	
 		gtk_widget_destroy(a_supp->bouton);
 		gtk_widget_destroy(a_supp->revealer);
 		
 		free(a_supp->obj->tab);
-		free(a_supp->obj->mac_dest);
-		free(a_supp->obj->mac_source);
+		free(a_supp->obj->nom_fichier);
+		
+		if (place>5){
+			free(a_supp->obj->mac_dest);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>11){
+			free(a_supp->obj->mac_source);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>13){
+			free(a_supp->obj->ip_type);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>14){
+			free(a_supp->obj->version);
+	
+			free(a_supp->obj->header_length);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>17){
+			free(a_supp->obj->total_length);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>19){
+			free(a_supp->obj->identification);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>20){
+			
+			free(a_supp->obj->flags_offset);
+			
+			free(a_supp->obj->reserved_bit);
+			
+			free(a_supp->obj->dont_fragment);
+		
+			free(a_supp->obj->more_fragment);
+			
+			
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>21){
+			free(a_supp->obj->frag_offset);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>23){
+			free(a_supp->obj->protocol);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>25){
+			free(a_supp->obj->header_checksum);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>29){
+			free(a_supp->obj->ip_source);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>33){
+			free(a_supp->obj->ip_dest);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		int i=(a_supp->obj->header_length_)-20;
+		
+		if (place>(35+i)){
+			free(a_supp->obj->source_port);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>(37+i)){
+			free(a_supp->obj->destination_port);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>(41+i)){
+			free(a_supp->obj->sequence_number_raw);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>(45+1)){
+			free(a_supp->obj->acknowledgment_number_raw);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>(46+1)){
+			free(a_supp->obj->tcp_header_length);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		
+		if (place>(47+i)){
+		
+			free(a_supp->obj->urg);
+		
+			free(a_supp->obj->ack);
+		
+			free(a_supp->obj->push);
+		
+			free(a_supp->obj->reset);
+		
+			free(a_supp->obj->syn);
+		
+			free(a_supp->obj->fin);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		if (place>(49+i)){
+			free(a_supp->obj->window);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+
+		if (place>(51+i)){
+			free(a_supp->obj->tcp_checksum);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+
+		if (place>(53+i)){
+			free(a_supp->obj->urgent);
+		}else{
+			free(a_supp->obj);
+			free(a_supp);
+			continue;
+		}
+		
+		//free(a_supp->obj->no_option);
+			
 		free(a_supp->obj);
 		free(a_supp);
 		
@@ -199,45 +398,118 @@ void fermer_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 
 
 void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
+	int place=tmp_trame->place;
 	
-	fprintf(fichier,"Ethernet:\n");
-	fprintf(fichier,"\t\tSource\t:  %s\n",(tmp_trame->mac_source));
-	fprintf(fichier,"\t\tDestination:  %s\n",(tmp_trame->mac_dest));
-	fprintf(fichier,"\t\tType:  %s\n\n",(tmp_trame->ip_type));
+	fprintf(fichier,"TRAME %d\t\t%s\n",tmp_trame->id,tmp_trame->nom_fichier);
 	
+	fprintf(fichier,"\tEthernet:\n");
+	fprintf(fichier,"\t---------\n");
 	
-	fprintf(fichier,"Internet Protocol:\n");
+	if (place>5){
+	fprintf(fichier,"\t\t\tSource\t:  %s\n",(tmp_trame->mac_source));
+	}
+	
+	if (place>11){
+	fprintf(fichier,"\t\t\tDestination:  %s\n",(tmp_trame->mac_dest));
+	}
+	if (place>13){
+	fprintf(fichier,"\t\t\tType:  %s\n\n",(tmp_trame->ip_type));
+	}
+	if (place>14){
+	fprintf(fichier,"\tInternet Protocol:\n");
+	fprintf(fichier,"\t------------------\n");
+	}
+	if (place>14){
 	fprintf(fichier,"\t\tVersion:  %s\n",(tmp_trame->version));
-	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->header_length));
-	fprintf(fichier,"\t\tTotal Length: %s\n",(tmp_trame->total_length));
-	fprintf(fichier,"\t\tIdentification: %s\n",(tmp_trame->identification));
-	fprintf(fichier,"\t\tValue: %s\n",(tmp_trame->flags_offset));
-	fprintf(fichier,"\t\t %d... .... = Reserved bit: %s\n",tmp_trame->f0, (tmp_trame->reserved_bit));
-	fprintf(fichier,"\t\t .%d.. .... = Don't Fragment: %s\n",tmp_trame->f1,(tmp_trame->dont_fragment));
-	fprintf(fichier,"\t\t ..%d. .... = More Fragments: %s\n",tmp_trame->f2,(tmp_trame->more_fragment));
-	fprintf(fichier,"\t\tFragment Offset: %s\n",(tmp_trame->frag_offset));
-	fprintf(fichier,"\t\tTime to Live: %d\n",(tmp_trame->TTL));
-	fprintf(fichier,"\t\tProtocol: %s\n",(tmp_trame->protocol));
-	fprintf(fichier,"\t\tHeader Checksum: %s\n",(tmp_trame->header_checksum));
-	fprintf(fichier,"\t\tSource Address: %s\n",(tmp_trame->ip_source));
-	fprintf(fichier,"\t\tDestination Address: %s\n\n",(tmp_trame->ip_dest));
+	}
 	
-	fprintf(fichier,"TCP:\n");
+	if (place>17){
+	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->header_length));
+	}
+	
+	if (place>19){
+	fprintf(fichier,"\t\tTotal Length: %s\n",(tmp_trame->total_length));
+	}
+	
+	if (place>20){
+	fprintf(fichier,"\t\tIdentification: %s\n",(tmp_trame->identification));
+	fprintf(fichier,"\t\t\tValue: %s\n",(tmp_trame->flags_offset));
+	fprintf(fichier,"\t\t\t %d... .... = Reserved bit: %s\n",tmp_trame->f0, (tmp_trame->reserved_bit));
+	fprintf(fichier,"\t\t\t .%d.. .... = Don't Fragment: %s\n",tmp_trame->f1,(tmp_trame->dont_fragment));
+	fprintf(fichier,"\t\t\t ..%d. .... = More Fragments: %s\n",tmp_trame->f2,(tmp_trame->more_fragment));
+	}
+	
+	if (place>21){
+	fprintf(fichier,"\t\tFragment Offset: %s\n",(tmp_trame->frag_offset));
+	}
+	
+	if (place>22){
+	fprintf(fichier,"\t\tTime to Live: %d\n",(tmp_trame->TTL));
+	}
+	
+	if (place>23){
+	fprintf(fichier,"\t\tProtocol: %s\n",(tmp_trame->protocol));
+	}
+	
+	if (place>25){
+	fprintf(fichier,"\t\tHeader Checksum: %s\n",(tmp_trame->header_checksum));
+	}
+	
+	if (place>29){
+	fprintf(fichier,"\t\tSource Address: %s\n",(tmp_trame->ip_source));
+	}
+	
+	if (place>33){
+	fprintf(fichier,"\t\tDestination Address: %s\n\n",(tmp_trame->ip_dest));
+	}
+	
+	int i=(tmp_trame->header_length_)-20;
+	
+	if (place>35+i){
+	fprintf(fichier,"\tTCP:\n");
+	fprintf(fichier,"\t----\n");
+	}
+	
+	if (place>35+i){
 	fprintf(fichier,"\t\tSource Port: %s\n",(tmp_trame->source_port));
+	}
+	
+	if (place>37+i){
 	fprintf(fichier,"\t\tDestination Port: %s\n",(tmp_trame->destination_port));
+	}
+	
+	if (place>41+i){
 	fprintf(fichier,"\t\tSequence Number (raw): %s\n",(tmp_trame->sequence_number_raw));
+	}
+	
+	if (place>45+i){
 	fprintf(fichier,"\t\tAcknowledgment Number (raw): %s\n",(tmp_trame->acknowledgment_number_raw));
+	}
+	
+	if (place>46+i){
 	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->tcp_header_length));
+	}
+	fprintf(fichier,"\t\tFlags");
+	if (place>47+i){
 	fprintf(fichier,"\t\t\t..%d. .... = Urgent: %s\n",tmp_trame->tcp_f0, (tmp_trame->urg));
 	fprintf(fichier,"\t\t\t...%d .... = Acknowledgement: %s\n",tmp_trame->tcp_f1, (tmp_trame->ack));
 	fprintf(fichier,"\t\t\t.... %d... = Push: %s\n",tmp_trame->tcp_f2, (tmp_trame->push));
 	fprintf(fichier,"\t\t\t.... .%d.. = Reset: %s\n",tmp_trame->tcp_f3, (tmp_trame->reset));
 	fprintf(fichier,"\t\t\t.... ..%d. = Syn: %s\n",tmp_trame->tcp_f4, (tmp_trame->syn));
 	fprintf(fichier,"\t\t\t.... ...%d = Fin: %s\n",tmp_trame->tcp_f5, (tmp_trame->fin));
-	fprintf(fichier,"\t\tWindow: %s\n",(tmp_trame->window));
-	fprintf(fichier,"\t\tChecksum: %s\n",(tmp_trame->tcp_checksum));
-	fprintf(fichier,"\t\tUrgent Pointer: %s\n\n",(tmp_trame->urgent));
+	}
 	
+	if (place>49+i){
+	fprintf(fichier,"\t\tWindow: %s\n",(tmp_trame->window));
+	}
+	
+	if (place>51+i){
+	fprintf(fichier,"\t\tChecksum: %s\n",(tmp_trame->tcp_checksum));
+	}
+	
+	if (place>53+i){
+	fprintf(fichier,"\t\tUrgent Pointer: %s\n\n",(tmp_trame->urgent));
+	}
 	fprintf(fichier,"\n\n");
 	return;
 }
@@ -987,6 +1259,7 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	cell *tmp_cell=(cell *)pData;
 	
 	set_bouton_menu_trame(new_box,tmp_cell,statut);
+	
 	if ( creation_ethernet(new_box,tmp_cell) == 0){
 		return ;
 	}

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "trame.h"
 #include "interface.h"
 
@@ -243,9 +244,22 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
 	char label[80];
 	char protocol_code[4];
-	strncpy(protocol_code, elem->protocol,3);
-	sprintf(label,"%d\t %s\t %s\t %s",elem->id,elem->ip_source, elem->ip_dest,protocol_code);					
+	if ((elem->place)>33){
+		strncpy(protocol_code, elem->protocol,3);
+	}
 	
+	if ((elem->place)>33){
+		sprintf(label,"%d\t %s\t %s\t %s",elem->id,elem->ip_source, elem->ip_dest,protocol_code);			
+	}else{
+		//29 source
+		if ((elem->place)>29){
+			printf("ok\n");
+			sprintf(label,"%d\t %s\t ???:???:???:???\t ???",elem->id, elem->ip_dest);
+		}else{
+			sprintf(label,"%d\t ???:???:???:???\t ???:???:???:???\t ???",elem->id);
+		}
+		
+	}
 	
 	GtkWidget* tmp_bouton=gtk_toggle_button_new_with_label(label);
 	if (elem->nb_ligne_erreur==-1){
@@ -266,6 +280,7 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->suiv=(*liste);
 	new_cell->status_bouton_ip=0;
 	*liste=new_cell;
+	
 	
 	
 	GtkWidget *revealer = gtk_revealer_new();
@@ -332,6 +347,7 @@ int remplir_ip_(trame *new_trame){
 	unsigned int *tab_ligne=new_trame->tab;
 	
 	
+	
 	if (place>14){
 		
 		new_trame->version=(char *)malloc(sizeof(char)*4);
@@ -349,7 +365,8 @@ int remplir_ip_(trame *new_trame){
 		int total_length = tab_ligne[16]*256 + tab_ligne[17];
 		sprintf(new_trame->total_length, "%d", total_length);
 		
-	}else{ return 0; }
+	}else{
+		return 0; }
 		
 	if (place>19){
 		new_trame->identification=(char *) malloc(sizeof(char)*20);
@@ -367,29 +384,29 @@ int remplir_ip_(trame *new_trame){
 		new_trame->f0 = bit;
 		new_trame->reserved_bit=(char*)malloc(sizeof(char)*20);
 		if(bit){
-			new_trame->reserved_bit = "Set";
+			strcpy(new_trame->reserved_bit,"Set");
 		}else{
-			new_trame->reserved_bit = "Not Set";
+			strcpy(new_trame->reserved_bit,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[20], 6);
 		new_trame->f1 = bit;
 		new_trame->dont_fragment=(char*)malloc(sizeof(char)*20);
 		if(bit){
-			new_trame->dont_fragment = "Set";
+			strcpy(new_trame->dont_fragment,"Set");
 		}
 		else{
-			new_trame->dont_fragment = "Not Set";
+			strcpy(new_trame->dont_fragment,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[20], 5);
 		new_trame->f2 = bit;
 		new_trame->more_fragment=(char*)malloc(sizeof(char)*20);
 		if(bit){
-			new_trame->more_fragment = "Set";
+			strcpy(new_trame->more_fragment,"Set");
 		}
 		else{
-			new_trame->more_fragment = "Not Set";
+			strcpy(new_trame->more_fragment,"Not Set");
 		}
 	
 	}else{ return 0; }
@@ -496,54 +513,55 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 		new_trame->tcp_f0=bit;
 		
 		if(bit){
-			sprintf(new_trame->urg,"Set");
+			strcpy(new_trame->urg,"Set");
 		}else{
-			sprintf(new_trame->urg,"Not Set");
+			strcpy(new_trame->urg,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[47+i], 4);
 		new_trame->tcp_f1=bit;
 	
 		if(bit){
-			sprintf(new_trame->ack,"Set");
+			strcpy(new_trame->ack,"Set");
 		}else{
-			sprintf(new_trame->ack,"Not Set");
+			strcpy(new_trame->ack,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[47+i], 3);
 		new_trame->tcp_f2=bit;
 	
 		if(bit){
-			sprintf(new_trame->push,"Set");
+			strcpy(new_trame->push,"Set");
 		}else{
-			sprintf(new_trame->push,"Not Set");
+			strcpy(new_trame->push,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[47+i], 2);
 		new_trame->tcp_f3=bit;
 		
 		if(bit){
-			sprintf(new_trame->reset,"Set");
+			strcpy(new_trame->reset,"Set");
 		}else{
-			sprintf(new_trame->reset,"Not Set");
+			strcpy(new_trame->reset,"Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[47+i], 1);
 		new_trame->tcp_f4=bit;
 	
 		if(bit){
-			sprintf(new_trame->syn,"Set");
+			strcpy(new_trame->syn,"Set");
 		}else{
-			sprintf(new_trame->syn,"Not Set");
+			strcpy(new_trame->syn,"Not Set");
 		}
 		
 		bit = valeur_n_eme_bit(tab_ligne[47+i], 0);
 		new_trame->tcp_f5=bit;
 		
 		if(bit){
-			sprintf(new_trame->fin,"Set");
+			strcpy(new_trame->fin,"Set");
 		}else{
-			sprintf(new_trame->fin,"Not Set");}
+			strcpy(new_trame->fin,"Not Set");
+		}
 	
 	}else{ return 0; }
 		
@@ -710,6 +728,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		if (verif==0){
 			new_trame->place=offset_prec;
 			lecture_trame(new_trame);
+			
 			ajout_liste(liste,new_trame,box_haut, box_bas);
 			
 			
