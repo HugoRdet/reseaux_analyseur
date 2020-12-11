@@ -406,14 +406,14 @@ void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
 	fprintf(fichier,"\t---------\n");
 	
 	if (place>5){
-	fprintf(fichier,"\t\t\tSource\t:  %s\n",(tmp_trame->mac_source));
+	fprintf(fichier,"\t\tSource\t:  %s\n",(tmp_trame->mac_source));
 	}
 	
 	if (place>11){
-	fprintf(fichier,"\t\t\tDestination:  %s\n",(tmp_trame->mac_dest));
+	fprintf(fichier,"\t\tDestination:  %s\n",(tmp_trame->mac_dest));
 	}
 	if (place>13){
-	fprintf(fichier,"\t\t\tType:  %s\n\n",(tmp_trame->ip_type));
+	fprintf(fichier,"\t\tType:  %s\n\n",(tmp_trame->ip_type));
 	}
 	if (place>14){
 	fprintf(fichier,"\tInternet Protocol:\n");
@@ -421,18 +421,19 @@ void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
 	}
 	if (place>14){
 	fprintf(fichier,"\t\tVersion:  %s\n",(tmp_trame->version));
-	}
-	
-	if (place>17){
 	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->header_length));
 	}
 	
+	if (place>17){
+		fprintf(fichier,"\t\tTotal Length: %s\n",(tmp_trame->total_length));
+	}
+	
 	if (place>19){
-	fprintf(fichier,"\t\tTotal Length: %s\n",(tmp_trame->total_length));
+		fprintf(fichier,"\t\tIdentification: %s\n",(tmp_trame->identification));
 	}
 	
 	if (place>20){
-	fprintf(fichier,"\t\tIdentification: %s\n",(tmp_trame->identification));
+	
 	fprintf(fichier,"\t\t\tValue: %s\n",(tmp_trame->flags_offset));
 	fprintf(fichier,"\t\t\t %d... .... = Reserved bit: %s\n",tmp_trame->f0, (tmp_trame->reserved_bit));
 	fprintf(fichier,"\t\t\t .%d.. .... = Don't Fragment: %s\n",tmp_trame->f1,(tmp_trame->dont_fragment));
@@ -471,7 +472,7 @@ void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
 	}
 	
 	if (place>35+i){
-	fprintf(fichier,"\t\tSource Port: %s\n",(tmp_trame->source_port));
+		fprintf(fichier,"\t\tSource Port: %s\n",(tmp_trame->source_port));
 	}
 	
 	if (place>37+i){
@@ -489,8 +490,9 @@ void sauvegarde_fichier(FILE *fichier,trame *tmp_trame){
 	if (place>46+i){
 	fprintf(fichier,"\t\tHeader Length: %s\n",(tmp_trame->tcp_header_length));
 	}
-	fprintf(fichier,"\t\tFlags");
+	
 	if (place>47+i){
+	fprintf(fichier,"\t\tFlags");
 	fprintf(fichier,"\t\t\t..%d. .... = Urgent: %s\n",tmp_trame->tcp_f0, (tmp_trame->urg));
 	fprintf(fichier,"\t\t\t...%d .... = Acknowledgement: %s\n",tmp_trame->tcp_f1, (tmp_trame->ack));
 	fprintf(fichier,"\t\t\t.... %d... = Push: %s\n",tmp_trame->tcp_f2, (tmp_trame->push));
