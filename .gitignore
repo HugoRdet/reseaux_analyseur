@@ -6,3 +6,9 @@ interface.o
 trame.o
 .DS_Store
 projet_reseaux.exe
+.DS_Store
+interface.o
+projet_reseaux
+projet_reseaux.exe
+projet_reseaux.o
+trame.o
