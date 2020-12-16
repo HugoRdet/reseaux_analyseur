@@ -78,6 +78,11 @@ typedef struct cell_{
 	struct cell_ **bouton_actif;
 	int status_bouton_ip;
 	
+	GtkWidget *b_box_actif;
+	GtkWidget *b_mac_dest;
+	GtkWidget *b_mac_source;
+	GtkWidget *b_ip_type;
+	
 	
 }cell;
 

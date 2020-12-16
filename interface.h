@@ -2,6 +2,11 @@
 #define __INTERFACE_H__
 #include "trame.h"
 
+typedef struct cell_button_{
+	GtkWidget *button;
+	struct cell_button_ *suiv;
+}cell_button;
+
 typedef struct box_{
 	GtkWidget **pvbox_haut;
 	GtkWidget **pvbox_bas;
@@ -20,6 +25,8 @@ GtkWidget *init_fenetre(int largeur,int hauteur,char *titre,GtkWidget** grid);
 void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 
 void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData);
+void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut);
 void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut);
-void assigne_ui_liste(cell **liste,GtkWidget* box_haut, GtkWidget* box_bas);
+void remplir_arbre_agrandir_trame(GtkWidget *new_box,GtkWidget *box_bas_agrandir, gpointer pData);
+
 #endif

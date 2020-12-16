@@ -4,3 +4,5 @@
 projet_reseaux.o
 interface.o
 trame.o
+.DS_Store
+projet_reseaux.exe

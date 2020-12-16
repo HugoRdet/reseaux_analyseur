@@ -279,6 +279,7 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	new_cell->bouton=tmp_bouton;
 	new_cell->suiv=(*liste);
 	new_cell->status_bouton_ip=0;
+	new_cell->b_box_actif=NULL;
 	*liste=new_cell;
 	
 	

@@ -156,21 +156,50 @@
     padding:2px 0 2px 0;
 }
 
-
+#label_trame_offset{
+    background-image: none;
+    background: #292929;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 15px;
+    border-image: none;
+    padding: 0px;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    -gtk-icon-shadow:none;
+    box-shadow:none;
+}
 
 #tree_dark_mode{
     background-color: #434343;
     color: #DFDFDF;
     font-family: DejaVu Sans;
     font-weight: lighter;
-    font-size: 12px;
+    font-size: 15px;
     background-image: none;
     border:0px;
     border-radius:0;
     box-shadow:none;
     border-style:none;
     text-shadow: none;
-    padding:2px 0 2px 0;
+    padding:0px 0 0px 0;
+}
+
+#tree_dark_mode_status_1{
+    background-color: #739ECC;
+    color: #DFDFDF;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 15px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:0px 0 0px 0;
 }
 
 #button_dark_mode_status_1{
