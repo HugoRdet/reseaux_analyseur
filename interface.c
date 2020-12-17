@@ -185,7 +185,15 @@ void agrandir_trame(GtkWidget *pWidget, gpointer pData){
 	gtk_box_set_homogeneous (GTK_BOX(box_octets),FALSE);
 	gtk_widget_set_name(box_octets,"tree_dark_mode");
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_octets),GTK_ORIENTATION_VERTICAL);
-	remplir_arbre_agrandir_trame(box_trame,box_octets,liste);
+	
+	
+	trame_agrandie *new_trame_agrandie=(trame_agrandie *) malloc(sizeof(trame_agrandie));
+	new_trame_agrandie->b_box_actif=NULL;
+	new_trame_agrandie->obj=liste;
+	
+	remplir_arbre_agrandir_trame(box_trame,box_octets,new_trame_agrandie);
+	
+	
 	gtk_container_add(GTK_CONTAINER(frame_haut),box_trame);
 	gtk_container_add(GTK_CONTAINER(frame_bas),box_octets);
 	
@@ -1387,42 +1395,43 @@ void offset_debut_ligne(GtkWidget *box, int n){
 }
 
 void action_bouton_mac_dest(GtkWidget *pWidget, gpointer pData){
-	cell *cellule_obj=(cell *) pData;
-	if ((cellule_obj->b_box_actif)!=NULL){
-		gtk_widget_set_name((cellule_obj->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(cellule_obj->b_box_actif);
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
+		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
+		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
 	}
 	
-	cellule_obj->b_box_actif=cellule_obj->b_mac_dest;
-	gtk_widget_set_name((cellule_obj->b_box_actif),"tree_dark_mode_status_1");
-	gtk_widget_show(cellule_obj->b_box_actif);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_dest;
+	gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode_status_1");
+	gtk_widget_show(tmp_trame_agrandie->b_box_actif);
 }
 
 void action_bouton_mac_source(GtkWidget *pWidget, gpointer pData){
-	cell *cellule_obj=(cell *) pData;
-	if ((cellule_obj->b_box_actif)!=NULL){
-		gtk_widget_set_name((cellule_obj->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(cellule_obj->b_box_actif);
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
+		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
+		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
 	}
 	
-	cellule_obj->b_box_actif=cellule_obj->b_mac_source;
-	gtk_widget_set_name((cellule_obj->b_box_actif),"tree_dark_mode_status_1");
-	gtk_widget_show(cellule_obj->b_box_actif);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_source;
+	gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode_status_1");
+	gtk_widget_show(tmp_trame_agrandie->b_box_actif);
 }
 
 void action_bouton_type(GtkWidget *pWidget, gpointer pData){
-	cell *cellule_obj=(cell *) pData;
-	if ((cellule_obj->b_box_actif)!=NULL){
-		gtk_widget_set_name((cellule_obj->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(cellule_obj->b_box_actif);
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
+		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
+		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
 	}
 	
-	cellule_obj->b_box_actif=cellule_obj->b_ip_type;
-	gtk_widget_set_name((cellule_obj->b_ip_type),"tree_dark_mode_status_1");
-	gtk_widget_show(cellule_obj->b_ip_type);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ip_type;
+	gtk_widget_set_name((tmp_trame_agrandie->b_ip_type),"tree_dark_mode_status_1");
+	gtk_widget_show(tmp_trame_agrandie->b_ip_type);
 }
 
-int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandir,cell *tmp_cell){
+int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
+	cell *tmp_cell=tmp_trame_agrandie->obj;
 	GtkWidget* box_trame=gtk_box_new(FALSE,0);
 	gtk_box_pack_start(GTK_BOX(box_bas_agrandir),box_trame, FALSE, FALSE, 0);
 
@@ -1456,11 +1465,12 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		tmp_label=gtk_label_new(label_ip);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_cell->b_mac_dest=tmp_button_bas;
+		tmp_trame_agrandie->b_mac_dest=tmp_button_bas;
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
-		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_dest),tmp_cell);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_dest),tmp_trame_agrandie);
+		
 		
 	}else{ return 0; }
 	
@@ -1482,11 +1492,11 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		tmp_label=gtk_label_new(label_ip);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_cell->b_mac_source=tmp_button_bas;
+		tmp_trame_agrandie->b_mac_source=tmp_button_bas;
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
-		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_source),tmp_cell);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_source),tmp_trame_agrandie);
 	
 	}else{ return 0; }
 	
@@ -1508,11 +1518,11 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		tmp_label=gtk_label_new(label_type);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_cell->b_ip_type=tmp_button_bas;
+		tmp_trame_agrandie->b_ip_type=tmp_button_bas;
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
-		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_type),tmp_cell);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_type),tmp_trame_agrandie);
 	}else{ return 0; }
 	gtk_widget_show_all(box_bas_agrandir);
 	return 1;
@@ -1870,15 +1880,17 @@ int remplir_tcp_agrandir(GtkWidget *box_tcp,GtkWidget *box_bas_agrandir, cell *t
 
 
 
-int creation_ethernet_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,cell *tmp_cell){
+int creation_ethernet_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
+	
 	GtkWidget *ethernet=gtk_expander_new ("\nEthernet II\n");
+	tmp_trame_agrandie->expander_ethernet=ethernet;
 	gtk_widget_set_name(GTK_WIDGET(ethernet),"expander");
 	gtk_expander_set_resize_toplevel (GTK_EXPANDER(ethernet),FALSE);
 	gtk_box_pack_start (GTK_BOX(new_box),ethernet,FALSE,FALSE,0);
 	GtkWidget *box_ethernet=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ethernet),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(ethernet),box_ethernet);
-	return remplir_ethernet_agrandir(box_ethernet,box_bas_agrandir,tmp_cell);	
+	return remplir_ethernet_agrandir(box_ethernet,box_bas_agrandir,tmp_trame_agrandie);	
 }
 
 
@@ -1929,19 +1941,19 @@ int creation_tcp_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,cell *t
 
 void remplir_arbre_agrandir_trame(GtkWidget *new_box,GtkWidget *box_bas_agrandir, gpointer pData){
 	
-	cell *tmp_cell=(cell *)pData;
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *)pData;
 	
-	bloc_erreur(new_box,tmp_cell);
+	bloc_erreur(new_box,tmp_trame_agrandie->obj);
 	
-	if ( creation_ethernet_agrandir(new_box,box_bas_agrandir,tmp_cell) == 0){
+	if ( creation_ethernet_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie) == 0){
 		return ;
 	}
 	
-	if ( creation_ip_agrandir(new_box,box_bas_agrandir,tmp_cell) == 0 ){
+	if ( creation_ip_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie->obj) == 0 ){
 		return ;
 	}
 	
-	if ( creation_tcp_agrandir(new_box,box_bas_agrandir,tmp_cell) ==0 ){
+	if ( creation_tcp_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie->obj) ==0 ){
 		return ;
 	}
 	

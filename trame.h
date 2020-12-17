@@ -75,13 +75,22 @@ typedef struct cell_{
 	struct cell_ **bouton_actif;
 	int status_bouton_ip;
 	
+	
+	
+	
+}cell;
+
+typedef struct trame_agrandie_{
+	
+	struct cell_ *obj;
+	
+	GtkWidget *expander_ethernet;
+	
 	GtkWidget *b_box_actif;
 	GtkWidget *b_mac_dest;
 	GtkWidget *b_mac_source;
 	GtkWidget *b_ip_type;
-	
-	
-}cell;
+}trame_agrandie;
 
 void afficher_ligne(FILE *fichier);
 int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut,GtkWidget *box_bas,char *filename);
