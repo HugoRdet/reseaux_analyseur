@@ -649,8 +649,30 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 				continue;
 			}
 		}
+		int pos = 54+i+taille_option;
+		return pos;
+
 	}else{return 0;}
 	return 1; 
+}
+
+void remplir_http_2(trame *new_trame, unsigned int *tab_ligne, int pos){
+	int place = new_trame->place;
+
+	new_trame->http = (char *)malloc(sizeof(char)*1518);
+	for(int k=0; k<1518; k++)
+	{
+		new_trame->http[k]=0;
+	}
+	int i = 0;
+	while(place > pos + 4){
+		if(tab_ligne[pos]==13 && tab_ligne[pos+1]==10 && tab_ligne[pos+3]==10 && tab_ligne[pos+2]==13)	
+			return;
+		new_trame->http[i]=tab_ligne[pos];
+		i++;
+		pos++;
+	}
+	return;	
 }
 
 static inline int lecture_trame(trame *new_trame){
@@ -670,10 +692,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	
 	
-	if (remplir_tcp_2(new_trame,tab_ligne)==0){
+	int pos = remplir_tcp_2(new_trame, tab_ligne);
+	if (pos == 0){
 		return 1;
 	}
 	
+	remplir_http_2(new_trame, tab_ligne, pos);
 	
 	
 	return 1;

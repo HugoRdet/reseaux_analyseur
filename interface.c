@@ -1080,9 +1080,9 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			GtkWidget *box_options_1=gtk_box_new(FALSE,0);
 			gtk_container_add(GTK_CONTAINER(tcp_options_1),box_options_1);	
 			gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_1),GTK_ORIENTATION_VERTICAL);
-			gtk_widget_set_name(GTK_WIDGET(tcp_options_1),"expander-tabbed");
+			gtk_widget_set_name(GTK_WIDGET(tcp_options_1),"expander-tabbed-2");
 
-			sprintf(label,"\t\tKind : %s\n","No Operation (NOP)");
+			sprintf(label,"\n\t\tKind : %s\n","No Operation (NOP)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_1),tmp_label, FALSE, FALSE, 0);
@@ -1095,19 +1095,19 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			GtkWidget *box_options_2=gtk_box_new(FALSE,0);
 			gtk_container_add(GTK_CONTAINER(tcp_options_2),box_options_2);	
 			gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_2),GTK_ORIENTATION_VERTICAL);
-			gtk_widget_set_name(GTK_WIDGET(tcp_options_2),"expander-tabbed");
+			gtk_widget_set_name(GTK_WIDGET(tcp_options_2),"expander-tabbed-2");
 
-			sprintf(label,"\t\tKind : %s\n","Maximum Segment Size (MSS)");
+			sprintf(label,"\n\t\tKind : %s\n","Maximum Segment Size (MSS)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
 
-			sprintf(label,"\t\tLength : %s\n","0x04 (4 bytes)");
+			sprintf(label,"\n\t\tLength : %s\n","0x04 (4 bytes)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
 
-			sprintf(label,"\t\tMSS value : %s\n",(tmp_cell->obj->option_mss));
+			sprintf(label,"\n\t\tMSS value : %s\n",(tmp_cell->obj->option_mss));
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
@@ -1121,14 +1121,14 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			GtkWidget *box_options_3=gtk_box_new(FALSE,0);
 			gtk_container_add(GTK_CONTAINER(tcp_options_3),box_options_3);	
 			gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_3),GTK_ORIENTATION_VERTICAL);
-			gtk_widget_set_name(GTK_WIDGET(tcp_options_3),"expander-tabbed");
+			gtk_widget_set_name(GTK_WIDGET(tcp_options_3),"expander-tabbed-2");
 
-			sprintf(label,"\t\tKind : %s\n","Window Scale (Wscale)");
+			sprintf(label,"\n\t\tKind : %s\n","Window Scale (Wscale)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_3),tmp_label, FALSE, FALSE, 0);
 		
-			sprintf(label,"\t\tShift count : %s\n",(tmp_cell->obj->option_wscale));
+			sprintf(label,"\n\t\tShift count : %s\n",(tmp_cell->obj->option_wscale));
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_3),tmp_label, FALSE, FALSE, 0);
@@ -1141,14 +1141,14 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			GtkWidget *box_options_4=gtk_box_new(FALSE,0);
 			gtk_container_add(GTK_CONTAINER(tcp_options_4),box_options_4);	
 			gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_4),GTK_ORIENTATION_VERTICAL);
-			gtk_widget_set_name(GTK_WIDGET(tcp_options_4),"expander-tabbed");
+			gtk_widget_set_name(GTK_WIDGET(tcp_options_4),"expander-tabbed-2");
 
-			sprintf(label,"\t\tKind : %s\n","Selective Acknoledgment Permitted (SACK Permitted)");
+			sprintf(label,"\n\t\tKind : %s\n","Selective Acknoledgment Permitted (SACK Permitted)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
 		
-			sprintf(label,"\t\tLength : %s\n","OxO2 (2 bytes)");
+			sprintf(label,"\n\t\tLength : %s\n","OxO2 (2 bytes)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
@@ -1161,19 +1161,19 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			GtkWidget *box_options_5=gtk_box_new(FALSE,0);
 			gtk_container_add(GTK_CONTAINER(tcp_options_5),box_options_5);	
 			gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_5),GTK_ORIENTATION_VERTICAL);
-			gtk_widget_set_name(GTK_WIDGET(tcp_options_5),"expander-tabbed");
+			gtk_widget_set_name(GTK_WIDGET(tcp_options_5),"expander-tabbed-2");
 
-			sprintf(label,"\t\tKind : %s\n","Timestamps (TSOPT)");
+			sprintf(label,"\n\t\tKind : %s\n","Timestamps (TSOPT)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
 		
-			sprintf(label,"\t\tTimestamp value : %s\n",(tmp_cell->obj->option_ts_val));
+			sprintf(label,"\n\t\tTimestamp value : %s\n",(tmp_cell->obj->option_ts_val));
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
 
-			sprintf(label,"\t\tTimestamp echo reply : %s\n",(tmp_cell->obj->option_ts_ecr));
+			sprintf(label,"\n\t\tTimestamp echo reply : %s\n",(tmp_cell->obj->option_ts_ecr));
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
@@ -1183,6 +1183,7 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 	}
 	return 1;
 }
+
 
 void bloc_erreur(GtkWidget *new_box,cell *tmp_cell){
 	if (tmp_cell->obj->nb_ligne_erreur!=-1){
@@ -1202,6 +1203,15 @@ void bloc_erreur(GtkWidget *new_box,cell *tmp_cell){
 	}
 }
 
+int remplir_http(GtkWidget *box_http, cell *tmp_cell){
+	
+	GtkWidget *tmp_label=NULL;
+	tmp_label=gtk_label_new(tmp_cell->obj->http);
+	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+	gtk_box_pack_start(GTK_BOX(box_http),tmp_label, FALSE, FALSE, 0);
+	return 1;
+
+}
 void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut){
 	
 	char tmp_label[256];
@@ -1310,6 +1320,23 @@ int creation_tcp(GtkWidget *new_box,cell *tmp_cell){
 	return 1;
 }
 
+int creation_http(GtkWidget *new_box, cell *tmp_cell){
+
+	int place=tmp_cell->obj->place;
+	int i=(tmp_cell->obj->header_length_)-20;
+	
+		
+	GtkWidget *http=gtk_expander_new ("\nHypertext Transfer Protocol\n");
+	gtk_widget_set_name(GTK_WIDGET(http),"expander");
+	gtk_expander_set_resize_toplevel (GTK_EXPANDER(http),FALSE);
+	gtk_box_pack_start (GTK_BOX(new_box),http,FALSE,FALSE,0);
+	GtkWidget *box_http=gtk_box_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(http),box_http);
+	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_http),GTK_ORIENTATION_VERTICAL);
+	return remplir_http(box_http, tmp_cell);	
+	
+	return 1;
+}
 void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	
 	cell *tmp_cell=(cell *)pData;
@@ -1324,10 +1351,13 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 		return ;
 	}
 	
-	if ( creation_tcp(new_box,tmp_cell) ==0 ){
+	if ( creation_tcp(new_box,tmp_cell) == 0 ){
 		return ;
 	}
 	
+	if ( creation_http(new_box,tmp_cell) == 0 )
+		return;
+	return;
 }		
 
 void ajout_liste_buttons(cell_button **liste,cell_button *elem){
@@ -1739,127 +1769,7 @@ int remplir_tcp_agrandir(GtkWidget *box_tcp,GtkWidget *box_bas_agrandir, cell *t
 		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
 		return 1;
 	}
-	/*
-	GtkWidget *tcp_options=gtk_expander_new (tmp_cell->obj->option_length);
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_tcp),tcp_options,FALSE,FALSE,0);
-	GtkWidget *box_options=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options),box_options);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options),"expander-tabbed");
 	
-	int i = 0;
-	while(tmp_cell->obj->option_tab[i]){
-	
-	if(strcmp((tmp_cell->obj->option_tab)[i], "No Operation (NOP)") == 0){
-	GtkWidget *tcp_options_1 =gtk_expander_new ("TCP Option - No-Operation");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_1),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_options),tcp_options_1,FALSE,FALSE,0);
-	GtkWidget *box_options_1=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options_1),box_options_1);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_1),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options_1),"expander-tabbed");
-	
-	sprintf(label,"\t\tKind : %s\n",(tmp_cell->obj->option_tab[i]));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_1),tmp_label, FALSE, FALSE, 0);
-	}	
-	
-	if(strcmp(tmp_cell->obj->option_tab[i], "Maximum Segment Size (MSS)") == 0){
-	GtkWidget *tcp_options_2 =gtk_expander_new ("TCP Option - Maximum segment size");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_2),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_options),tcp_options_2,FALSE,FALSE,0);
-	GtkWidget *box_options_2=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options_2),box_options_2);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_2),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options_2),"expander-tabbed");
-	
-	sprintf(label,"\t\tKind : %s\n",(tmp_cell->obj->option_tab[i]));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tLength : %s\n",(tmp_cell->obj->option_mss_length));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tMSS value : %s\n",(tmp_cell->obj->option_mss));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_2),tmp_label, FALSE, FALSE, 0);
-	
-	}		
-	
-	if(strcmp(tmp_cell->obj->option_tab[i], "Window Scale (WScale)") == 0){
-	GtkWidget *tcp_options_3 =gtk_expander_new ("TCP Option - Window scale");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_3),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_options),tcp_options_3,FALSE,FALSE,0);
-	GtkWidget *box_options_3=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options_3),box_options_3);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_3),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options_3),"expander-tabbed");
-	
-	sprintf(label,"\t\tKind : %s\n",(tmp_cell->obj->option_tab[i]));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_3),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tShift count : %s\n",(tmp_cell->obj->option_wscale));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_3),tmp_label, FALSE, FALSE, 0);
-	}
-	
-	if(strcmp(tmp_cell->obj->option_tab[i], "Selective Acknowledgment (SACK)") == 0){
-	GtkWidget *tcp_options_4 =gtk_expander_new ("TCP Option - Selective Acknowledgment");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_4),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_options),tcp_options_4,FALSE,FALSE,0);
-	GtkWidget *box_options_4=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options_4),box_options_4);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_4),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options_4),"expander-tabbed");
-	
-	sprintf(label,"\t\tKind : %s\n",(tmp_cell->obj->option_sack));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tLength : %s\n",(tmp_cell->obj->option_sack_length));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
-	}
-	
-	if(strcmp(tmp_cell->obj->option_tab[i], "Timestamps (TS)") == 0){
-	GtkWidget *tcp_options_5 =gtk_expander_new ("TCP Option - Timestamps");
-	gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_options_5),FALSE);
-	gtk_box_pack_start (GTK_BOX(box_options),tcp_options_5,FALSE,FALSE,0);
-	GtkWidget *box_options_5=gtk_box_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(tcp_options_5),box_options_5);	
-	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_options_5),GTK_ORIENTATION_VERTICAL);
-	gtk_widget_set_name(GTK_WIDGET(tcp_options_5),"expander-tabbed");
-	
-	sprintf(label,"\t\tKind : %s\n",(tmp_cell->obj->option_tab[i]));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tTimestamp value : %s\n",(tmp_cell->obj->option_ts_val));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
-	
-	sprintf(label,"\t\tTimestamp echo reply : %s\n",(tmp_cell->obj->option_ts_ecr));
-	tmp_label=gtk_label_new(label);
-	gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-	gtk_box_pack_start(GTK_BOX(box_options_5),tmp_label, FALSE, FALSE, 0);
-	}
-	i++;
-	
-	}
-	*/
 	return 1;
 }
 

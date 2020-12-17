@@ -33,16 +33,15 @@
     box-shadow:none;
 }
 
-
-#expander{
- }
- #expander:active{
- }
-
 #expander-tabbed{
-    padding: 5px;
+    padding: 8px;
     margin-left:38px;
-    margin-bottom:4px;
+    margin-bottom:5px;
+}
+#expander-tabbed-2{
+    padding: 10px;
+    margin-left:50px;
+    margin-top:10px;
 }
 
 
