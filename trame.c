@@ -304,15 +304,6 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 
 }
 
-void affiche_tab(unsigned int *tab){
-	for (int i=0;i<16;i++){
-		printf("%d ",tab[i]);
-	}
-	printf("\n");
-}
-
-
-
 int remplir_ethernet_(trame *new_trame){
 	
 	int place=new_trame->place;
@@ -496,10 +487,10 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 		sprintf(new_trame->acknowledgment_number_raw, "%ld",raw);
 	}else{ return 0; }
 		
+	int header_length=tab_ligne[46+i]/16;
 	if (place>(46+i)){
 		new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
-		int header_length=tab_ligne[46+i]/16*4;
-		sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length);
+		sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length*4);
 	}else{ return 0; }
 	
 	if (place>(47+i)){
@@ -513,9 +504,11 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 		int bit = valeur_n_eme_bit(tab_ligne[47+i], 5);
 		new_trame->tcp_f0=bit;
 		
+
 		if(bit){
 			strcpy(new_trame->urg,"Set");
-		}else{
+		}
+		else{
 			strcpy(new_trame->urg,"Not Set");
 		}
 		
@@ -587,80 +580,76 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 		sprintf(new_trame->no_option, "0x00  (EOL)");
 		return 1;
 	}
-	/*
-	//printf("%d",header_length);	
-	int option_length =(int) ( (header_length/4 - 5) * 4 );
-	new_trame->option_length =(char*)malloc(sizeof(char)*30);
-	sprintf(new_trame->option_length, "Options:\t(%d bytes)", option_length);
-	new_trame->option_tab = (char **)malloc(sizeof(char *)*6);
-	int k=0;
 	
-	int j=0;
-	
-	while (j<5){
-		new_trame->option_tab[j] = NULL;
-		if(tab_ligne[54+i+k]==1){
-			new_trame->option_tab[j] = (char *) malloc(sizeof(char)*40);
-			sprintf(new_trame->option_tab[j],"No Operation (NOP)");
-			k++;
-			j++;
-		}
-		if(tab_ligne[54+i+k]==2){
-			new_trame->option_tab[j] = (char*)malloc(sizeof(char)*40);
-			sprintf(new_trame->option_tab[j], "Maximum Segment Size (MSS)");
-			new_trame->option_mss_length = (char *)malloc(sizeof(char)*2);
-			int option_length =  tab_ligne[54+i+k+1];
-			sprintf(new_trame->option_mss_length, "%d",option_length);
-			new_trame->option_mss = (char *)malloc(sizeof(char)*10);
-			k+=2;
-			int option_value = tab_ligne[54+i+k]*256 + tab_ligne[54+i+k+1];
-			sprintf(new_trame->option_mss,"%d bytes", option_value);
-			k+=2 ;
-			j++;
-		}
-		if(tab_ligne[54+i+k]==3){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
-			sprintf(new_trame->option_tab[j], "Window Scale (WScale)");
-			new_trame->option_wscale = (char *)malloc(sizeof(char)*10);
-			k+=2;
-			sprintf(new_trame->option_wscale, "%d", tab_ligne[54+i+k]);
-			k++;
-			j++;
-		}
-		if(tab_ligne[54+i+k]==4 || tab_ligne[54+i+k]==5){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
-			sprintf(new_trame->option_tab[j], "Selective Acknowledgment (SACK)");
-			int option_sack = tab_ligne[54+i+k];
-			int option_sack_length = tab_ligne[54+i+k+1];
-			new_trame->option_sack = (char *)malloc(sizeof(char)*20);
-			new_trame->option_sack_length = (char *)malloc(sizeof(char)*2);
-			if(option_sack == 5)
-				sprintf(new_trame->option_sack, "SACK");
-			else{
-				sprintf(new_trame->option_sack, "SACK permitted");
+	int taille_option = 0;
+	int indice_option = 0;
+	int is_option = 1;	
+	if(place > 54 + i){
+		int option_length = (header_length - 5)*4;
+		new_trame->option_length =(char*)malloc(sizeof(char)*30);
+		sprintf(new_trame->option_length, "Options:\t(%d bytes)", option_length);
+		new_trame->option_tab = (int *)malloc(sizeof(int)*6); 
+		
+		while((place > 54 + i + taille_option) &&  is_option != 0 && indice_option < 6){
+			is_option = 0;
+			if(tab_ligne[54+i+taille_option]==1){ 
+				is_option = 1;
+				new_trame->option_tab[indice_option] = 1;
+				taille_option ++;
+				indice_option ++;
+				continue;
+			}	
+			if(tab_ligne[54+i+taille_option]==2){
+				is_option = 1;
+				new_trame->option_tab[indice_option] = 2;
+				taille_option += 2;
+				if(place > 54 + i + taille_option){
+					new_trame->option_mss = (char *)malloc(sizeof(char)*20);
+					int option_mss_value = tab_ligne[54+i+taille_option]*256 + tab_ligne[54+i+taille_option+1];
+					sprintf(new_trame->option_mss,"%d bytes", option_mss_value);
+				}else{return 0;}
+				taille_option += 2;
+				indice_option ++;
+				continue;
 			}
-			sprintf(new_trame->option_sack_length, "%d", option_sack_length);
-			k+=2;
-			j++;
+			if(tab_ligne[54+i+taille_option]==3){
+				is_option = 1;
+				new_trame->option_tab[indice_option] = 3;
+				taille_option += 2;
+				if(place > 54 + i + taille_option){
+					new_trame->option_wscale = (char *)malloc(sizeof(char)*10);
+					sprintf(new_trame->option_wscale, "%d", tab_ligne[54+i+taille_option]);
+				}else{return 0;}
+				taille_option ++;
+				indice_option ++;
+				continue;
+			}
+			if(tab_ligne[54+i+taille_option]==4){
+				is_option = 1;
+				new_trame->option_tab[indice_option] = 4;
+				taille_option += 2;
+				indice_option++;
+				continue;
+			}
+			if(tab_ligne[54+i+taille_option]==8){
+				is_option = 1;
+				new_trame->option_tab[indice_option] = 8;
+				taille_option += 2;
+				if(tab_ligne[54+i+taille_option+7]){
+					new_trame->option_ts_val = (char *)malloc(sizeof(char)*30);
+					new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*30);
+					long val = (long)tab_ligne[54+i+taille_option]*16777216 + tab_ligne[54+i+taille_option+1]*65536 + tab_ligne[54+i+taille_option+2]*256 + tab_ligne[54+i+taille_option+3];
+					taille_option += 4;		
+					long ecr = (long)tab_ligne[54+i+taille_option]*16777216 + tab_ligne[54+i+taille_option+1]*65536 + tab_ligne[54+i+taille_option+2]*256 + tab_ligne[54+i+taille_option+3];
+					sprintf(new_trame->option_ts_val, "%ld", val);
+					sprintf(new_trame->option_ts_ecr, "%ld", ecr);
+				}else{return 0;}
+				taille_option += 4;
+				indice_option++;
+				continue;
+			}
 		}
-		if(tab_ligne[54+i+k]==8){
-			new_trame->option_tab[j] = (char *)malloc(sizeof(char)*40);
-			sprintf(new_trame->option_tab[j], "Timestamps (TS)");
-			new_trame->option_ts_val = (char *)malloc(sizeof(char)*20);
-			new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*20);
-			k++;
-			long val = (long)tab_ligne[54+i+k]*16777216 + tab_ligne[54+i+k+1]*65536 + tab_ligne[54+i+k+2]*256 + tab_ligne[54+i+k+3];
-			k+=4;
-			long ecr = (long)tab_ligne[54+i+k]*16777216 + tab_ligne[54+i+k+1]*65536 + tab_ligne[54+i+k+2]*256 + tab_ligne[54+i+k+3];
-			sprintf(new_trame->option_ts_val, "%ld", val);
-			sprintf(new_trame->option_ts_ecr, "%ld", ecr);
-			k+=4;
-			j++;
-		}
-		j++;
-	}
-	*/
-		 
+	}else{return 0;}
 	return 1; 
 }
 

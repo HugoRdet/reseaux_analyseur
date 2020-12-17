@@ -59,13 +59,10 @@ typedef struct trame_{
 	char *tcp_checksum;
 	char *urgent;
 	char *no_option;
-	char **option_tab;
+	int *option_tab;
 	char *option_length;
 	char *option_mss;	
-	char *option_mss_length;
 	char *option_wscale;
-	char *option_sack;
-	char *option_sack_length;
 	char *option_ts_val;
 	char *option_ts_ecr;
 }trame;
