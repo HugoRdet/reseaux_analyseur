@@ -21,6 +21,7 @@ Simply double-click on the output file or type in a terminal:
 ```
 #### Linux & BSD
 The archive comes with a .desktop file.
+
 First allow it to be executed : 
 ```
 sudo chmod +x babyshark.desktop
