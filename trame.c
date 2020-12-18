@@ -243,8 +243,13 @@ int cherche_prochaine_ligne(FILE *fichier_src,int *pt_offset,int *ligne){
 
 void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_bas){
 	char label[80];
-	char protocol_code[4];
-	if ((elem->place)>33){
+	char protocol_code[5];
+	char *http = "HTTP";
+	
+	if ((elem->place)>75){
+		strncpy(protocol_code, http,4);
+	}
+	if ((elem->place)>33 && (elem->place)<=75){
 		strncpy(protocol_code, elem->protocol,3);
 	}
 	
@@ -327,7 +332,18 @@ int remplir_ethernet_(trame *new_trame){
 	
 	if (place>13){
 		new_trame->ip_type=(char *) malloc(sizeof(char)*10);	
-		sprintf(new_trame->ip_type, "(0x0%X0%X)", tab_ligne[12],tab_ligne[13]);
+		char *ether_type = "";
+		int ether_type_value = tab_ligne[12]+tab_ligne[13];
+		if(ether_type_value == 8){
+			ether_type = "IPv4";
+		}
+		if(ether_type_value == 14){
+			ether_type = "ARP";
+		}
+		if(ether_type_value == 154){
+			ether_type = "IPv6";
+		}
+		sprintf(new_trame->ip_type, "(0x%X%X%X%X)   %s", tab_ligne[12]/16,tab_ligne[12]%16,tab_ligne[13]/16,tab_ligne[13]%16,ether_type);
 	}else{ return 0; }
 	
 	return 1;
@@ -649,8 +665,30 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 				continue;
 			}
 		}
+		int pos = 54+i+taille_option;
+		return pos;
+
 	}else{return 0;}
 	return 1; 
+}
+
+void remplir_http_2(trame *new_trame, unsigned int *tab_ligne, int pos){
+	int place = new_trame->place;
+	
+	new_trame->http = (char *)malloc(sizeof(char)*1518);
+	for(int k=0; k<1518; k++)
+	{
+		new_trame->http[k]=0;
+	}
+	int i = 0;
+	while(place > pos + 4){
+		if(tab_ligne[pos]==13 && tab_ligne[pos+1]==10 && tab_ligne[pos+3]==10 && tab_ligne[pos+2]==13)	
+			return;
+		new_trame->http[i]=tab_ligne[pos];
+		i++;
+		pos++;
+	}
+	return;	
 }
 
 static inline int lecture_trame(trame *new_trame){
@@ -670,10 +708,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	
 	
-	if (remplir_tcp_2(new_trame,tab_ligne)==0){
+	int pos = remplir_tcp_2(new_trame, tab_ligne);
+	if (pos == 0){
 		return 1;
 	}
 	
+	remplir_http_2(new_trame, tab_ligne, pos);
 	
 	
 	return 1;

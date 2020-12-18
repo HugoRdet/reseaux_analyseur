@@ -2,6 +2,7 @@
 #define __TRAME_H__
 #include <gtk/gtk.h>
 
+
 typedef struct trame_{
 	unsigned int *tab;
 	int id;
@@ -65,6 +66,9 @@ typedef struct trame_{
 	char *option_wscale;
 	char *option_ts_val;
 	char *option_ts_ecr;
+	
+	// couche http
+	char *http;
 }trame;
 
 typedef struct cell_{
@@ -196,6 +200,7 @@ typedef struct trame_agrandie_{
 	
 		
 }trame_agrandie;
+
 
 void afficher_ligne(FILE *fichier);
 int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut,GtkWidget *box_bas,char *filename);

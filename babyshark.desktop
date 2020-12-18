@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Babyshark
+Exec=./reseaux_analyseur/projet_reseaux
+Icon=babyshark
+Terminal=False
