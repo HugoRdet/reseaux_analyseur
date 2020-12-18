@@ -10,6 +10,7 @@ It parses network frames from .txt files and display the data in an intelligible
 ##### Requirements :  
 git  
 make
+gtk
 #### Unix user
 Simply clone the repository and compile from there.
 ```
