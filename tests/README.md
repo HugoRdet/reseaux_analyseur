@@ -2,7 +2,7 @@
 
 BabyShark est un décodeur de paquets hexadécimaux inspiré de Wireshark.
 
-Il peut lire des trames de réseau contenues dans un fichier *.txt* et en afficher le contenu
+Il peut lire des trames de réseau contenues dans un fichier et en afficher le contenu
 dans une interface simple d'utilisation.
 
 ### Protocoles reconnus
