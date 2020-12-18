@@ -19,3 +19,4 @@ BabyShark est capable de décoder les entêtes de type:
 - **interface.c** génère l'interface graphique et est en particulier responsable des différents affichages.
 - **trame.c** est responsable de la lecture des fichiers *.txt* entrants, et de l'interprétation des données 
 hexadécimales.
+- le **makefile** permet de compiler l'ensemble du programme.
