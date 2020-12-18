@@ -25,7 +25,7 @@ First allow it to be executed :
 ```
 sudo chmod +x babyshark.desktop
 ```
-Then move the icon in your .icon folder :
+Then move the icon in your .icons folder :
 ```
 mv ./icones/babyshark.png ~/.icons/babyshark.png
 ```
