@@ -1,0 +1,253 @@
+
+
+
+#fond_dark{
+    background-image: none;
+    background-color: #151618;
+    box-shadow:none;
+    border-style:none;
+    padding: 10px;
+}
+
+
+
+#fond_panneau{
+    background-image: none;
+    box-shadow:none;
+    border-style:none;
+    background: #282C34;
+    padding: 0px;
+    
+}
+
+#fond_menu{
+    background-image: none;
+    background: #282C34;
+    border-image: none;
+    padding: 3px;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    -gtk-icon-shadow:none;
+    box-shadow:none;
+}
+
+#expander-tabbed{
+    padding: 8px;
+    margin-left:38px;
+    margin-bottom:5px;
+}
+#expander-tabbed-2{
+    padding: 10px;
+    margin-left:50px;
+    margin-top:10px;
+}
+
+
+#label_menu_dark_mode{
+    background-color:#ABB2BF;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+    
+}
+
+#label_menu_trame_dark_mode{
+    background-color: #ABB2BF;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+    
+}
+
+#label_trame_dark_mode{
+    background-color: #ABB2BF;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 7px 2px 2px;
+    -gtk-icon-shadow:none;
+}
+
+
+#label_trame_dark_mode_erreur{
+    background-color: #E06C75;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 7px 2px 0;
+    -gtk-icon-shadow:none;
+}
+
+#button_dark_mode{
+    background-color:#282C34;
+    color: #ABB2BF;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#button_dark_mode_error_pop_up{
+    background-color: #E06C75;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 14px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#button_dark_mode_erreur{
+    background-color: #282C34;
+    color: #E06C75;
+    font-family: DejaVu Sans;
+    font-weight: lighter;
+    font-size: 19px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#label_trame_offset{
+    background-image: none;
+    background: #292929;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 15px;
+    border-image: none;
+    padding: 0px;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    -gtk-icon-shadow:none;
+    box-shadow:none;
+}
+
+#tree_dark_mode{
+    background-color: #282C34;
+    color: #ABB2BF;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 15px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:0px 0 0px 0;
+}
+
+#tree_dark_mode_status_1{
+    background-color: #ABB2BF;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 15px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:0px 0 0px 0;
+}
+
+#button_dark_mode_status_1{
+    background-color: #ABB2BF;
+    color: #282C34;
+    font-family: DejaVu Sans;
+    font-weight: normal;
+    font-size: 18px;
+    background-image: none;
+    border:0px;
+    border-radius:0;
+    box-shadow:none;
+    border-style:none;
+    text-shadow: none;
+    padding:2px 0 2px 0;
+}
+
+#button_dark_mode:active{
+    background-color:#ABB2BF;
+    color: #282C34;
+}
+
+#button_dark_mode_erreur:active{
+    background-color: #E06C75;
+    color: #282C34;
+}
+
+
+
+#button_dark_mode_erreur:hover{
+    background-color: #D06868;
+    color: #DFDFDF;
+}
+
+#button_dark_mode:hover{
+    background-color: #ABB2BF;
+    color: #282C34;
+}
+
+#button_dark_mode_status_1:hover{
+    background-color: #CCCCEE;
+    color: #282C34;
+}
+
+#scroll_bar_perso{
+    background-image: none;
+    color:  #ABB2BF;
+    background-color: #282C34;
+    opacity: 1;
+    box-shadow: none;
+}
+

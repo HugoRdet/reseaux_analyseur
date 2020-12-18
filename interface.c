@@ -748,7 +748,7 @@ void init_panneau(GtkWidget *grille,GtkWidget **pvbox_haut_,GtkWidget **pvbox_ba
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (pvbox_haut),GTK_ORIENTATION_VERTICAL);
 	gtk_container_add(GTK_CONTAINER(frame_haut),pvbox_haut);
 	
-	GtkWidget *menu_label=gtk_toggle_button_new_with_label("Id\t     Source       \tDestination       \tProtocol");
+	GtkWidget *menu_label=gtk_toggle_button_new_with_label("Id\t   Source      \t \tDestination       \t\tProtocol\t\t");
 	gtk_widget_set_name(menu_label,"label_menu_dark_mode");
 	gtk_widget_set_vexpand (menu_label, FALSE);
 	gtk_widget_set_hexpand (menu_label, FALSE);
