@@ -1,7 +1,8 @@
 # BabyShark
 BabyShark is a simple hex-packet decoder, inspired from Wireshark.
 It parses network frames from .txt files and display the data in an intelligible way.
-<img src="https://github.com/HugoRdet/reseaux_analyseur/blob/main/screenshots/screen_shot_1.png" width="500" height="500">
+
+<img src="https://github.com/HugoRdet/reseaux_analyseur/blob/main/screenshots/screen_shot_1.png" width="500" height="400">
 ### Install
 ##### Requirements :  
 git  
