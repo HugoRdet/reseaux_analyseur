@@ -74,22 +74,127 @@ typedef struct cell_{
 	struct cell_ *suiv;
 	struct cell_ **bouton_actif;
 	int status_bouton_ip;
-	
-	
-	
-	
 }cell;
+
+typedef struct cell_button_{
+	GtkWidget *button;
+	struct cell_button_ *suiv;
+}cell_button;
 
 typedef struct trame_agrandie_{
 	
 	struct cell_ *obj;
+	GtkWidget **tab_box_offset;
+	int ligne;
+	GtkWidget *box_trame;
+	GtkWidget *box_offset;
 	
 	GtkWidget *expander_ethernet;
+	GtkWidget *expander_ip;
+	GtkWidget *expander_tcp;
+	GtkWidget *expander_http;
+	GtkWidget *expander_flags;
+	GtkWidget *expander_flags_tcp;
 	
-	GtkWidget *b_box_actif;
-	GtkWidget *b_mac_dest;
-	GtkWidget *b_mac_source;
-	GtkWidget *b_ip_type;
+	struct cell_button_ *u_box_actif;
+	struct cell_button_ *b_box_actif;
+	struct cell_button_ *b_mac_dest;
+	struct cell_button_ *u_mac_dest;
+	struct cell_button_ *b_mac_source;
+	struct cell_button_ *u_mac_source;
+	struct cell_button_ *b_ip_type;
+	struct cell_button_ *u_ip_type;
+	
+	struct cell_button_ *b_version_hl;
+	struct cell_button_ *u_version;
+	struct cell_button_ *u_header_length;
+	struct cell_button_ *b_total_length;
+	struct cell_button_ *u_total_length;
+	struct cell_button_ *b_identification;
+	struct cell_button_ *u_identification;
+	struct cell_button_ *b_flags_offset;
+	struct cell_button_ *u_flags_offset;
+	
+	struct cell_button_ *b_reserved_bit;
+	struct cell_button_ *u_reserved_bit;
+	struct cell_button_ *b_dont_fragment;
+	struct cell_button_ *u_dont_fragment;
+	struct cell_button_ *b_more_fragment;
+	struct cell_button_ *u_more_fragment;
+	struct cell_button_ *b_frag_offset;
+	struct cell_button_ *u_frag_offset;
+	
+	struct cell_button_ *b_ttl;
+	struct cell_button_ *u_ttl;
+	
+	struct cell_button_ *b_protocol;
+	struct cell_button_ *u_protocol;
+	struct cell_button_ *b_header_checksum; 
+	struct cell_button_ *u_header_checksum; 
+	struct cell_button_ *b_ip_source;
+	struct cell_button_ *u_ip_source;
+	struct cell_button_ *b_ip_dest;
+	struct cell_button_ *b_ip_dest_1;
+	struct cell_button_ *u_ip_dest;
+	
+	struct cell_button_ *b_source_port;
+	struct cell_button_ *u_source_port;
+	struct cell_button_ *b_destination_port;
+	struct cell_button_ *u_destination_port;
+	struct cell_button_ *b_sequence_number;
+	struct cell_button_ *u_sequence_number;
+	struct cell_button_ *b_sequence_number_raw;
+	struct cell_button_ *u_sequence_number_raw;
+	struct cell_button_ *b_next_sequence_number;
+	struct cell_button_ *u_next_sequence_number;
+	struct cell_button_ *b_acknowledgment_number;
+	struct cell_button_ *u_acknowledgment_number;
+	struct cell_button_ *b_acknowledgment_number_raw;
+	struct cell_button_ *u_acknowledgment_number_raw;
+	struct cell_button_ *b_tcp_header_length;
+	struct cell_button_ *u_tcp_header_length;
+	struct cell_button_ *b_urg;
+	struct cell_button_ *u_urg;
+	struct cell_button_ *b_ack;
+	struct cell_button_ *u_ack;
+	struct cell_button_ *b_push;
+	struct cell_button_ *u_push;
+	struct cell_button_ *b_reset;
+	struct cell_button_ *u_reset;
+	struct cell_button_ *b_syn;
+	struct cell_button_ *u_syn;
+	struct cell_button_ *b_fin;
+	struct cell_button_ *u_fin;
+	struct cell_button_ *u_tcp_f;
+	struct cell_button_ *b_tcp_f0;
+	struct cell_button_ *b_tcp_f1;
+	struct cell_button_ *b_tcp_f2;
+	struct cell_button_ *b_tcp_f3;
+	struct cell_button_ *b_tcp_f4;
+	struct cell_button_ *b_tcp_f5;
+	struct cell_button_ *b_window;
+	struct cell_button_ *u_window;
+	struct cell_button_ *b_tcp_checksum;
+	struct cell_button_ *u_tcp_checksum;
+	struct cell_button_ *b_urgent;
+	struct cell_button_ *u_urgent;
+	struct cell_button_ *b_no_option;
+	struct cell_button_ *u_no_option;
+	struct cell_button_ *b_option_tab;
+	struct cell_button_ *u_option_tab;
+	struct cell_button_ *b_option_length;
+	struct cell_button_ *u_option_length;
+	struct cell_button_ *b_option_mss;
+	struct cell_button_ *u_option_mss;
+	struct cell_button_ *b_option_wscale;
+	struct cell_button_ *u_option_wscale;
+	struct cell_button_ *b_option_ts_val;
+	struct cell_button_ *u_option_ts_val;
+	struct cell_button_ *b_option_ts_ecr;
+	struct cell_button_ *u_option_ts_ecr;
+
+	
+		
 }trame_agrandie;
 
 void afficher_ligne(FILE *fichier);

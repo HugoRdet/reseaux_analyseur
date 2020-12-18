@@ -90,7 +90,7 @@
     box-shadow:none;
     border-style:none;
     text-shadow: none;
-    padding:2px 7px 2px 0;
+    padding:2px 7px 2px 2px;
     -gtk-icon-shadow:none;
 }
 

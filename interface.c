@@ -189,6 +189,16 @@ void agrandir_trame(GtkWidget *pWidget, gpointer pData){
 	
 	trame_agrandie *new_trame_agrandie=(trame_agrandie *) malloc(sizeof(trame_agrandie));
 	new_trame_agrandie->b_box_actif=NULL;
+	new_trame_agrandie->u_box_actif=NULL;
+	int nb_l=( (int) ( (liste->obj->place)/16.0 ) ) + 1 ;
+	new_trame_agrandie->tab_box_offset=(GtkWidget**) malloc(sizeof(GtkWidget*)*nb_l);
+	new_trame_agrandie->expander_ethernet=NULL;
+	new_trame_agrandie->expander_ip=NULL;
+	new_trame_agrandie->expander_tcp=NULL;
+	new_trame_agrandie->expander_http=NULL;
+	new_trame_agrandie->box_trame=box_trame;
+	new_trame_agrandie->box_offset=box_octets;
+	new_trame_agrandie->ligne=0;
 	new_trame_agrandie->obj=liste;
 	
 	remplir_arbre_agrandir_trame(box_trame,box_octets,new_trame_agrandie);
@@ -196,27 +206,7 @@ void agrandir_trame(GtkWidget *pWidget, gpointer pData){
 	
 	gtk_container_add(GTK_CONTAINER(frame_haut),box_trame);
 	gtk_container_add(GTK_CONTAINER(frame_bas),box_octets);
-	
-	/* BOT BOX */
-	
-	
 
-	/*
-	GtkWidget *scroll_fenetre= gtk_scrolled_window_new (NULL,NULL);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll_fenetre),GTK_SHADOW_IN);
-	gtk_widget_set_name(scroll_fenetre,"scroll_bar_perso");
-
-	
-		
-	GtkWidget *scroll_bar=gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW(scroll_fenetre));
-	gtk_widget_set_name(scroll_bar,"scroll_bar_perso");
-	
-	gtk_container_add(GTK_CONTAINER(fenetre),scroll_fenetre);
-	gtk_container_add(GTK_CONTAINER(scroll_fenetre),box_trame);
-	
-	remplir_arbre(box_trame,liste,0);
-	*/
-	
 	
 	gtk_widget_show_all(fenetre);
 	g_signal_connect_swapped (fenetre, "destroy",G_CALLBACK (gtk_widget_destroy),fenetre);
@@ -1318,6 +1308,7 @@ int creation_tcp(GtkWidget *new_box,cell *tmp_cell){
 	return 1;
 }
 
+
 void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	
 	cell *tmp_cell=(cell *)pData;
@@ -1338,51 +1329,62 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	
 }		
 
-void ajout_liste_buttons(cell_button **liste,cell_button *elem){
-	if (*liste==NULL){
-		*liste=elem;
-		elem->suiv=NULL;
-	}else{
-		elem->suiv=*liste;
-		*liste=elem;
-	}
+cell_button *cree_cell_button(GtkWidget* button){
+	cell_button *new=(cell_button *) malloc(sizeof(cell_button));
+	new->suiv=NULL;
+	new->button=button;
+	return new;
 }
 
-void detruire_liste_buttons(cell_button **liste,cell_button *elem){
-	cell_button *a_supp=NULL;
-	cell_button *tmp=*liste;
-	while (tmp!=NULL){
-		a_supp=tmp;
+static inline void reset_bouton_actif(trame_agrandie *tmp_trame_agrandie){
+	
+	cell_button *tmp=tmp_trame_agrandie->b_box_actif;
+	cell_button *tmp_change_dest=NULL;
+	while (tmp!=NULL) {
+		gtk_widget_set_name(tmp->button,"tree_dark_mode");
+		gtk_widget_show(GTK_WIDGET(tmp->button));
+		tmp_change_dest=tmp;
 		tmp=tmp->suiv;
-		gtk_widget_destroy(a_supp->button);
-		free(a_supp);
-	}
-}
-
-void show_liste_buttons(cell_button *liste){
-	while (liste!=NULL) {
-		gtk_widget_set_name(GTK_WIDGET(liste->button),"button_dark_mode_erreur");
-		gtk_widget_show(GTK_WIDGET(liste->button));
-		liste=liste->suiv;
+		tmp_change_dest->suiv=NULL;
 		
-
 	}
+	
+	tmp=tmp_trame_agrandie->u_box_actif;
+	
+	while (tmp!=NULL) {
+		gtk_widget_set_name(tmp->button,"tree_dark_mode");
+		gtk_widget_show(GTK_WIDGET(tmp->button));
+		tmp_change_dest=tmp;
+		tmp=tmp->suiv;
+		tmp_change_dest->suiv=NULL;
+	}
+	
+	tmp_trame_agrandie->u_box_actif=NULL;
+	tmp_trame_agrandie->b_box_actif=NULL;
 }
 
-void hide_liste_buttons(cell_button *liste){
-	while (liste!=NULL) {
-		gtk_widget_set_name(GTK_WIDGET(liste->button),"button_dark_mode");
-		gtk_widget_show(GTK_WIDGET(liste->button));
-		liste=liste->suiv;
+static inline void mise_a_jour_theme_actif(trame_agrandie *tmp_trame_agrandie){
+	cell_button *tmp=tmp_trame_agrandie->b_box_actif;
+	
+	while (tmp!=NULL) {
+		gtk_widget_set_name(tmp->button,"tree_dark_mode_status_1");
+		gtk_widget_show(GTK_WIDGET(tmp->button));
+		tmp=tmp->suiv;
 	}
+	
+	tmp=tmp_trame_agrandie->u_box_actif;
+	
+	while (tmp!=NULL) {
+		gtk_widget_set_name(tmp->button,"tree_dark_mode_status_1");
+		gtk_widget_show(GTK_WIDGET(tmp->button));
+		tmp=tmp->suiv;
+	}
+	
 }
 
 
 
-
-
-
-void offset_debut_ligne(GtkWidget *box, int n){
+static inline void offset_debut_ligne(GtkWidget *box, int n){
 	char label[7];
 	
 	sprintf(label," %.4X ",n);
@@ -1394,57 +1396,65 @@ void offset_debut_ligne(GtkWidget *box, int n){
 	
 }
 
-void action_bouton_mac_dest(GtkWidget *pWidget, gpointer pData){
-	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
-	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
-		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
-	}
-	
-	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_dest;
-	gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode_status_1");
-	gtk_widget_show(tmp_trame_agrandie->b_box_actif);
-}
-
-void action_bouton_mac_source(GtkWidget *pWidget, gpointer pData){
-	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
-	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
-		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
-	}
-	
-	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_source;
-	gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode_status_1");
-	gtk_widget_show(tmp_trame_agrandie->b_box_actif);
-}
-
-void action_bouton_type(GtkWidget *pWidget, gpointer pData){
-	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
-	if ((tmp_trame_agrandie->b_box_actif)!=NULL){
-		gtk_widget_set_name((tmp_trame_agrandie->b_box_actif),"tree_dark_mode");
-		gtk_widget_show(tmp_trame_agrandie->b_box_actif);
-	}
-	
-	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ip_type;
-	gtk_widget_set_name((tmp_trame_agrandie->b_ip_type),"tree_dark_mode_status_1");
-	gtk_widget_show(tmp_trame_agrandie->b_ip_type);
-}
-
-int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
-	cell *tmp_cell=tmp_trame_agrandie->obj;
+static inline void ajout_ligne_offset(trame_agrandie *tmp_trame_agrandie){
 	GtkWidget* box_trame=gtk_box_new(FALSE,0);
-	gtk_box_pack_start(GTK_BOX(box_bas_agrandir),box_trame, FALSE, FALSE, 0);
-
+	(tmp_trame_agrandie->tab_box_offset)[(tmp_trame_agrandie->ligne)]=box_trame;
+	gtk_box_pack_start(GTK_BOX(tmp_trame_agrandie->box_offset),box_trame, FALSE, FALSE, 0);
+	
 	gtk_box_set_homogeneous (GTK_BOX(box_trame),FALSE);
 	gtk_widget_set_name(box_trame,"tree_dark_mode");
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (box_trame),GTK_ORIENTATION_HORIZONTAL);
 	
+	
+	offset_debut_ligne(box_trame,tmp_trame_agrandie->ligne);
+	(tmp_trame_agrandie->ligne)++;
+}
+
+void action_bouton_mac_dest(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ethernet),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_dest;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_mac_dest;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+
+void action_bouton_mac_source(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ethernet),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_mac_source;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_mac_source;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_type(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ethernet),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ip_type;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_ip_type;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+
+
+int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
+	cell *tmp_cell=tmp_trame_agrandie->obj;
+	
+	ajout_ligne_offset(tmp_trame_agrandie);
+	GtkWidget *box_trame=(tmp_trame_agrandie->tab_box_offset)[0];
 	char label[80];
 	GtkWidget *tmp_label=NULL;
 	GtkWidget *tmp_button=NULL;;
-	int place=tmp_cell->obj->place;
-	offset_debut_ligne(box_trame,0);
-	
+	int place=tmp_trame_agrandie->obj->obj->place;
 	char label_ip[20];
 	
 	if (place>5){
@@ -1453,10 +1463,11 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		
 		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_mac_dest=cree_cell_button(tmp_button);
 		gtk_widget_set_name(tmp_button,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_button, FALSE, FALSE, 0);
-		sprintf(label_ip," %.2X %.2X %.2X %.2X %.2X %.2X ",(tmp_cell->obj->tab)[0]
+		sprintf(label_ip," %.2X %.2X %.2X %.2X %.2X %.2X",(tmp_cell->obj->tab)[0]
 			,(tmp_cell->obj->tab)[1]
 			,(tmp_cell->obj->tab)[2]
 			,(tmp_cell->obj->tab)[3]
@@ -1465,11 +1476,12 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		tmp_label=gtk_label_new(label_ip);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_trame_agrandie->b_mac_dest=tmp_button_bas;
+		tmp_trame_agrandie->b_mac_dest=cree_cell_button(tmp_button_bas);
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
 		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_dest),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_mac_dest),tmp_trame_agrandie);
 		
 		
 	}else{ return 0; }
@@ -1480,10 +1492,11 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		
 		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_mac_source=cree_cell_button(tmp_button);
 		gtk_widget_set_name(tmp_button,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_button, FALSE, FALSE, 0);
-		sprintf(label_ip,"%.2X %.2X %.2X %.2X %.2X %.2X ",(tmp_cell->obj->tab)[6]
+		sprintf(label_ip," %.2X %.2X %.2X %.2X %.2X %.2X",(tmp_cell->obj->tab)[6]
 													,(tmp_cell->obj->tab)[7]
 													,(tmp_cell->obj->tab)[8]
 													,(tmp_cell->obj->tab)[9]
@@ -1492,11 +1505,12 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		tmp_label=gtk_label_new(label_ip);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_trame_agrandie->b_mac_source=tmp_button_bas;
+		tmp_trame_agrandie->b_mac_source=cree_cell_button(tmp_button_bas);
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
 		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_mac_source),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_mac_source),tmp_trame_agrandie);
 	
 	}else{ return 0; }
 	
@@ -1509,63 +1523,284 @@ int remplir_ethernet_agrandir(GtkWidget *box_ethernet,GtkWidget *box_bas_agrandi
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		
 		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_ip_type=cree_cell_button(tmp_button);
 		gtk_widget_set_name(tmp_button,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_ethernet),tmp_button, FALSE, FALSE, 0);
-		char label_type[6];
-		printf("prout\n");
-		sprintf(label_type,"%.2X %.2X",(tmp_cell->obj->tab)[12],(tmp_cell->obj->tab)[13]);
+		char label_type[10];
+		
+		sprintf(label_type," %.2X %.2X",(tmp_cell->obj->tab)[12],(tmp_cell->obj->tab)[13]);
 		tmp_label=gtk_label_new(label_type);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		GtkWidget *tmp_button_bas=gtk_button_new ();
-		tmp_trame_agrandie->b_ip_type=tmp_button_bas;
+		tmp_trame_agrandie->b_ip_type=cree_cell_button(tmp_button_bas);
 		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
 		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
 		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
 		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_type),tmp_trame_agrandie);
+		
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_type),tmp_trame_agrandie);
+		
+		
 	}else{ return 0; }
 	gtk_widget_show_all(box_bas_agrandir);
 	return 1;
 }
 
-int remplir_ip_agrandir(GtkWidget *box_ip,GtkWidget *box_bas_agrandir, cell *tmp_cell){
+
+void action_bouton_version(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_version_hl;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_version;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_hl(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_version_hl;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_header_length;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_version_hl(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_version_hl;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_header_length;
+	tmp_trame_agrandie->u_header_length->suiv=tmp_trame_agrandie->u_version;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_total_length(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_total_length;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_total_length;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_identification(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_identification;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_identification;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_flags(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_flags),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_flags_offset;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_flags_offset;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_flag_offset(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_frag_offset;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_frag_offset;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_ttl(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ttl;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_ttl;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_protocol(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_protocol;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_protocol;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_hchecksum(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_header_checksum;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_header_checksum;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_ip_source(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_ip),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ip_source;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_ip_source;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_ip_dest(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_ip_dest;
+	tmp_trame_agrandie->b_ip_dest->suiv=tmp_trame_agrandie->b_ip_dest_1;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_ip_dest;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+int remplir_ip_agrandir(GtkWidget *box_ip,GtkWidget *box_bas_agrandir, trame_agrandie *tmp_trame_agrandie){
 	char label[80];
 	GtkWidget *tmp_label=NULL;
+	GtkWidget *tmp_button=NULL;
+	cell *tmp_cell=tmp_trame_agrandie->obj;
 	int place=tmp_cell->obj->place;
 	
+	ajout_ligne_offset(tmp_trame_agrandie);
+	GtkWidget *box_trame=(tmp_trame_agrandie->tab_box_offset)[1];
+	
 	if (place>14){
+		char label_version[5];
+		
+		sprintf(label_version," %.2X",(tmp_cell->obj->tab)[14]);
+		tmp_label=gtk_label_new(label_version);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_version_hl=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX((tmp_trame_agrandie->tab_box_offset)[0]),tmp_button_bas, FALSE, FALSE, 0);
+		
 		sprintf(label,"\t\tVersion:  %s\n",(tmp_cell->obj->version));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_version=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_version),tmp_trame_agrandie);
 		
 		
 		
 		sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->header_length));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_header_length=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_hl),tmp_trame_agrandie);
+		
+		tmp_label=gtk_label_new(label);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_version_hl),tmp_trame_agrandie);
+		
+		
+		char label_octet_fin[4];
+		sprintf(label_octet_fin," 00");
+		tmp_label=gtk_label_new(label_octet_fin);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		gtk_widget_set_name(tmp_label,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(((tmp_trame_agrandie->tab_box_offset)[0])),tmp_label, FALSE, FALSE, 0);
+		
+
 	}else{ return 0; }
 	
 	if (place>17){
 		sprintf(label,"\t\tTotal Length: %s\n",(tmp_cell->obj->total_length));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_total_length=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_total_l[10];
+		sprintf(label_total_l," %.2X %.2X",(tmp_cell->obj->tab)[16],(tmp_cell->obj->tab)[17]);
+		tmp_label=gtk_label_new(label_total_l);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_total_length=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_total_length),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_total_length),tmp_trame_agrandie);
 	}else{ return 0; }
 	
 	if (place>19){
 		sprintf(label,"\t\tIdentification: %s\n",(tmp_cell->obj->identification));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_identification=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		char label_identification[10];
+		sprintf(label_identification," %.2X %.2X",(tmp_cell->obj->tab)[18],(tmp_cell->obj->tab)[19]);
+		tmp_label=gtk_label_new(label_identification);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_identification=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_identification),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_identification),tmp_trame_agrandie);
+
+		
+		
 	}else{ return 0; }
 	
 	if (place>20){
+		
 		GtkWidget *flags=gtk_expander_new ("Flags");
 		gtk_expander_set_resize_toplevel (GTK_EXPANDER(flags),FALSE);
 		gtk_box_pack_start (GTK_BOX(box_ip),flags,FALSE,FALSE,0);
 		GtkWidget *box_flags=gtk_box_new(FALSE,0);
+		tmp_trame_agrandie->expander_flags=flags;
 		gtk_container_add(GTK_CONTAINER(flags),box_flags);	
 		gtk_orientable_set_orientation (GTK_ORIENTABLE (box_flags),GTK_ORIENTATION_VERTICAL);
 		gtk_widget_set_name(GTK_WIDGET(flags),"expander-tabbed");
@@ -1573,7 +1808,24 @@ int remplir_ip_agrandir(GtkWidget *box_ip,GtkWidget *box_bas_agrandir, cell *tmp
 		sprintf(label,"\t\tValue: %s\n",(tmp_cell->obj->flags_offset));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_flags_offset=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_flags),tmp_button, FALSE, FALSE, 0);
+		char label_flags[10];
+		sprintf(label_flags," %.2X",(tmp_cell->obj->tab)[20]);
+		tmp_label=gtk_label_new(label_flags);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_flags_offset=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_flags),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_flags),tmp_trame_agrandie);
+
 		
 		sprintf(label,"\t\t %d... .... = Reserved bit: %s\n",tmp_cell->obj->f0, (tmp_cell->obj->reserved_bit));
 		tmp_label=gtk_label_new(label);
@@ -1589,98 +1841,499 @@ int remplir_ip_agrandir(GtkWidget *box_ip,GtkWidget *box_bas_agrandir, cell *tmp
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 		gtk_box_pack_start(GTK_BOX(box_flags),tmp_label, FALSE, FALSE, 0);
+		
+		
+		
 	}else{ return 0; }
 	
 	if (place>21){
 		sprintf(label,"\t\tFragment Offset: %s\n",(tmp_cell->obj->frag_offset));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_frag_offset=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_total_l[10];
+		sprintf(label_total_l," %.2X",(tmp_cell->obj->tab)[21]);
+		tmp_label=gtk_label_new(label_total_l);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_frag_offset=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_flag_offset),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_flag_offset),tmp_trame_agrandie);
+
 	}else{ return 0; }
 	
 	if (place>22){
 		sprintf(label,"\t\tTime to Live: %d\n",(tmp_cell->obj->TTL));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_ttl=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_ttl[10];
+		sprintf(label_ttl," %.2X",(tmp_cell->obj->tab)[22]);
+		tmp_label=gtk_label_new(label_ttl);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_ttl=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_ttl),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_ttl),tmp_trame_agrandie);
 	}else { return 0; }
 	
 	if (place>23){
 		sprintf(label,"\t\tProtocol: %s\n",(tmp_cell->obj->protocol));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_protocol=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_protocol[10];
+		sprintf(label_protocol," %.2X",(tmp_cell->obj->tab)[23]);
+		tmp_label=gtk_label_new(label_protocol);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_protocol=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_protocol),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_protocol),tmp_trame_agrandie);
+
 	}else{ return 0; }
 	
 	if (place > 25){
 		sprintf(label,"\t\tHeader Checksum: %s\n",(tmp_cell->obj->header_checksum));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_header_checksum=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_hchecksum[10];
+		sprintf(label_hchecksum," %.2X %.2X",(tmp_cell->obj->tab)[24],(tmp_cell->obj->tab)[25]);
+		tmp_label=gtk_label_new(label_hchecksum);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_header_checksum=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_hchecksum),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_hchecksum),tmp_trame_agrandie);
+
 	}else{ return 0; }
 	
 	if (place > 29){
 		sprintf(label,"\t\tSource Address: %s\n",(tmp_cell->obj->ip_source));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_ip_source=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_ip_source[20];
+		sprintf(label_ip_source," %.2X %.2X %.2X %.2X",(tmp_cell->obj->tab)[26],(tmp_cell->obj->tab)[27],(tmp_cell->obj->tab)[28],(tmp_cell->obj->tab)[29]);
+		tmp_label=gtk_label_new(label_ip_source);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_ip_source=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_ip_source),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_ip_source),tmp_trame_agrandie);
 	}else{ return 0; }
 	
 	if (place> 33){
 		sprintf(label,"\t\tDestination Address: %s\n",(tmp_cell->obj->ip_dest));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_ip),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_ip_dest=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_ip),tmp_button, FALSE, FALSE, 0);
+		
+		char label_ip_dest[15];
+		sprintf(label_ip_dest," %.2X %.2X",(tmp_cell->obj->tab)[30],(tmp_cell->obj->tab)[31]);
+		tmp_label=gtk_label_new(label_ip_dest);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_ip_dest=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_ip_dest),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_ip_dest),tmp_trame_agrandie);
+		
+		ajout_ligne_offset(tmp_trame_agrandie);
+		sprintf(label_ip_dest," %.2X %.2X",(tmp_cell->obj->tab)[32],(tmp_cell->obj->tab)[33]);
+		tmp_label=gtk_label_new(label_ip_dest);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_ip_dest_1=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX((tmp_trame_agrandie->tab_box_offset)[2]),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_ip_dest),tmp_trame_agrandie);
 	}else{ return 0; }
+	
+	gtk_widget_show_all(box_bas_agrandir);
 	
 	return 1;
 	
 }
 
-int remplir_tcp_agrandir(GtkWidget *box_tcp,GtkWidget *box_bas_agrandir, cell *tmp_cell){
+
+void action_bouton_source_port(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_source_port;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_source_port;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+
+void action_bouton_destination_port(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_destination_port;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_destination_port;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_sequence_number(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_sequence_number_raw;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_sequence_number_raw;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_ack_number(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_acknowledgment_number_raw;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_acknowledgment_number_raw;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_hl(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_header_length;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_header_length;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_u(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f0;
+	tmp_trame_agrandie->b_tcp_f0->suiv=tmp_trame_agrandie->b_tcp_f1;
+	tmp_trame_agrandie->b_tcp_f1->suiv=tmp_trame_agrandie->b_tcp_f2;
+	tmp_trame_agrandie->b_tcp_f2->suiv=tmp_trame_agrandie->b_tcp_f3;
+	tmp_trame_agrandie->b_tcp_f3->suiv=tmp_trame_agrandie->b_tcp_f4;
+	tmp_trame_agrandie->b_tcp_f4->suiv=tmp_trame_agrandie->b_tcp_f5;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+
+void action_bouton_tcp_flags_f0(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f0;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_f1(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f1;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_f2(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f2;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_f3(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f3;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_f4(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f4;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_flags_f5(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_f5;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_f;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_window(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_window;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_window;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_checksum(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_tcp_checksum;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_tcp_checksum;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+void action_bouton_tcp_urgent_pointer(GtkWidget *pWidget, gpointer pData){
+	trame_agrandie *tmp_trame_agrandie=(trame_agrandie *) pData;
+	
+	gtk_expander_set_expanded (GTK_EXPANDER(tmp_trame_agrandie->expander_tcp),TRUE);
+	
+	reset_bouton_actif(tmp_trame_agrandie);
+	tmp_trame_agrandie->b_box_actif=tmp_trame_agrandie->b_urgent;
+	tmp_trame_agrandie->u_box_actif=tmp_trame_agrandie->u_urgent;
+	mise_a_jour_theme_actif(tmp_trame_agrandie);
+}
+
+int remplir_tcp_agrandir(GtkWidget *box_tcp,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
 	
 	char label[80];
 	GtkWidget *tmp_label=NULL;
+	
+	
+	GtkWidget *tmp_button=NULL;
+	cell *tmp_cell=tmp_trame_agrandie->obj;
 	int place=tmp_cell->obj->place;
+	GtkWidget *box_trame=(tmp_trame_agrandie->tab_box_offset)[2];
+	
 	int i=(tmp_cell->obj->header_length_)-20;
+	
+	
 	
 	if (place>(35+i)){
 		sprintf(label,"\t\tSource Port: %s\n",(tmp_cell->obj->source_port));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_source_port=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		char label_src_port[10];
+		sprintf(label_src_port," %.2X %.2X",(tmp_cell->obj->tab)[34+i],(tmp_cell->obj->tab)[35+i]);
+		tmp_label=gtk_label_new(label_src_port);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_source_port=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_source_port),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_source_port),tmp_trame_agrandie);
+
 	}else{ return 0; }
 	
 	if (place>(37+i)){
 		sprintf(label,"\t\tDestination Port: %s\n",(tmp_cell->obj->destination_port));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_destination_port=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		char label_dst_port[10];
+		sprintf(label_dst_port," %.2X %.2X",(tmp_cell->obj->tab)[36+i],(tmp_cell->obj->tab)[37+i]);
+		tmp_label=gtk_label_new(label_dst_port);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_destination_port=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_destination_port),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_destination_port),tmp_trame_agrandie);	
 	}else{ return 0; }
 	
 	if (place>(41+i)){
 		sprintf(label,"\t\tSequence Number (raw): %s\n",(tmp_cell->obj->sequence_number_raw));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_sequence_number_raw=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		char label_sequence_number[25];
+		sprintf(label_sequence_number," %.2X %.2X %.2X %.2X",(tmp_cell->obj->tab)[38+i],(tmp_cell->obj->tab)[39+i],(tmp_cell->obj->tab)[40+i],(tmp_cell->obj->tab)[41+i]);
+		tmp_label=gtk_label_new(label_sequence_number);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_sequence_number_raw=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_sequence_number),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_sequence_number),tmp_trame_agrandie);		
 	}else{ return 0; }
 	
 	if (place>(45+i)){
 		sprintf(label,"\t\tAcknowledgment Number (raw): %s\n",(tmp_cell->obj->acknowledgment_number_raw));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
-	}else{ return 0; }
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_acknowledgment_number_raw=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		char label_ack_number[25];
+		sprintf(label_ack_number," %.2X %.2X %.2X %.2X",(tmp_cell->obj->tab)[42+i],(tmp_cell->obj->tab)[43+i],(tmp_cell->obj->tab)[44+i],(tmp_cell->obj->tab)[45+i]);
+		tmp_label=gtk_label_new(label_ack_number);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_acknowledgment_number_raw=cree_cell_button(tmp_button_bas);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_ack_number),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_ack_number),tmp_trame_agrandie);		}else{ return 0; }
 	
 	if (place>(46+i)){
 		sprintf(label,"\t\tHeader Length: %s\n",(tmp_cell->obj->tcp_header_length));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		
+		
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_header_length=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		
+		char label_hl[10];
+		sprintf(label_hl," %.2X",(tmp_cell->obj->tab)[46+i]);
+		tmp_label=gtk_label_new(label_hl);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->u_tcp_header_length=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_hl),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_tcp_hl),tmp_trame_agrandie);
+
+		
+		
 	}else{ return 0; }
 	
 	if (place>(47+i)){
 		GtkWidget *tcp_flags=gtk_expander_new ("Flags");
+		tmp_trame_agrandie->expander_flags_tcp=tcp_flags;
 		gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp_flags),FALSE);
 		gtk_box_pack_start (GTK_BOX(box_tcp),tcp_flags,FALSE,FALSE,0);
 		GtkWidget *box_flags_2=gtk_box_new(FALSE,0);
@@ -1689,56 +2342,161 @@ int remplir_tcp_agrandir(GtkWidget *box_tcp,GtkWidget *box_bas_agrandir, cell *t
 		gtk_widget_set_name(GTK_WIDGET(tcp_flags),"expander-tabbed");
 		
 		
+		char label_flags_tcp[10];
+		sprintf(label_flags_tcp," %.2X",(tmp_cell->obj->tab)[47+i]);
+		tmp_label=gtk_label_new(label_flags_tcp);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->u_tcp_f=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_tcp_flags_u),tmp_trame_agrandie);
+		
+		
 		sprintf(label,"\t\t..%d. .... = Urgent: %s\n",tmp_cell->obj->tcp_f0, (tmp_cell->obj->urg));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f0=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f0),tmp_trame_agrandie);
+		
+		
+		
 		
 		sprintf(label,"\t\t...%d .... = Acknowledgement: %s\n",tmp_cell->obj->tcp_f1, (tmp_cell->obj->ack));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f1=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f1),tmp_trame_agrandie);
 		
 		sprintf(label,"\t\t.... %d... = Push: %s\n",tmp_cell->obj->tcp_f2, (tmp_cell->obj->push));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f2=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f2),tmp_trame_agrandie);
 		
 		sprintf(label,"\t\t.... .%d.. = Reset: %s\n",tmp_cell->obj->tcp_f3, (tmp_cell->obj->reset));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f3=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f3),tmp_trame_agrandie);
 		
 		sprintf(label,"\t\t.... ..%d. = Syn: %s\n",tmp_cell->obj->tcp_f4, (tmp_cell->obj->syn));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f4=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f4),tmp_trame_agrandie);
 		
 		sprintf(label,"\t\t.... ...%d = Fin: %s\n",tmp_cell->obj->tcp_f5, (tmp_cell->obj->fin));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_flags_2),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_f5=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_flags_f5),tmp_trame_agrandie);	
 	}else{ return 0; }
 	
 	if (place>(49+i)){
+		
+		
+		ajout_ligne_offset(tmp_trame_agrandie);
+		box_trame=(tmp_trame_agrandie->tab_box_offset)[3];
+		
 		sprintf(label,"\t\tWindow: %s\n",(tmp_cell->obj->window));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_window=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		
+		char label_window[10];
+		sprintf(label_window," %.2X",(tmp_cell->obj->tab)[49+i]);
+		tmp_label=gtk_label_new(label_window);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_window=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_window),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_window),tmp_trame_agrandie);
 	}else{ return 0; }
 	
 	if (place>(51+i)){
 		sprintf(label,"\t\tChecksum: %s\n",(tmp_cell->obj->tcp_checksum));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_tcp_checksum=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		
+		char label_tcp[10];
+		sprintf(label_tcp," %.2X %.2X",(tmp_cell->obj->tab)[50+i],(tmp_cell->obj->tab)[51+i]);
+		tmp_label=gtk_label_new(label_tcp);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_tcp_checksum=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_checksum),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_tcp_checksum),tmp_trame_agrandie);
 	}else{ return 0; }
 	
 	if (place>(53+i)){
 		sprintf(label,"\t\tUrgent Pointer: %s\n",(tmp_cell->obj->urgent));
 		tmp_label=gtk_label_new(label);
 		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
-		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_label, FALSE, FALSE, 0);
+		tmp_button=gtk_button_new ();
+		tmp_trame_agrandie->u_urgent=cree_cell_button(tmp_button);
+		gtk_widget_set_name(tmp_button,"tree_dark_mode");
+		gtk_container_add (GTK_CONTAINER(tmp_button),tmp_label);
+		gtk_box_pack_start(GTK_BOX(box_tcp),tmp_button, FALSE, FALSE, 0);
+		
+		char label_urg_ptr[10];
+		sprintf(label_urg_ptr," %.2X %.2X",(tmp_cell->obj->tab)[52+i],(tmp_cell->obj->tab)[53+i]);
+		tmp_label=gtk_label_new(label_urg_ptr);
+		gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
+		GtkWidget *tmp_button_bas=gtk_button_new ();
+		tmp_trame_agrandie->b_urgent=cree_cell_button(tmp_button_bas);
+		gtk_container_add (GTK_CONTAINER(tmp_button_bas),tmp_label);
+		gtk_widget_set_name(tmp_button_bas,"tree_dark_mode");
+		gtk_box_pack_start(GTK_BOX(box_trame),tmp_button_bas, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(tmp_button), "clicked", G_CALLBACK(action_bouton_tcp_urgent_pointer),tmp_trame_agrandie);
+		g_signal_connect(G_OBJECT(tmp_button_bas), "clicked", G_CALLBACK(action_bouton_tcp_urgent_pointer),tmp_trame_agrandie);
+		/*
+		
+		
+		
+		
+		
+		*/
 	}else{ return 0; }
 	
 	
@@ -1894,19 +2652,20 @@ int creation_ethernet_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,tr
 }
 
 
-int creation_ip_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,cell *tmp_cell){
+int creation_ip_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
 	
-	int place=tmp_cell->obj->place;
+	int place=tmp_trame_agrandie->obj->obj->place;
 	
 	if (place>14){
 		GtkWidget *IP=gtk_expander_new ("\nInternet Protocol\n");
+		tmp_trame_agrandie->expander_ip=IP;
 		gtk_widget_set_name(GTK_WIDGET(IP),"expander");
 		gtk_expander_set_resize_toplevel (GTK_EXPANDER(IP),FALSE);
 		gtk_box_pack_start (GTK_BOX(new_box),IP,FALSE,FALSE,0);
 		GtkWidget *box_ip=gtk_box_new(FALSE,0);
 		gtk_container_add(GTK_CONTAINER(IP),box_ip);
 		gtk_orientable_set_orientation (GTK_ORIENTABLE (box_ip),GTK_ORIENTATION_VERTICAL);
-		return remplir_ip_agrandir(box_ip,box_bas_agrandir, tmp_cell);
+		return remplir_ip_agrandir(box_ip,box_bas_agrandir, tmp_trame_agrandie);
 	}else{
 		return 0;
 	}
@@ -1915,21 +2674,22 @@ int creation_ip_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,cell *tm
 }
 
 
-int creation_tcp_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,cell *tmp_cell){
+int creation_tcp_agrandir(GtkWidget *new_box,GtkWidget *box_bas_agrandir,trame_agrandie *tmp_trame_agrandie){
 	
-	int place=tmp_cell->obj->place;
-	int i=(tmp_cell->obj->header_length_)-20;
+	int place=tmp_trame_agrandie->obj->obj->place;
+	int i=(tmp_trame_agrandie->obj->obj->header_length_)-20;
 	
 	if (place>(35+i)){
 		
 		GtkWidget *tcp=gtk_expander_new ("\nTransmission Control Protocol\n");
+		tmp_trame_agrandie->expander_tcp=tcp;
 		gtk_widget_set_name(GTK_WIDGET(tcp),"expander");
 		gtk_expander_set_resize_toplevel (GTK_EXPANDER(tcp),FALSE);
 		gtk_box_pack_start (GTK_BOX(new_box),tcp,FALSE,FALSE,0);
 		GtkWidget *box_tcp=gtk_box_new(FALSE,0);
 		gtk_container_add(GTK_CONTAINER(tcp),box_tcp);
 		gtk_orientable_set_orientation (GTK_ORIENTABLE (box_tcp),GTK_ORIENTATION_VERTICAL);
-		return remplir_tcp_agrandir(box_tcp,box_bas_agrandir, tmp_cell);	
+		return remplir_tcp_agrandir(box_tcp,box_bas_agrandir, tmp_trame_agrandie);	
 		
 	}else {
 		return 0;
@@ -1949,11 +2709,11 @@ void remplir_arbre_agrandir_trame(GtkWidget *new_box,GtkWidget *box_bas_agrandir
 		return ;
 	}
 	
-	if ( creation_ip_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie->obj) == 0 ){
+	if ( creation_ip_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie) == 0 ){
 		return ;
 	}
 	
-	if ( creation_tcp_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie->obj) ==0 ){
+	if ( creation_tcp_agrandir(new_box,box_bas_agrandir,tmp_trame_agrandie) ==0 ){
 		return ;
 	}
 	

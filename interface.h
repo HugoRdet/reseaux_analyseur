@@ -2,10 +2,7 @@
 #define __INTERFACE_H__
 #include "trame.h"
 
-typedef struct cell_button_{
-	GtkWidget *button;
-	struct cell_button_ *suiv;
-}cell_button;
+
 
 typedef struct box_{
 	GtkWidget **pvbox_haut;
