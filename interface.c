@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
 
 void action_bouton_ip(GtkWidget *pWidget, gpointer pData){
 	cell *cellule_obj=(cell *) pData;
@@ -687,11 +687,20 @@ void init_menu(GtkWidget* grille,box *pvbox){
 	gtk_widget_set_name(fermer_fichier,"fond_menu");
 	gtk_widget_set_name(sauvegarder_fichier,"fond_menu");
 
-	
-	
-	GtkWidget * ouvrir_fichier_icone=gtk_image_new_from_file ("icones/ajouter_fichier_32px.png");
-	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file ("icones/supprimer_fichier_1_32px.png");
-	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file ("icones/save_fichier_32px.png");
+	char open[100];
+	char close[100];
+	char save[100];
+	getcwd(open, 100);
+	getcwd(close, 100);
+	getcwd(save, 100);
+	printf("%s\n", open);
+	strcat(open, "/icones/ajouter_fichier_32px.png");
+	strcat(close, "/icones/supprimer_fichier_1_32px.png");
+	strcat(save, "/icones/save_fichier_32px.png");
+
+	GtkWidget * ouvrir_fichier_icone=gtk_image_new_from_file (open);
+	GtkWidget * fermer_fichier_icone=gtk_image_new_from_file (close);
+	GtkWidget * sauvegarder_fichier_icone=gtk_image_new_from_file (save);
 	
 
 	
@@ -1251,7 +1260,11 @@ void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut){
 	
 	gtk_menu_attach (GTK_MENU(menu_bouton_menu_trame),sauvegarder,0,2,1,2);
 	
-	GtkWidget *bouton_menu_trame_icone=gtk_image_new_from_file ("icones/options_32px.png");
+	char option[100];
+	getcwd(option, 100);
+	strcat(option, "/icones/options_32px.png");
+
+	GtkWidget *bouton_menu_trame_icone=gtk_image_new_from_file (option);
 	gtk_button_set_image(GTK_BUTTON(bouton_menu_trame),bouton_menu_trame_icone);
 	gtk_box_pack_end (GTK_BOX(box_titre),bouton_menu_trame,FALSE,FALSE,0);
 	
