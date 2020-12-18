@@ -246,11 +246,12 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	char protocol_code[5];
 	char *http = "HTTP";
 	
-	if ((elem->place)>75){
+	if (elem->http[0]!=0){
 		strncpy(protocol_code, http,4);
 	}
-	if ((elem->place)>33 && (elem->place)<=75){
-		strncpy(protocol_code, elem->protocol,3);
+	else{
+		if ((elem->place)>33)
+			strncpy(protocol_code, elem->protocol,3);
 	}
 	
 	if ((elem->place)>33){
@@ -319,14 +320,14 @@ int remplir_ethernet_(trame *new_trame){
 	if (place>5){
 		
 		new_trame->mac_dest=(char *) malloc(sizeof(char)*80);
-		sprintf(new_trame->mac_dest, "%X:%X:%X:%X:%X:%X", tab_ligne[0],tab_ligne[1],tab_ligne[2],tab_ligne[3],tab_ligne[4],tab_ligne[5]);	
+		sprintf(new_trame->mac_dest, "%X%X:%X%X:%X%X:%X%X:%X%X:%X%X", tab_ligne[0]/16,tab_ligne[0]%16,tab_ligne[1]/16,tab_ligne[1]%16, tab_ligne[2]/16,tab_ligne[2]%16,tab_ligne[3]/16,tab_ligne[3]%16,tab_ligne[4]/16,tab_ligne[4]%16,tab_ligne[5]/16,tab_ligne[5]%16);	
 		
 	}else{ return 0; }
 	
 	if (place>11){
 		
 		new_trame->mac_source=(char *) malloc(sizeof(char)*80);	
-		sprintf(new_trame->mac_source, "%X:%X:%X:%X%X:%X", tab_ligne[6],tab_ligne[7],tab_ligne[8],tab_ligne[9],tab_ligne[10],tab_ligne[11]);
+		sprintf(new_trame->mac_source, "%X%X:%X%X:%X%X:%X%X:%X%X:%X%X", tab_ligne[6]/16,tab_ligne[6]%16,tab_ligne[7]/16,tab_ligne[7]%16, tab_ligne[8]/16,tab_ligne[8]%16,tab_ligne[9]/16,tab_ligne[9]%16,tab_ligne[10]/16,tab_ligne[10]%16,tab_ligne[11]/16,tab_ligne[11]%16);	
 		
 	}else{ return 0; }
 	
@@ -675,11 +676,6 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 void remplir_http_2(trame *new_trame, unsigned int *tab_ligne, int pos){
 	int place = new_trame->place;
 	
-	new_trame->http = (char *)malloc(sizeof(char)*1518);
-	for(int k=0; k<1518; k++)
-	{
-		new_trame->http[k]=0;
-	}
 	int i = 0;
 	while(place > pos + 4){
 		if(tab_ligne[pos]==13 && tab_ligne[pos+1]==10 && tab_ligne[pos+3]==10 && tab_ligne[pos+2]==13)	
@@ -695,6 +691,12 @@ static inline int lecture_trame(trame *new_trame){
 	
 	
 	unsigned int *tab_ligne=new_trame->tab;
+
+	new_trame->http = (char *)malloc(sizeof(char)*1518);
+	for(int k=0; k<1518; k++)
+	{
+		new_trame->http[k]=0;
+	}
 	
 	if (remplir_ethernet_(new_trame)==0){
 		return 1;

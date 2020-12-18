@@ -1155,7 +1155,7 @@ int remplir_tcp(GtkWidget *box_tcp, cell *tmp_cell){
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
 		
-			sprintf(label,"\n\t\tLength : %s\n","OxO2 (2 bytes)");
+			sprintf(label,"\n\t\tLength : %s\n","0x02 (2 bytes)");
 			tmp_label=gtk_label_new(label);
 			gtk_label_set_xalign (GTK_LABEL(tmp_label),0);
 			gtk_box_pack_start(GTK_BOX(box_options_4),tmp_label, FALSE, FALSE, 0);
@@ -1366,8 +1366,10 @@ void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut){
 	
 	if ( creation_tcp(new_box,tmp_cell) == 0 ){
 		return ;
+	}	
+	if(tmp_cell->obj->http[0] == 0){
+		return;
 	}
-	
 	if ( creation_http(new_box,tmp_cell) == 0 )
 		return;
 	return;
