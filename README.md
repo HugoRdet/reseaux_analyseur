@@ -9,7 +9,7 @@ It parses network frames from .txt files and display the data in an intelligible
 ### Install
 ##### Requirements :  
 git  
-make
+make 
 gtk
 #### Unix user
 Simply clone the repository and compile from there.
