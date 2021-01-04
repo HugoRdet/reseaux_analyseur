@@ -1,16 +1,9 @@
 #ifndef __INTERFACE_H__
 #define __INTERFACE_H__
+#include "types.h"
 #include "trame.h"
 
 
-
-typedef struct box_{
-	GtkWidget **pvbox_haut;
-	GtkWidget **pvbox_bas;
-	GtkWidget **window;
-	cell **liste;
-	int taille_liste;
-}box;
 
 void action_bouton_ip(GtkWidget *pWidget, gpointer pData);
 //initialisation de la fenetre
@@ -24,6 +17,6 @@ void fermeture_fenetre(GtkWidget *pWidget, gpointer pData);
 void affiche_trame_terminal(GtkWidget *pWidget, gpointer pData);
 void set_bouton_menu_trame(GtkWidget *new_box,cell *tmp_cell,int statut);
 void remplir_arbre(GtkWidget *new_box, gpointer pData,int statut);
-void remplir_arbre_agrandir_trame(GtkWidget *new_box,GtkWidget *box_bas_agrandir, gpointer pData);
+void remplir_arbre_agrandir_trame(GtkWidget *new_box, gpointer pData);
 
 #endif

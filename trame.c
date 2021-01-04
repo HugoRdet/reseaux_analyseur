@@ -91,7 +91,8 @@ void afficher_ligne(FILE *fichier){
 	char c=' ';
 	while ((c!=EOF)&&(c!='\n')) {
 		c=fgetc(fichier);
-		printf("%c",c);
+		
+	
 	}
 	printf("\n");
 }
@@ -129,19 +130,77 @@ unsigned int valeur_n_eme_bit(unsigned int x, int n){
 	return quotient;
 }
 
-static inline void charge_ligne(FILE *fichier_src,unsigned int *tab,int *place){
+static inline void charge_ligne(FILE *fichier_src,unsigned int *tab,int *place,int *ligne){
 	char c;
 	int i=*place;
 	int val_exa;
+	int val_exa_1;
+	
+	do{
+		c=fgetc(fichier_src);
+	}while((c==' ')&&(c!=EOF));
+	
+	if (c==EOF){
+		return ;
+	}
+	
+	if (c=='\n'){
+		*place=i;
+		return;
+	}
+	
+	val_exa=val_exa_int(c);
+	
+	if (c=='\n'){
+		*place=i;
+		return;
+	}
+	
+	
+	if (val_exa==-1){
+		*place=i;
+		fin_ligne(fichier_src,ligne,c);
+		return;
+	}
+	
+	c=fgetc(fichier_src);
+	
+	if (c=='\n'){
+		*place=i;
+		return;
+	}
+	
+	
+	
+	
+	val_exa_1=val_exa_int(c);
+	
+	if (val_exa_1==-1){
+		*place=i;
+		fin_ligne(fichier_src,ligne,c);
+		return;
+	}
+	
+	val_exa=(val_exa*16)+val_exa_1;
+	if (c=='\n'){
+		*place=i;
+		return;
+	}
+	tab[i]=val_exa;
+	
+	i++;
+	
 	do{	
 		//saut de l espace;
 		c=fgetc(fichier_src);
+		
 		if (c=='\n'){
 			*place=i;
 			return;
 		}
 		
 		c=fgetc(fichier_src);
+		
 		val_exa=val_exa_int(c);
 		
 		if (c=='\n'){
@@ -152,19 +211,39 @@ static inline void charge_ligne(FILE *fichier_src,unsigned int *tab,int *place){
 		
 		if (val_exa==-1){
 			*place=i;
-			fin_ligne(fichier_src,place,c);
+			fin_ligne(fichier_src,ligne,c);
 			return;
 		}
 		
 		c=fgetc(fichier_src);
-		val_exa=(val_exa*16)+val_exa_int(c);
+		
+		if (c=='\n'){
+			*place=i;
+			return;
+		}
+		
+		
+		
+		
+		val_exa_1=val_exa_int(c);
+		
+		if (val_exa_1==-1){
+			*place=i;
+			fin_ligne(fichier_src,ligne,c);
+			return;
+		}
+		
+		val_exa=(val_exa*16)+val_exa_1;
 		if (c=='\n'){
 			*place=i;
 			return;
 		}
 		tab[i]=val_exa;
+		
 		i++;
+		
 	}while ((c!='\n')&&(c!=EOF));
+	
 	(*place)=i;
 }
 
@@ -246,7 +325,8 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	char protocol_code[5];
 	char *http = "HTTP";
 	
-	if (elem->http[0]!=0){
+	
+	if (elem->methode==1){
 		strncpy(protocol_code, http,4);
 	}
 	else{
@@ -295,11 +375,14 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	gtk_revealer_set_transition_type (GTK_REVEALER(revealer),GTK_REVEALER_TRANSITION_TYPE_NONE);
 	GtkWidget *new_box=gtk_box_new(FALSE,0);
 	gtk_orientable_set_orientation (GTK_ORIENTABLE (new_box),GTK_ORIENTATION_VERTICAL);
+	
 	remplir_arbre(new_box, new_cell,1);
+	
+	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, TRUE, 0);
+	
 	gtk_widget_set_name(new_box,"tree_dark_mode");
 	gtk_container_add(GTK_CONTAINER(revealer), new_box);
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), FALSE);
-	gtk_box_pack_start(GTK_BOX(box_bas),revealer, FALSE, TRUE, 0);
 	
 	gtk_box_pack_start(GTK_BOX(box_haut),tmp_bouton, FALSE,TRUE, 0);
 	gtk_widget_show_all(box_bas);
@@ -307,7 +390,7 @@ void ajout_liste(cell **liste,trame *elem,GtkWidget* box_haut, GtkWidget* box_ba
 	gtk_widget_show (tmp_bouton);
 	
 	g_signal_connect(G_OBJECT(tmp_bouton), "clicked", G_CALLBACK(action_bouton_ip),new_cell);
-
+	
 }
 
 int remplir_ethernet_(trame *new_trame){
@@ -508,6 +591,8 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 	if (place>(46+i)){
 		new_trame->tcp_header_length =(char *)malloc(sizeof(char)*10);
 		sprintf(new_trame->tcp_header_length, "(%X)\t%d bytes",tab_ligne[46+i]/10, header_length*4);
+		new_trame->tcp_header_length_=tab_ligne[46+i]/4;
+	
 	}else{ return 0; }
 	
 	if (place>(47+i)){
@@ -607,6 +692,13 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 		sprintf(new_trame->option_length, "Options:\t(%d bytes)", option_length);
 		new_trame->option_tab = (int *)malloc(sizeof(int)*6); 
 		
+		(new_trame->option_tab)[0]=0;
+		(new_trame->option_tab)[1]=0;
+		(new_trame->option_tab)[2]=0;
+		(new_trame->option_tab)[3]=0;
+		(new_trame->option_tab)[4]=0;
+		(new_trame->option_tab)[5]=0;
+		
 		while((place > 54 + i + taille_option) &&  is_option != 0 && indice_option < 6){
 			is_option = 0;
 			if(tab_ligne[54+i+taille_option]==1){ 
@@ -652,9 +744,10 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 				is_option = 1;
 				new_trame->option_tab[indice_option] = 8;
 				taille_option += 2;
-				if(tab_ligne[54+i+taille_option+7]){
-					new_trame->option_ts_val = (char *)malloc(sizeof(char)*30);
-					new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*30);
+				//if(tab_ligne[54+i+taille_option+7]){
+				if ((new_trame->place)>=54+i+taille_option+7){
+					new_trame->option_ts_val = (char *)malloc(sizeof(char)*80);
+					new_trame->option_ts_ecr = (char *)malloc(sizeof(char)*80);
 					long val = (long)tab_ligne[54+i+taille_option]*16777216 + tab_ligne[54+i+taille_option+1]*65536 + tab_ligne[54+i+taille_option+2]*256 + tab_ligne[54+i+taille_option+3];
 					taille_option += 4;		
 					long ecr = (long)tab_ligne[54+i+taille_option]*16777216 + tab_ligne[54+i+taille_option+1]*65536 + tab_ligne[54+i+taille_option+2]*256 + tab_ligne[54+i+taille_option+3];
@@ -673,14 +766,233 @@ int remplir_tcp_2(trame *new_trame, unsigned int *tab_ligne){
 	return 1; 
 }
 
+void http_connect(trame *new_trame,unsigned int *tab_ligne){
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+		
+	
+		if ('C'!=(char) tab_ligne[z+34+hl+0]) return ;
+		if ('O'!=(char) tab_ligne[z+34+hl+1]) return ;
+		if ('N'!=(char) tab_ligne[z+34+hl+2]) return ;
+		if ('N'!=(char) tab_ligne[z+34+hl+3]) return ;
+		if ('E'!=(char) tab_ligne[z+34+hl+4]) return ;
+		if ('C'!=(char) tab_ligne[z+34+hl+5]) return ;
+		if ('T'!=(char) tab_ligne[z+34+hl+6]) return ;
+									
+		new_trame->methode=1;
+		sprintf(new_trame->methode_,":\tCONNECT\n");
+	
+}
+
+void http_options(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('O'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('P'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('T'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('I'!=(char) tab_ligne[z+34+hl+3]) return ;
+	if ('O'!=(char) tab_ligne[z+34+hl+4]) return ;
+	if ('N'!=(char) tab_ligne[z+34+hl+5]) return ;
+	if ('S'!=(char) tab_ligne[z+34+hl+6]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tOTIONS\n");
+	
+}
+
+void http_get(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('G'!=(char) tab_ligne[z+34+hl+0]) return  ;
+	if ('E'!=(char) tab_ligne[z+34+hl+1]) return  ;
+	if ('T'!=(char) tab_ligne[z+34+hl+2]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tGET\n");
+}
+
+void http_head(trame *new_trame,unsigned int *tab_ligne){
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+	
+	if ('H'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('E'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('A'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('D'!=(char) tab_ligne[z+34+hl+3]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tHEAD\n");
+	
+}
+
+void http_post(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('P'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('O'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('S'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('T'!=(char) tab_ligne[z+34+hl+3]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tPOST\n");
+	
+}
+
+void http_put(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('P'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('U'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('T'!=(char) tab_ligne[z+34+hl+2]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tPUT\n");
+	
+}
+
+void http_delete(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('D'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('E'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('L'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('E'!=(char) tab_ligne[z+34+hl+3]) return ;
+	if ('T'!=(char) tab_ligne[z+34+hl+4]) return ;
+	if ('E'!=(char) tab_ligne[z+34+hl+5]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tDELETE\n");
+	
+	
+	
+}
+
+void http_trace(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('T'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('R'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('A'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('C'!=(char) tab_ligne[z+34+hl+3]) return ;
+	if ('E'!=(char) tab_ligne[z+34+hl+3]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tTRACE\n");
+	
+	
+	
+}
+
+void http_patch(trame *new_trame,unsigned int *tab_ligne){
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if ('P'!=(char) tab_ligne[z+34+hl+0]) return ;
+	if ('A'!=(char) tab_ligne[z+34+hl+1]) return ;
+	if ('T'!=(char) tab_ligne[z+34+hl+2]) return ;
+	if ('C'!=(char) tab_ligne[z+34+hl+3]) return ;
+	if ('H'!=(char) tab_ligne[z+34+hl+3]) return ;
+	
+	new_trame->methode=1;
+	sprintf(new_trame->methode_,":\tPATCH\n");
+	
+	
+	
+}
+
+
+
 void remplir_http_2(trame *new_trame, unsigned int *tab_ligne, int pos){
 	int place = new_trame->place;
 	
 	int i = 0;
+	
+	new_trame->methode=0;
+	new_trame->methode_=(char *) malloc(sizeof(char)*30);
+	
+	
+	int z=(new_trame->header_length_)-20;
+	int hl=new_trame->tcp_header_length_;
+	
+
+	
+	if (place>=z+34+hl+7){
+		http_patch(new_trame,tab_ligne);
+		http_trace(new_trame,tab_ligne);
+		http_delete(new_trame,tab_ligne);
+		http_put(new_trame,tab_ligne);
+		http_post(new_trame,tab_ligne);
+		http_head(new_trame,tab_ligne);
+		http_get(new_trame,tab_ligne);
+		http_options(new_trame,tab_ligne);
+		http_connect(new_trame,tab_ligne);
+	}
+		
+	int nb=0;
 	while(place > pos + 4){
 		if(tab_ligne[pos]==13 && tab_ligne[pos+1]==10 && tab_ligne[pos+3]==10 && tab_ligne[pos+2]==13)	
 			return;
-		new_trame->http[i]=tab_ligne[pos];
+		
+		if ((tab_ligne[pos])==10){
+			new_trame->http[i]=(char) (tab_ligne[pos]);
+			nb=0;
+		}else{
+			
+			
+			if (((tab_ligne[pos])<127)&&((tab_ligne[pos])>31)){
+				if (nb%64==0){
+					new_trame->http[i]='\n';
+					i++;
+					
+				}
+				new_trame->http[i]=(char) (tab_ligne[pos]);
+		    }else{
+				if (i%64==0){
+					new_trame->http[i]='\n';
+					i++;
+					
+				}
+				new_trame->http[i]='.';
+		    }
+		}
+		nb++;
 		i++;
 		pos++;
 	}
@@ -691,8 +1003,9 @@ static inline int lecture_trame(trame *new_trame){
 	
 	
 	unsigned int *tab_ligne=new_trame->tab;
-
+	new_trame->methode=-1;
 	new_trame->http = (char *)malloc(sizeof(char)*1518);
+	
 	for(int k=0; k<1518; k++)
 	{
 		new_trame->http[k]=0;
@@ -711,6 +1024,7 @@ static inline int lecture_trame(trame *new_trame){
 	
 	
 	int pos = remplir_tcp_2(new_trame, tab_ligne);
+		
 	if (pos == 0){
 		return 1;
 	}
@@ -725,7 +1039,7 @@ static inline int lecture_trame(trame *new_trame){
 
 
 
-int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas,char *filename){
+int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidget *box_haut, GtkWidget *box_bas,char *filename,int *erreur){
 	
 	int offset=0;
 	int offset_prec=0;
@@ -738,19 +1052,24 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	new_trame->nb_octet_erreur=-1;
 	new_trame->nb_ligne_erreur=-1;
 	new_trame->place=1518;
+	new_trame->methode=-1;
 	unsigned int *tab=(unsigned int *) malloc(sizeof(unsigned int)*1518);
 	new_trame->tab=tab;
-	
+
+
 	new_trame->nom_fichier=(char *) malloc(sizeof(char)*80);
 	strcpy(new_trame->nom_fichier,filename);
 	
 	do{
 		offset_prec_prec=offset_prec;
-		charge_ligne(fichier_src,tab,&offset);
+		
+		charge_ligne(fichier_src,tab,&offset,ligne);
+		
 		offset_prec=offset;
 		
 		do{
 			offset=offset_prec;
+			
 			verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			(*ligne)++;
 		}while(((offset!=0)&&(offset<=offset_prec_prec))&&(verif!=0));
@@ -758,7 +1077,9 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		
 		//fin de fichier
 		if (verif==0){
+			
 			new_trame->place=offset_prec;
+			
 			lecture_trame(new_trame);
 			
 			ajout_liste(liste,new_trame,box_haut, box_bas);
@@ -769,15 +1090,18 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 		}
 		
 		if (offset-offset_prec>0){
-			printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
-			new_trame->nb_ligne_erreur=(*ligne)-2;
+			//printf("%d octets manquants a la ligne %d\n",offset-offset_prec,(*ligne)-2);
+			new_trame->nb_ligne_erreur=(*ligne)-2-(*erreur);
+			(*erreur)++;
 			new_trame->nb_octet_erreur=offset-offset_prec;
 			while ((offset!=0)&&(verif!=0)) {
 				verif=cherche_prochaine_ligne(fichier_src,&offset,ligne);
 			}
 			
 			new_trame->place=offset_prec;
+			
 			lecture_trame(new_trame);
+			
 			ajout_liste(liste,new_trame,box_haut, box_bas);
 			
 			
@@ -787,6 +1111,7 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 	}while (offset!=0);
 	
 	new_trame->place=offset_prec;
+	
 	lecture_trame(new_trame);
 	
 	ajout_liste(liste,new_trame,box_haut, box_bas);
@@ -798,3 +1123,4 @@ int charge_trame(FILE *fichier_src,int *ligne,int nb_trame,cell **liste,GtkWidge
 
 
 
+	

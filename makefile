@@ -4,22 +4,23 @@ CFLAGS = -W -Wall #-Qunused-arguments
 GTKFLAGS=`pkg-config --cflags gtk+-3.0`
 GTKLIBS= `pkg-config --libs gtk+-3.0`
 
-EXEC = projet_reseaux
+EXEC = BabyShark
 
 all: $(EXEC)
 
-trame.o: trame.c trame.h interface.h
+trame.o: trame.c trame.h interface.h types.h
 	$(CC) $(CFLAGS) $(GTKFLAGS) -c trame.c $(GTKLIBS)
 
-interface.o: interface.c interface.h trame.h
+
+interface.o: interface.c trame.h types.h  interface.h 
 	$(CC) $(CFLAGS) $(GTKFLAGS) -c interface.c $(GTKLIBS)
 
-projet_reseaux.o: projet_reseaux.c trame.h interface.h 
-	$(CC) $(CFLAGS) $(GTKFLAGS) -c projet_reseaux.c 
+BabyShark.o: BabyShark.c trame.h interface.h types.h
+	$(CC) $(CFLAGS) $(GTKFLAGS) -c BabyShark.c 
 	
-projet_reseaux: projet_reseaux.o trame.o interface.o 
-	$(CC)  -o projet_reseaux projet_reseaux.o trame.o interface.o  $(GTKLIBS)
-	$(CC)  -o projet_reseaux.exe projet_reseaux.o trame.o interface.o  $(GTKLIBS)
+BabyShark: BabyShark.o trame.o interface.o 
+	$(CC)  -o BabyShark BabyShark.o trame.o interface.o   $(GTKLIBS)
+	
 	
 clean:
 	rm -f *.o $(EXEC)

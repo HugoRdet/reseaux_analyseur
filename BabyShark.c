@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "types.h"
 #include "trame.h"
 #include "interface.h"
-
+#define STYLE "/style.css"
 
 int main(int    argc, char **argv) {
 	
@@ -17,7 +18,7 @@ int main(int    argc, char **argv) {
 	GtkWidget *fenetre=init_fenetre(400,600,"Baby Shark",&grille);
 	char style[100];
 	getcwd(style, 100);
-	strcat(style, "/style.css");
+	strcat(style, STYLE);
 	GtkCssProvider *cssProvider = gtk_css_provider_new();
 	gtk_css_provider_load_from_path(cssProvider,style, NULL);
 	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),GTK_STYLE_PROVIDER(cssProvider),
