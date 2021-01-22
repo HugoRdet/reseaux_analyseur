@@ -81,6 +81,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 		NULL);
 	
 	res = gtk_dialog_run (GTK_DIALOG (dialog));
+	
 	switch (res){
 		case GTK_RESPONSE_ACCEPT :
 			{
@@ -95,6 +96,7 @@ void affiche_selection_fichiers(GtkWidget *pWidget, gpointer pData){
 				int offset=1;
 				int taille_liste_prec=pvbox->taille_liste;
 				int erreur=0;
+				
 				while (res!=0) {
 					while ((offset!=0)&&(verif!=0)) {
 						verif=cherche_prochaine_ligne(fichier_source,&offset,&ligne);
